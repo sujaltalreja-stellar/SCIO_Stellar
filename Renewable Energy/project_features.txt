@@ -1,0 +1,59 @@
+========================================================================
+             AETHERIS RENEWABLES - OPERATIONS CONTROL CENTER
+========================================================================
+
+Aetheris Renewables is a unified, context-aware Operational ERP platform 
+designed to manage modern renewable energy portfolios (Solar, Wind, BESS).
+
+This document outlines the core platform features in a simple, crisp format.
+
+------------------------------------------------------------------------
+1. EXECUTIVE PORTFOLIO & GIS OPERATIONS MAP
+------------------------------------------------------------------------
+* Live Fleet Capacity: Aggregated MW generation vs. Total Capacity (GW) meter.
+* SCADA Status Feed: Simulated real-time sensor loop updating every 5s.
+* Spatial GIS View: Leaflet map showing plant locations with instant status overlays (Online, Offline, Maintenance).
+* Local Weather telemetry: Live meteorological details (temperatures, wind speed, solar irradiance) per plant.
+
+------------------------------------------------------------------------
+2. ASSET REGISTRY & TELEMETRY
+------------------------------------------------------------------------
+* Component Catalog: Tracks inventory details of inverters, transformers, and battery racks.
+* Health Indicators: Live asset health percentage scoring (0-100%) indicating active degradation.
+* Deep Telemetry Parameters: Reads junction temperatures, battery state-of-charge, grid frequencies, and phase voltages.
+
+------------------------------------------------------------------------
+3. AI OPERATIONS COMMAND (MISTRAL AI INTEGRATED)
+------------------------------------------------------------------------
+* Context-Aware Chat: Operations Copilot reads plants, active alarms, cost center budgets, and work orders to answer queries.
+* Predictive Anomalies: Dashboard flagging high-risk assets, Failure Probability (%), and Remaining Useful Life (RUL) days.
+* Operation Recommendations: AI-generated preventive maintenance actions.
+
+------------------------------------------------------------------------
+4. FIELD OPERATIONS & SAFETY COMPLIANCE
+------------------------------------------------------------------------
+* Work Order Scheduler: Manages technician routing, scheduling, and workload balancing.
+* Digital Checklist Inspections: Interactive digital checklists for field audits. Failed check-points automatically degrade asset health and log critical alarms.
+* Digital Signatures: Touch signature submissions to lock completed safety checklists.
+
+------------------------------------------------------------------------
+5. PROCUREMENT & INVENTORY CONTROL
+------------------------------------------------------------------------
+* PR Approvals Manager: Purchase Requisition workflow showcasing cost estimates, required dates, and one-click approvals.
+* Auto-Vendor Matching: POs are automatically routed to qualified supplier lists sorted by category specializations.
+* Warehouse Bin Registry: Shelf bin locator mapping with safety-stock limit notifications.
+
+------------------------------------------------------------------------
+6. FINANCIAL CONTROL & PPA BILLING
+------------------------------------------------------------------------
+* Cost Center allocation: Real-time budget consumption logs across Solar, Wind, and BESS segments.
+* Invoice matching: Invoice checkouts linked back to purchase orders.
+* PPA billing engine: Solar/Wind power generation integration with power rate agreements to calculate billings.
+
+------------------------------------------------------------------------
+7. ENTERPRISE ERP SYNCHRONIZATION
+------------------------------------------------------------------------
+* Connector status: Active visual feeds monitoring SAP, NetSuite, and Maximo links.
+* Sync Logs: Chronological history of synced records.
+* Automation Loops: Workflows that automatically update order queues and unlock dependencies upon parts arrival.
+========================================================================

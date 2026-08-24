@@ -1,0 +1,397 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ================================================================
+   1. CSS VARIABLES FOR THEMES
+   ================================================================ */
+
+:root {
+  --color-background: #090b10;
+  --color-panel: #11141f;
+  --color-panelLight: #181d2c;
+  --color-borderMuted: #222738;
+  --color-textMuted: #7e87a2;
+  --color-textBright: #f1f3f9;
+
+  --color-maritime-accent: #6d28d9;
+  --color-maritime-accentHover: #a855f7;
+  --color-energy-accent: #10b981;
+  --color-energy-accentHover: #34d399;
+  --color-manufacturing-accent: #ef4444;
+  --color-manufacturing-accentHover: #f87171;
+  --color-logistics-accent: #3b82f6;
+  --color-logistics-accentHover: #60a5fa;
+
+  --color-critical: #f43f5e;
+  --color-high: #f97316;
+  --color-medium: #eab308;
+  --color-low: #3b82f6;
+  --color-healthy: #10b981;
+
+  --glass-bg: #11141f;
+  --glass-border: #222738;
+  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* LIGHT THEME VARIABLES */
+html[data-theme="light"],
+html.light {
+  --color-background: #f8fafc;
+  --color-panel: #ffffff;
+  --color-panelLight: #f1f5f9;
+  --color-borderMuted: #e2e8f0;
+  --color-textMuted: #64748b;
+  --color-textBright: #0f172a;
+
+  --glass-bg: #ffffff;
+  --glass-border: #e2e8f0;
+  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+@theme {
+  --color-background: var(--color-background);
+  --color-panel: var(--color-panel);
+  --color-panelLight: var(--color-panelLight);
+  --color-borderMuted: var(--color-borderMuted);
+  --color-textMuted: var(--color-textMuted);
+  --color-textBright: var(--color-textBright);
+
+  --color-maritime-accent: var(--color-maritime-accent);
+  --color-maritime-accentHover: var(--color-maritime-accentHover);
+  --color-energy-accent: var(--color-energy-accent);
+  --color-energy-accentHover: var(--color-energy-accentHover);
+  --color-manufacturing-accent: var(--color-manufacturing-accent);
+  --color-manufacturing-accentHover: var(--color-manufacturing-accentHover);
+  --color-logistics-accent: var(--color-logistics-accent);
+  --color-logistics-accentHover: var(--color-logistics-accentHover);
+
+  --color-critical: var(--color-critical);
+  --color-high: var(--color-high);
+  --color-medium: var(--color-medium);
+  --color-low: var(--color-low);
+  --color-healthy: var(--color-healthy);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ================================================================
+   2. BASE STYLES
+   ================================================================ */
+@layer base {
+  html {
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-textBright);
+    -webkit-font-smoothing: antialiased;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+}
+
+/* ================================================================
+   3. THEME TOGGLE PILL
+   ================================================================ */
+.theme-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #1e293b;
+  border: 1px solid #334155;
+  flex-shrink: 0;
+}
+html[data-theme="light"] .theme-toggle,
+html.light .theme-toggle {
+  background: #f59e0b;
+  border-color: #d97706;
+}
+.theme-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #94a3b8;
+  transition: transform 0.25s ease, background 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+}
+html[data-theme="light"] .theme-toggle-knob,
+html.light .theme-toggle-knob {
+  transform: translateX(20px);
+  background: #ffffff;
+}
+
+/* ================================================================
+   4. PANELS, CARDS & UTILITIES (DARK DEFAULT)
+   ================================================================ */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 0.75rem;
+}
+
+.glow-card {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.08);
+  border: 1px solid var(--color-borderMuted);
+  background: var(--color-panel);
+}
+
+.card-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+}
+
+/* ================================================================
+   5. COMPLETE, BULLETPROOF LIGHT MODE OVERHAUL
+   ================================================================ */
+html[data-theme="light"],
+html.light {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+
+  /* --- SURFACES & CONTAINERS --- */
+  main,
+  main > div,
+  .bg-background,
+  div[class*="bg-background"] {
+    background-color: #f8fafc !important;
+  }
+
+  /* All major card surfaces turn crisp pure white */
+  aside,
+  header,
+  .bg-panel,
+  .glass-panel,
+  .glow-card,
+  article,
+  div[class*="bg-panel"],
+  div[class*="bg-zinc-950"],
+  div[class*="bg-slate-950"],
+  div[class*="bg-zinc-900"],
+  div[class*="bg-slate-900"],
+  div[class*="bg-[#11141f]"],
+  div[class*="bg-[#0c0e17]"],
+  div[class*="bg-[#090b10]"] {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* Sub-panels, table headers, and pill backgrounds turn soft slate */
+  .bg-panelLight,
+  div[class*="bg-panelLight"],
+  div[class*="bg-slate-800"],
+  div[class*="bg-zinc-800"],
+  div[class*="bg-slate-900/50"],
+  div[class*="bg-slate-900/40"],
+  div[class*="bg-slate-900/30"] {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  /* --- BORDERS --- */
+  .border-borderMuted,
+  div[class*="border-zinc-"],
+  div[class*="border-slate-"],
+  header[class*="border-"],
+  aside[class*="border-"],
+  section[class*="border-"],
+  article[class*="border-"] {
+    border-color: #e2e8f0 !important;
+  }
+
+  /* --- TYPOGRAPHY & TEXT VISIBILITY --- */
+  /* Make all main titles, numbers, and headings crisp dark slate */
+  h1, h2, h3, h4, h5, h6,
+  strong,
+  .text-textBright,
+  div[class*="text-textBright"],
+  span[class*="text-textBright"],
+  div[class*="text-zinc-100"],
+  span[class*="text-zinc-100"],
+  div[class*="text-zinc-200"],
+  span[class*="text-zinc-200"],
+  div[class*="text-slate-100"],
+  span[class*="text-slate-100"],
+  div[class*="text-slate-200"],
+  span[class*="text-slate-200"] {
+    color: #0f172a !important;
+  }
+
+  /* Secondary / subtitle / description text */
+  p,
+  .text-textMuted,
+  div[class*="text-textMuted"],
+  span[class*="text-textMuted"],
+  div[class*="text-zinc-400"],
+  span[class*="text-zinc-400"],
+  div[class*="text-slate-400"],
+  span[class*="text-slate-400"],
+  div[class*="text-zinc-500"],
+  span[class*="text-zinc-500"],
+  div[class*="text-slate-500"],
+  span[class*="text-slate-500"] {
+    color: #64748b !important;
+  }
+
+  /* Fix dangerous invisible text-white in light mode */
+  span.text-white,
+  div.text-white,
+  h1.text-white,
+  h2.text-white,
+  h3.text-white,
+  h4.text-white,
+  p.text-white,
+  b.text-white {
+    color: #0f172a !important;
+  }
+
+  /* --- EXCEPTION: Preserve White Text for Filled Action Buttons --- */
+  button[class*="bg-emerald-"],
+  button[class*="bg-blue-"],
+  button[class*="bg-amber-"],
+  button[class*="bg-purple-"],
+  button[class*="bg-cyan-"],
+  button[class*="bg-rose-"],
+  button[class*="bg-indigo-"],
+  .btn-primary,
+  .badge-filled {
+    color: #ffffff !important;
+  }
+
+  button[class*="bg-emerald-"] *,
+  button[class*="bg-blue-"] *,
+  button[class*="bg-amber-"] *,
+  button[class*="bg-purple-"] *,
+  button[class*="bg-cyan-"] *,
+  button[class*="bg-rose-"] * {
+    color: #ffffff !important;
+  }
+
+  /* --- SIDEBAR REFINEMENT (LIGHT MODE) --- */
+  aside {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  aside button {
+    color: #475569 !important;
+  }
+
+  aside button:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+
+  aside button[class*="border-r-2"] {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border-color: #10b981 !important;
+    font-weight: 600 !important;
+  }
+
+  aside button[class*="border-r-2"] * {
+    color: #047857 !important;
+  }
+
+  /* --- INPUTS & CONTROLS --- */
+  input,
+  select,
+  textarea {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  /* --- TABLES --- */
+  table thead tr {
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  table thead th {
+    color: #475569 !important;
+    font-weight: 600 !important;
+  }
+
+  table tbody tr {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+  }
+
+  table tbody tr:hover {
+    background-color: #f8fafc !important;
+  }
+
+  table tbody td {
+    color: #334155 !important;
+  }
+
+  /* --- STATUS BADGES & ACCENTS --- */
+  .text-healthy, .text-emerald-400, .text-emerald-500 { color: #059669 !important; }
+  .bg-healthy\/5, .bg-healthy\/10, .bg-emerald-500\/5, .bg-emerald-500\/10 { background-color: #ecfdf5 !important; }
+  .border-healthy\/20, .border-healthy\/30, .border-emerald-500\/10, .border-emerald-500\/20 { border-color: #a7f3d0 !important; }
+
+  .text-critical, .text-red-400, .text-red-500, .text-rose-400, .text-rose-500 { color: #dc2626 !important; }
+  .bg-critical\/5, .bg-critical\/10, .bg-red-500\/10, .bg-rose-500\/10 { background-color: #fef2f2 !important; }
+  .border-critical\/20, .border-critical\/30, .border-red-500\/20, .border-rose-500\/20 { border-color: #fecaca !important; }
+
+  .text-medium, .text-high, .text-yellow-400, .text-yellow-500, .text-amber-400, .text-amber-500 { color: #d97706 !important; }
+  .bg-medium\/10, .bg-high\/10, .bg-yellow-500\/10, .bg-amber-500\/10 { background-color: #fffbeb !important; }
+  .border-medium\/30, .border-high\/30, .border-yellow-500\/20, .border-amber-500\/20 { border-color: #fde68a !important; }
+
+  .text-low, .text-blue-400, .text-blue-500, .text-sky-400, .text-sky-500 { color: #2563eb !important; }
+  .bg-low\/10, .bg-blue-500\/10, .bg-sky-500\/10 { background-color: #eff6ff !important; }
+  .border-low\/30, .border-blue-500\/20, .border-sky-500\/20 { border-color: #bfdbfe !important; }
+
+  .text-cyan-400, .text-cyan-500 { color: #0891b2 !important; }
+  .bg-cyan-500\/10, .bg-cyan-900\/30 { background-color: #ecfeff !important; }
+  .border-cyan-500\/30 { border-color: #a5f3fc !important; }
+}
+
+/* ================================================================
+   6. SCROLLBARS
+   ================================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-thumb,
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover,
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

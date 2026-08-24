@@ -1,0 +1,438 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ================================================================
+   1. FORTUNE 500 COCKPIT THEME TOKENS
+   ================================================================ */
+
+:root {
+  /* Obsidian, Steel Grey & Brushed Silver (Dark Default) */
+  --color-background: #08090d;
+  --color-panel: #0f1219;
+  --color-panelLight: #161a24;
+  --color-borderMuted: #252b3b;
+  --color-textMuted: #8490a7;
+  --color-textBright: #f1f4fb;
+
+  --color-steel-base: #11141c;
+  --color-steel-surface: #181d28;
+  --color-steel-highlight: #242b3b;
+  --color-silver-accent: #cbd5e1;
+  --color-silver-glow: rgba(226, 232, 240, 0.15);
+
+  /* Heavy Vivid Color Spectrum */
+  --color-electric-cyan: #00f0ff;
+  --color-cyber-violet: #a855f7;
+  --color-laser-amber: #f59e0b;
+  --color-matrix-emerald: #00ff9d;
+  --color-critical-crimson: #ff0055;
+  --color-molten-copper: #ff6b00;
+  --color-plasma-blue: #3b82f6;
+
+  --color-maritime-accent: #8b5cf6;
+  --color-maritime-accentHover: #a855f7;
+  --color-energy-accent: #00ff9d;
+  --color-energy-accentHover: #34d399;
+  --color-manufacturing-accent: #ff6b00;
+  --color-manufacturing-accentHover: #fb923c;
+  --color-logistics-accent: #00f0ff;
+  --color-logistics-accentHover: #38bdf8;
+
+  --color-critical: #ff0055;
+  --color-high: #ff6b00;
+  --color-medium: #f59e0b;
+  --color-low: #00f0ff;
+  --color-healthy: #00ff9d;
+
+  --glass-bg: #0f1219;
+  --glass-border: #252b3b;
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* Crisp Executive Light Mode (High Contrast & Pure Surfaces) */
+html[data-theme="light"],
+html.light {
+  --color-background: #f8fafc;
+  --color-panel: #ffffff;
+  --color-panelLight: #f1f5f9;
+  --color-borderMuted: #e2e8f0;
+  --color-textMuted: #64748b;
+  --color-textBright: #0f172a;
+
+  --glass-bg: #ffffff;
+  --glass-border: #e2e8f0;
+  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+@theme {
+  --color-background: var(--color-background);
+  --color-panel: var(--color-panel);
+  --color-panelLight: var(--color-panelLight);
+  --color-borderMuted: var(--color-borderMuted);
+  --color-textMuted: var(--color-textMuted);
+  --color-textBright: var(--color-textBright);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-display: 'Space Grotesk', sans-serif;
+}
+
+/* ================================================================
+   2. BASE STYLES & COCKPIT BACKGROUND
+   ================================================================ */
+@layer base {
+  html {
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-textBright);
+    -webkit-font-smoothing: antialiased;
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+}
+
+/* ================================================================
+   3. BRUSHED SILVER, STEEL GREY & METALLIC CARDS
+   ================================================================ */
+
+/* High-End Industrial Cockpit Panel */
+.cockpit-panel {
+  background: linear-gradient(180deg, #131722 0%, #0d1017 100%);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 4px 20px rgba(0, 0, 0, 0.5);
+  border-radius: 0.875rem;
+}
+
+/* Brushed Silver Hairline Card */
+.silver-card {
+  position: relative;
+  background: #10141d;
+  border: 1px solid rgba(203, 213, 225, 0.16);
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.45);
+  border-radius: 0.75rem;
+}
+.silver-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(226, 232, 240, 0.4) 50%, transparent 100%);
+}
+
+/* Metallic Badge Plate */
+.chrome-plate {
+  background: linear-gradient(180deg, #222938 0%, #151a24 100%);
+  border: 1px solid rgba(203, 213, 225, 0.25);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.glow-card {
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background: #11151e;
+}
+
+.card-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(203, 213, 225, 0.35);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Animated Beacon */
+.beacon-pulse {
+  position: relative;
+}
+.beacon-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  background: inherit;
+  opacity: 0.5;
+  animation: beacon-ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes beacon-ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* ================================================================
+   4. SPECTRUM COLOR ACCENTS & GLOWS
+   ================================================================ */
+.glow-cyan {
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+}
+.glow-emerald {
+  box-shadow: 0 0 16px rgba(0, 255, 157, 0.25);
+}
+.glow-amber {
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+}
+.glow-crimson {
+  box-shadow: 0 0 16px rgba(255, 0, 85, 0.25);
+}
+.glow-violet {
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+}
+
+/* ================================================================
+   5. THEME TOGGLE PILL
+   ================================================================ */
+.theme-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: #181d28;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  flex-shrink: 0;
+}
+html[data-theme="light"] .theme-toggle,
+html.light .theme-toggle {
+  background: #f59e0b;
+  border-color: #d97706;
+}
+.theme-toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: transform 0.25s ease, background 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+}
+html[data-theme="light"] .theme-toggle-knob,
+html.light .theme-toggle-knob {
+  transform: translateX(20px);
+  background: #ffffff;
+}
+
+/* ================================================================
+   6. COMPLETE, BULLETPROOF LIGHT MODE OVERHAUL
+   ================================================================ */
+html[data-theme="light"],
+html.light {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+
+  /* Surfaces */
+  main,
+  main > div,
+  .bg-background,
+  div[class*="bg-background"] {
+    background-color: #f8fafc !important;
+  }
+
+  aside,
+  header,
+  .bg-panel,
+  .glass-panel,
+  .glow-card,
+  .cockpit-panel,
+  .silver-card,
+  article,
+  div[class*="bg-panel"],
+  div[class*="bg-zinc-950"],
+  div[class*="bg-slate-950"],
+  div[class*="bg-zinc-900"],
+  div[class*="bg-slate-900"],
+  div[class*="bg-[#08090d]"],
+  div[class*="bg-[#0f1219]"],
+  div[class*="bg-[#11141f]"],
+  div[class*="bg-[#0c0e17]"],
+  div[class*="bg-[#090b10]"] {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  .bg-panelLight,
+  .chrome-plate,
+  div[class*="bg-panelLight"],
+  div[class*="bg-slate-800"],
+  div[class*="bg-zinc-800"],
+  div[class*="bg-slate-900/50"],
+  div[class*="bg-slate-900/40"] {
+    background: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  /* Borders */
+  .border-borderMuted,
+  div[class*="border-zinc-"],
+  div[class*="border-slate-"],
+  header[class*="border-"],
+  aside[class*="border-"],
+  section[class*="border-"],
+  article[class*="border-"] {
+    border-color: #e2e8f0 !important;
+  }
+
+  /* Headings & Text */
+  h1, h2, h3, h4, h5, h6,
+  strong,
+  .text-textBright,
+  div[class*="text-textBright"],
+  span[class*="text-textBright"],
+  div[class*="text-zinc-100"],
+  span[class*="text-zinc-100"],
+  div[class*="text-zinc-200"],
+  span[class*="text-zinc-200"],
+  div[class*="text-slate-100"],
+  span[class*="text-slate-100"],
+  div[class*="text-slate-200"],
+  span[class*="text-slate-200"] {
+    color: #0f172a !important;
+  }
+
+  p,
+  .text-textMuted,
+  div[class*="text-textMuted"],
+  span[class*="text-textMuted"],
+  div[class*="text-zinc-400"],
+  span[class*="text-zinc-400"],
+  div[class*="text-slate-400"],
+  span[class*="text-slate-400"],
+  div[class*="text-zinc-500"],
+  span[class*="text-zinc-500"],
+  div[class*="text-slate-500"],
+  span[class*="text-slate-500"] {
+    color: #64748b !important;
+  }
+
+  span.text-white,
+  div.text-white,
+  h1.text-white,
+  h2.text-white,
+  h3.text-white,
+  h4.text-white,
+  p.text-white,
+  b.text-white {
+    color: #0f172a !important;
+  }
+
+  button[class*="bg-emerald-"],
+  button[class*="bg-blue-"],
+  button[class*="bg-amber-"],
+  button[class*="bg-purple-"],
+  button[class*="bg-cyan-"],
+  button[class*="bg-rose-"],
+  button[class*="bg-indigo-"] {
+    color: #ffffff !important;
+  }
+
+  button[class*="bg-emerald-"] *,
+  button[class*="bg-blue-"] *,
+  button[class*="bg-amber-"] *,
+  button[class*="bg-purple-"] *,
+  button[class*="bg-cyan-"] *,
+  button[class*="bg-rose-"] * {
+    color: #ffffff !important;
+  }
+
+  /* Sidebar */
+  aside {
+    background: #ffffff !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  aside button {
+    color: #475569 !important;
+  }
+
+  aside button:hover {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+
+  aside button[class*="border-r-2"] {
+    background-color: #ecfdf5 !important;
+    color: #047857 !important;
+    border-color: #10b981 !important;
+    font-weight: 600 !important;
+  }
+
+  aside button[class*="border-r-2"] * {
+    color: #047857 !important;
+  }
+
+  /* Inputs */
+  input,
+  select,
+  textarea {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #94a3b8 !important;
+  }
+
+  /* Tables */
+  table thead tr {
+    background-color: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+  table thead th {
+    color: #475569 !important;
+    font-weight: 600 !important;
+  }
+  table tbody tr {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+  }
+  table tbody tr:hover {
+    background-color: #f8fafc !important;
+  }
+  table tbody td {
+    color: #334155 !important;
+  }
+}
+
+/* ================================================================
+   7. SCROLLBARS
+   ================================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #252b3b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3b445d;
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-thumb,
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover,
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

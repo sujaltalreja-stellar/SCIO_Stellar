@@ -1,0 +1,323 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 240 5% 96%;
+
+    --card: 240 10% 6%;
+    --card-foreground: 240 5% 96%;
+
+    --popover: 240 10% 5%;
+    --popover-foreground: 240 5% 96%;
+
+    --primary: 240 5% 96%;
+    --primary-foreground: 240 10% 4%;
+
+    --secondary: 240 4% 12%;
+    --secondary-foreground: 240 5% 96%;
+
+    --muted: 240 4% 12%;
+    --muted-foreground: 240 4% 65%;
+
+    --accent: 240 4% 14%;
+    --accent-foreground: 240 5% 98%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 4% 15%;
+    --input: 240 4% 12%;
+    --ring: 240 4% 80%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground overflow-x-hidden;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Premium custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(9, 9, 11, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(39, 39, 42, 0.8);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(63, 63, 70, 1);
+}
+
+/* Leaflet Map overrides for premium dark theme */
+.leaflet-container {
+  background: #09090b !important;
+  font-family: inherit;
+}
+
+.leaflet-bar {
+  border: 1px solid rgba(63, 63, 70, 0.4) !important;
+  box-shadow: none !important;
+}
+
+.leaflet-bar a {
+  background-color: #18181b !important;
+  color: #f4f4f5 !important;
+  border-bottom: 1px solid rgba(63, 63, 70, 0.4) !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: #27272a !important;
+  color: #ffffff !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(24, 24, 27, 0.95) !important;
+  color: #f4f4f5 !important;
+  border: 1px solid rgba(63, 63, 70, 0.6) !important;
+  backdrop-filter: blur(8px);
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(24, 24, 27, 0.95) !important;
+  border: 1px solid rgba(63, 63, 70, 0.6) !important;
+}
+
+/* Custom digital glow styles */
+.digital-glow-solar {
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+.digital-glow-wind {
+  box-shadow: 0 0 15px rgba(14, 165, 233, 0.15);
+  border-color: rgba(14, 165, 233, 0.3) !important;
+}
+
+.digital-glow-bess {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(15, 15, 20, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(39, 39, 42, 0.7);
+}
+
+.glass-panel:hover {
+  background: rgba(20, 20, 25, 0.85);
+  border-color: rgba(63, 63, 70, 0.7);
+}
+
+/* Grid lines overlay for Siemens / Azure dashboard feel */
+.cyber-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(39, 39, 42, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(39, 39, 42, 0.1) 1px, transparent 1px);
+}
+
+/* --- LIGHT MODE COMPACT OVERRIDES --- */
+.light {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --border: 214.3 31.8% 91.4%;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.light .bg-\[\#07070a\], .light .bg-zinc-950 {
+  background-color: #f8fafc !important;
+}
+
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+}
+
+.light .glass-panel:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(203, 213, 225, 0.9) !important;
+}
+
+.light header {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light aside {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light main {
+  background-color: #f1f5f9 !important;
+}
+
+.light .text-white, .light h2, .light h3, .light h4, .light th, .light td.font-bold {
+  color: #0f172a !important;
+}
+
+.light .text-zinc-100, .light .text-zinc-200, .light .text-zinc-300 {
+  color: #1e293b !important;
+}
+
+.light .text-zinc-400 {
+  color: #475569 !important;
+}
+
+.light .text-zinc-500, .light .text-zinc-550, .light .text-zinc-600 {
+  color: #64748b !important;
+}
+
+.light .bg-zinc-950\/20, .light .bg-zinc-950\/30, .light .bg-zinc-950\/40, .light .bg-zinc-900\/50, .light .bg-zinc-900\/40 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light .bg-zinc-900, .light .bg-zinc-900\/60, .light .bg-zinc-950 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.light .border-zinc-900, .light .border-zinc-800, .light .border-zinc-850, .light .border-zinc-950 {
+  border-color: #e2e8f0 !important;
+}
+
+.light input, .light select, .light textarea {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.light input::placeholder {
+  color: #94a3b8 !important;
+}
+
+.light tr {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.light tr:hover {
+  background-color: rgba(241, 245, 249, 0.4) !important;
+}
+
+.light .bg-slate-800\/35 {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.light .cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px) !important;
+}
+
+.light .bg-emerald-500\/5, .light .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.light .bg-amber-500\/5, .light .bg-amber-500\/10 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+  color: #d97706 !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+.light .bg-red-500\/5, .light .bg-red-500\/10, .light .bg-red-950\/5 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.light .text-emerald-400 {
+  color: #059669 !important;
+}
+
+.light .text-amber-400 {
+  color: #d97706 !important;
+}
+
+.light .text-red-400 {
+  color: #dc2626 !important;
+}
+
+.light .text-zinc-450 {
+  color: #475569 !important;
+}
+
+.light .border-emerald-500\/20, .light .border-emerald-500\/10 {
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.light .border-amber-500\/20, .light .border-amber-500\/10 {
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+.light .border-red-500\/20, .light .border-red-500\/10 {
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.light .bg-zinc-900 border-emerald-500\/25 {
+  background-color: #ffffff !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Light mode Leaflet overrides */
+.light .leaflet-container {
+  background: #f8fafc !important;
+}
+
+.light .leaflet-popup-content-wrapper {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+}
+
+.light .leaflet-popup-tip {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border: 1px solid rgba(226, 232, 240, 0.95) !important;
+}
+
+.light .leaflet-bar a {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.95) !important;
+}
+
+.light .leaflet-bar a:hover {
+  background-color: #f1f5f9 !important;
+  color: #000000 !important;
+}
+
+.light .leaflet-popup-content span, .light .leaflet-popup-content div {
+  color: #334155 !important;
+}
+
+.light .leaflet-popup-content .font-bold {
+  color: #0f172a !important;
+}
+
+
