@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Factory,
   Cpu,
@@ -8,24 +9,25 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle2,
+  CircleAlert,
   TrendingUp,
   Wrench,
   Scan,
   Zap,
-  Flame,
   Layers,
   ArrowUpRight,
   ShieldAlert,
   Play,
   Pause,
-  RefreshCw,
-  Sliders,
-  Radio,
-  Eye,
   SlidersHorizontal,
   Package,
   Clock,
-  Sparkles
+  Sparkles,
+  ExternalLink,
+  ShieldCheck,
+  RefreshCw,
+  Search,
+  Filter
 } from "lucide-react";
 import {
   AreaChart,
@@ -42,8 +44,6 @@ import {
   ResponsiveContainer,
   Legend,
   Cell,
-  PieChart,
-  Pie
 } from "recharts";
 
 interface ManufacturingControlCenterProps {
@@ -51,10 +51,150 @@ interface ManufacturingControlCenterProps {
   onCreateWorkOrder: (title: string, assetId: string, priority: string) => void;
 }
 
+// Motion easing & viewport constants
+const ENTRANCE = [0.22, 1, 0.36, 1] as const;
+const VIEWPORT_WIDE = { once: true, amount: 0.15 };
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: ENTRANCE },
+  },
+};
+
+const stagger = (delayChildren = 0.08, staggerChildren = 0.1) => ({
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren,
+      staggerChildren,
+    },
+  },
+});
+
+// Interactive Sub-tabs for Manufacturing Tower
+const TABS = [
+  "Overview",
+  "Production Lines & Telemetry",
+  "Vision QA & Defects",
+  "OEE Pareto & Energy",
+  "Tooling & Maintenance",
+];
+
+// Helper: Lightweight Animated CountUp
+function CountUp({
+  to,
+  decimals = 0,
+  duration = 1.2,
+}: {
+  to: number;
+  decimals?: number;
+  duration?: number;
+}) {
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    let animationFrameId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / (duration * 1000), 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setVal(easeOut * to);
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(step);
+      } else {
+        setVal(to);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [to, duration]);
+
+  return <>{decimals > 0 ? val.toFixed(decimals) : Math.round(val)}</>;
+}
+
+// Reusable Dark Card Component
+function Card({
+  title,
+  children,
+  className = "",
+  accentColor = "#E8A33D",
+  badge,
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+  accentColor?: string;
+  badge?: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 sm:p-5 transition-all hover:border-white/[0.12] ${className}`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-white/40 sm:text-[11.5px]">
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: accentColor }}
+          />
+          {title}
+        </p>
+        {badge}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// Reusable Meter Bar Component
+function Meter({
+  label,
+  value,
+  display,
+  percent,
+  color,
+  delay = 0,
+}: {
+  label: string;
+  value?: number | string;
+  display?: string | number;
+  percent: number;
+  color: string;
+  delay?: number;
+}) {
+  return (
+    <div className="grid grid-cols-[100px_minmax(0,1fr)_44px] items-center gap-3 sm:grid-cols-[130px_minmax(0,1fr)_48px]">
+      <span className="truncate font-mono text-[11px] text-white/50 sm:text-[11.5px]" title={label}>
+        {label}
+      </span>
+      <span className="h-1.5 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+        <motion.span
+          className="block h-full rounded-full"
+          style={{ background: color }}
+          initial={{ width: 0 }}
+          whileInView={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 1, ease: ENTRANCE, delay }}
+        />
+      </span>
+      <span className="text-right font-mono text-[11px] text-white/75 sm:text-[11.5px]">
+        {display ?? (typeof value === "number" ? `${value}%` : value)}
+      </span>
+    </div>
+  );
+}
+
 export default function ManufacturingControlCenter({
   onNavigate,
   onCreateWorkOrder,
 }: ManufacturingControlCenterProps) {
+  const [selectedTab, setSelectedTab] = useState("Overview");
   const [selectedLineId, setSelectedLineId] = useState<string>("line-01");
   const [simulationActive, setSimulationActive] = useState<boolean>(true);
   const [selectedDefectId, setSelectedDefectId] = useState<string | null>("def-v01");
@@ -143,29 +283,18 @@ export default function ManufacturingControlCenter({
     },
   ]);
 
-  // Live PLC Tag Stream
+  // Live Machine Sensor Telemetry Stream
   const [plcTags, setPlcTags] = useState([
-    { tag: "DB10.DBD14", label: "Spindle Drive Velocity", value: 14250, unit: "RPM", status: "Optimal", min: 0, max: 18000 },
-    { tag: "DB22.DBD08", label: "Main Spindle Bearing Temp", value: 58.6, unit: "°C", status: "Warning", min: 20, max: 80 },
-    { tag: "DB14.DBD32", label: "FFT Vibration Velocity (RMS)", value: 2.38, unit: "mm/s", status: "Warning", min: 0, max: 4.5 },
-    { tag: "DB08.DBD04", label: "Hydraulic Chuck Pressure", value: 184.2, unit: "Bar", status: "Optimal", min: 100, max: 250 },
-    { tag: "DB30.DBD16", label: "Servo Feed Rate Axis-Z", value: 1240, unit: "mm/min", status: "Optimal", min: 0, max: 2000 },
-    { tag: "DB04.DBD02", label: "3-Phase Power Active Load", value: 48.6, unit: "kW", status: "Optimal", min: 10, max: 75 },
+    { tag: "Speed Sensor", label: "Spindle Speed", value: 14250, unit: "RPM", status: "Optimal", min: 0, max: 18000, target: "Target: 14,000" },
+    { tag: "Thermal Sensor", label: "Spindle Bearing Temp", value: 58.6, unit: "°C", status: "Warning", min: 20, max: 80, target: "Limit: < 70°C" },
+    { tag: "Vibration Sensor", label: "Vibration Level (RMS)", value: 2.38, unit: "mm/s", status: "Warning", min: 0, max: 4.5, target: "Optimal < 3.0" },
+    { tag: "Pressure Sensor", label: "Hydraulic Pressure", value: 184.2, unit: "Bar", status: "Optimal", min: 100, max: 250, target: "Nominal: 180" },
+    { tag: "Feed Sensor", label: "Servo Feed Rate", value: 1240, unit: "mm/min", status: "Optimal", min: 0, max: 2000, target: "Target: 1,200" },
+    { tag: "Power Sensor", label: "Machine Power Load", value: 48.6, unit: "kW", status: "Optimal", min: 10, max: 75, target: "Rated: 60 kW" },
   ]);
 
-  // Real-time Trend Series
-  const [telemetryHistory, setTelemetryHistory] = useState([
-    { time: "09:00", oee: 84.2, throughput: 380, vibration: 1.2, power: 42 },
-    { time: "09:30", oee: 86.1, throughput: 395, vibration: 1.3, power: 44 },
-    { time: "10:00", oee: 88.4, throughput: 410, vibration: 1.4, power: 46 },
-    { time: "10:30", oee: 82.0, throughput: 360, vibration: 2.1, power: 49 },
-    { time: "11:00", oee: 79.5, throughput: 345, vibration: 2.4, power: 51 },
-    { time: "11:30", oee: 85.3, throughput: 405, vibration: 1.8, power: 47 },
-    { time: "12:00", oee: 87.2, throughput: 418, vibration: 1.5, power: 45 },
-  ]);
-
-  // Optical Inspection (AI Vision QA) Feed
-  const [visionDefects, setVisionDefects] = useState([
+  // Optical Inspection Feed
+  const [visionDefects] = useState([
     {
       id: "def-v01",
       timestamp: "12:04:18",
@@ -204,30 +333,36 @@ export default function ManufacturingControlCenter({
     }
   ]);
 
-  // Tool Wear Countdown Roster
-  const [toolingRoster, setToolingRoster] = useState([
+  // Tooling Roster
+  const [toolingRoster] = useState([
     { id: "T-01", name: "Solid Carbide End Mill Ø12mm", line: "Line B2", remainingCycles: 142, maxCycles: 800, wearPercent: 82.2, status: "Replace Soon" },
     { id: "T-02", name: "Laser Optic Protective Lens Kit", line: "Line A1", remainingCycles: 480, maxCycles: 1000, wearPercent: 52.0, status: "Healthy" },
     { id: "T-03", name: "SMT Pick & Place Vacuum Nozzle N4", line: "Line C3", remainingCycles: 2450, maxCycles: 5000, wearPercent: 51.0, status: "Healthy" },
     { id: "T-04", name: "Spot Welding Copper Tip Set", line: "Line A1", remainingCycles: 85, maxCycles: 600, wearPercent: 85.8, status: "Critical Wear" }
   ]);
 
+  // Real-time Trend Series
+  const [telemetryHistory] = useState([
+    { time: "09:00", oee: 84.2, throughput: 380, vibration: 1.2, power: 42 },
+    { time: "09:30", oee: 86.1, throughput: 395, vibration: 1.3, power: 44 },
+    { time: "10:00", oee: 88.4, throughput: 410, vibration: 1.4, power: 46 },
+    { time: "10:30", oee: 82.0, throughput: 360, vibration: 2.1, power: 49 },
+    { time: "11:00", oee: 79.5, throughput: 345, vibration: 2.4, power: 51 },
+    { time: "11:30", oee: 85.3, throughput: 405, vibration: 1.8, power: 47 },
+    { time: "12:00", oee: 87.2, throughput: 418, vibration: 1.5, power: 45 },
+  ]);
+
   // Live simulation ticker
   useEffect(() => {
     if (!simulationActive) return;
     const interval = setInterval(() => {
-      // Jiggle PLC tags realistically
       setPlcTags(prev => prev.map(tag => {
         let delta = (Math.random() - 0.5) * (tag.max - tag.min) * 0.02;
         let nextVal = +(Math.min(tag.max, Math.max(tag.min, tag.value + delta))).toFixed(1);
         if (tag.unit === "RPM") nextVal = Math.round(nextVal);
-        return {
-          ...tag,
-          value: nextVal,
-        };
+        return { ...tag, value: nextVal };
       }));
 
-      // Update cycle counts & production
       setProductionLines(prev => prev.map(line => {
         const partsDelta = Math.random() > 0.6 ? 1 : 0;
         return {
@@ -245,7 +380,7 @@ export default function ManufacturingControlCenter({
 
   const selectedLine = productionLines.find(l => l.id === selectedLineId) || productionLines[0];
 
-  // Calculate Overall Portfolio OEE
+  // Portfolio calculations
   const avgAvailability = Math.round(productionLines.reduce((acc, l) => acc + l.availabilityPercent, 0) / productionLines.length);
   const avgPerformance = Math.round(productionLines.reduce((acc, l) => acc + l.performancePercent, 0) / productionLines.length);
   const avgQuality = Math.round(productionLines.reduce((acc, l) => acc + l.qualityPercent, 0) / productionLines.length);
@@ -255,14 +390,15 @@ export default function ManufacturingControlCenter({
   const totalTargetUnits = productionLines.reduce((acc, l) => acc + l.targetUnitsShift, 0);
   const totalScrapUnits = productionLines.reduce((acc, l) => acc + l.scrapUnits, 0);
   const overallScrapRate = +((totalScrapUnits / (totalActualUnits || 1)) * 100).toFixed(2);
+  const firstPassYield = +(100 - overallScrapRate).toFixed(2);
 
-  // Six Big Losses Breakdown data with cumulative Pareto calculation
+  // Six Big Losses Pareto
   const rawLosses = [
-    { name: "Unplanned Breakdown", category: "Availability Loss", lossHours: 4.2, costDollars: 12600, color: "#ff0055", icon: "🚨" },
-    { name: "Setup & Tool Change", category: "Availability Loss", lossHours: 2.8, costDollars: 8400, color: "#f97316", icon: "🔧" },
-    { name: "Idling & Micro-Stops", category: "Performance Loss", lossHours: 2.1, costDollars: 6300, color: "#f59e0b", icon: "⏱️" },
-    { name: "Reduced Cycle Speed", category: "Performance Loss", lossHours: 1.6, costDollars: 4800, color: "#3b82f6", icon: "📉" },
-    { name: "Process Defects & Scrap", category: "Quality Loss", lossHours: 1.1, costDollars: 3300, color: "#a855f7", icon: "🔬" },
+    { name: "Unplanned Breakdown", category: "Availability Loss", lossHours: 4.2, costDollars: 12600, color: "#F0526B", icon: "🚨" },
+    { name: "Setup & Tool Change", category: "Availability Loss", lossHours: 2.8, costDollars: 8400, color: "#E8A33D", icon: "🔧" },
+    { name: "Idling & Micro-Stops", category: "Performance Loss", lossHours: 2.1, costDollars: 6300, color: "#E8A33D", icon: "⏱️" },
+    { name: "Reduced Cycle Speed", category: "Performance Loss", lossHours: 1.6, costDollars: 4800, color: "#3FC8D8", icon: "📉" },
+    { name: "Process Defects & Scrap", category: "Quality Loss", lossHours: 1.1, costDollars: 3300, color: "#8B5CF6", icon: "🔬" },
     { name: "Startup Yield Loss", category: "Quality Loss", lossHours: 0.5, costDollars: 1500, color: "#64748b", icon: "♻️" },
   ];
 
@@ -278,496 +414,657 @@ export default function ManufacturingControlCenter({
 
   const selectedDefect = visionDefects.find(d => d.id === selectedDefectId) || visionDefects[0];
 
+  // AI Inspection Precision
+  const AI_QA_METRICS = [
+    ["Surface Micro-Crack AOI", 98.6],
+    ["Solder Bridge SPI (3D)", 97.4],
+    ["Laser Weld Seam Pyrometer", 95.8],
+    ["Gasket Alignment Robot CV", 99.1],
+  ] as const;
+
+  // Footer Highlights
+  const FOOTER_HIGHLIGHTS = [
+    {
+      label: "Tooling & Cycle Bottlenecks",
+      value: "1 Watchlist",
+      highlight: "Line B2 Mill",
+      highlightTone: "#E8A33D",
+      body: "Hermle C42U End Mill at 82% wear · Changeover scheduled for Shift 2",
+    },
+    {
+      label: "Active Plant Operators",
+      value: "24 Technicians",
+      highlight: "Shift 1 Active",
+      highlightTone: "#2FBF71",
+      body: "All digital work orders synchronized via SCIO Edge Tablet Terminals",
+    },
+    {
+      label: "Plant Scrap Trend · 90 Days",
+      value: "−24%",
+      highlight: "improving",
+      highlightTone: "#2FBF71",
+      body: "First pass yield improved to 99.12% after AI vision closed-loop gating",
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* ==================== 1. EXECUTIVE HERO COMMAND BANNER ==================== */}
-      <section className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-panel to-slate-900/10 dark:from-[#1b1407] dark:via-[#11141f] dark:to-[#090b10] p-6 shadow-sm">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-amber-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/4 h-px w-1/2 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
+    <section className="bg-[#0B0D0F] rounded-2xl border border-white/[0.08] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-10 shadow-2xl">
+      <div className="mx-auto w-full max-w-[1360px] space-y-8">
         
-        <div className="relative flex flex-col justify-between gap-6 xl:flex-row xl:items-end">
-          <div>
-            <div className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-amber-700 dark:text-amber-400 font-mono">
-              <Factory className="h-4 w-4" />
-              Smart Manufacturing 4.0 - Digital Shopfloor Hub
+        {/* ==================== 1. TOP HERO SECTION INTRO ==================== */}
+        <div className="flex flex-col justify-between gap-6 border-b border-white/[0.07] pb-8 xl:flex-row xl:items-end">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#E8A33D]">
+              <Factory className="h-3.5 w-3.5" />
+              01 — SHOPFLOOR · MANUFACTURING OPERATIONS CONTROL TOWER
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
-              Production Execution & OEE Control Center
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
+              One Control Tower for the Entire Shopfloor Ecosystem
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Live SCADA PLC tag acquisition, ISO 22400 OEE performance analytics, computer vision defect inspection, and tooling wear prediction.
+            <p className="max-w-3xl text-sm leading-relaxed text-white/50 sm:text-[14.5px]">
+              Centralized, real-time visibility into overall plant OEE, live machine telemetry, AI computer vision defect inspection,
+              and ISO/IATF compliance — with cell-level telemetry behind every number.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <button
-              onClick={() => setSimulationActive(!simulationActive)}
-              className={`inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-semibold shadow-sm transition-all ${
-                simulationActive
-                  ? "border-emerald-400/40 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-                  : "border-amber-400/40 bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300"
-              }`}
+              onClick={() => onNavigate("planning")}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.12] bg-[#101315] px-4 py-2.5 font-mono text-xs font-semibold text-white/80 transition-all hover:border-[#E8A33D]/50 hover:bg-[#E8A33D]/10 hover:text-white"
             >
-              {simulationActive ? <Pause className="h-3.5 w-3.5 animate-pulse" /> : <Play className="h-3.5 w-3.5" />}
-              <span>{simulationActive ? "PLC Telemetry Streaming" : "Simulation Paused"}</span>
+              <Cpu className="h-4 w-4 text-[#E8A33D]" />
+              <span>Production Planning (Gantt)</span>
+              <ArrowUpRight className="h-3.5 w-3.5 opacity-60" />
             </button>
-
             <button
               onClick={() => onCreateWorkOrder("Emergency Tooling Changeover", selectedLine.robotModel, "Critical")}
-              className="inline-flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 shadow-sm transition-all"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#F0526B]/30 bg-[#F0526B]/10 px-4 py-2.5 font-mono text-xs font-semibold text-[#F0526B] transition-all hover:border-[#F0526B]/60 hover:bg-[#F0526B]/20"
             >
-              <Wrench className="h-3.5 w-3.5" /> Dispatch Line WO
+              <CircleAlert className="h-4 w-4" />
+              <span>Report Finding / CAPA</span>
             </button>
           </div>
         </div>
-      </section>
 
-      {/* ==================== 2. REAL-TIME OEE & PRODUCTION KPI STRIP ==================== */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {/* OVERALL OEE SCORE */}
-        <article className="rounded-xl border border-amber-500/30 bg-panel p-4 shadow-sm relative overflow-hidden">
-          <div className="flex items-start justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Overall Plant OEE</span>
-            <Gauge className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-3xl font-bold font-mono text-slate-900 dark:text-white">{overallOEE}%</span>
-            <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 font-mono">World Class: 85%</span>
-          </div>
-          <div className="mt-2 grid grid-cols-3 gap-1 text-[10px] font-mono text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-            <div><span className="block text-slate-400">Avail:</span> <strong className="text-slate-800 dark:text-slate-200">{avgAvailability}%</strong></div>
-            <div><span className="block text-slate-400">Perf:</span> <strong className="text-slate-800 dark:text-slate-200">{avgPerformance}%</strong></div>
-            <div><span className="block text-slate-400">Qual:</span> <strong className="text-slate-800 dark:text-slate-200">{avgQuality}%</strong></div>
-          </div>
-        </article>
+        {/* ==================== 2. MAIN CONTROL TOWER SHELL ==================== */}
+        <motion.div
+          className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#101315] shadow-2xl"
+          variants={stagger(0.08, 0.12)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={VIEWPORT_WIDE}
+        >
+          {/* Sub-Nav Header Bar */}
+          <motion.div
+            variants={fadeUp}
+            className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-b border-white/[0.07] bg-[#0E1113] px-4 py-3 sm:px-6"
+          >
+            <div className="flex items-center gap-4">
+              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/35">
+                CONTROL TOWER
+              </span>
+              <span className="h-3 w-[1px] bg-white/[0.1]" />
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                {TABS.map((tab) => {
+                  const isActive = selectedTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setSelectedTab(tab)}
+                      className={`relative px-3 py-1.5 text-xs font-medium transition-all rounded-md ${
+                        isActive
+                          ? "text-white bg-white/[0.06] font-semibold"
+                          : "text-white/40 hover:text-white/70 hover:bg-white/[0.02]"
+                      }`}
+                    >
+                      {tab}
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeMfgTabUnderline"
+                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[#E8A33D]"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
-        {/* SHIFT OUTPUT VS TARGET */}
-        <article className="rounded-xl border border-borderMuted bg-panel p-4 shadow-sm">
-          <div className="flex items-start justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Shift Output Yield</span>
-            <Package className="h-4 w-4 text-emerald-500" />
-          </div>
-          <div className="mt-3 font-mono text-2xl font-bold text-slate-900 dark:text-white">
-            {totalActualUnits.toLocaleString()} <span className="text-sm font-normal text-slate-400">/ {totalTargetUnits.toLocaleString()}</span>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>Progress: {Math.round((totalActualUnits / totalTargetUnits) * 100)}%</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">On Schedule</span>
-          </div>
-        </article>
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[#2FBF71]">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2FBF71] opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2FBF71]" />
+              </span>
+              <span>Live · Shopfloor OPC-UA Feed · {productionLines.length} Active Lines</span>
+            </div>
+          </motion.div>
 
-        {/* REJECT & SCRAP RATE */}
-        <article className="rounded-xl border border-borderMuted bg-panel p-4 shadow-sm">
-          <div className="flex items-start justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Scrap & Defect Rate</span>
-            <ShieldAlert className="h-4 w-4 text-rose-500" />
-          </div>
-          <div className="mt-3 font-mono text-2xl font-bold text-slate-900 dark:text-white">
-            {overallScrapRate}% <span className="text-xs font-normal text-rose-600 dark:text-rose-400">({totalScrapUnits} units)</span>
-          </div>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Below allowable 1.2% threshold</p>
-        </article>
-
-        {/* ACTIVE ASSEMBLY LINES */}
-        <article className="rounded-xl border border-borderMuted bg-panel p-4 shadow-sm">
-          <div className="flex items-start justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Operating Lines</span>
-            <Activity className="h-4 w-4 text-cyan-500" />
-          </div>
-          <div className="mt-3 font-mono text-2xl font-bold text-slate-900 dark:text-white">
-            {productionLines.filter(l => l.status === "Running").length} / {productionLines.length}
-          </div>
-          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 font-medium">1 Line Micro-Stoppage Warning</p>
-        </article>
-
-        {/* TOOLING & MAINTENANCE HEALTH */}
-        <article className="rounded-xl border border-borderMuted bg-panel p-4 shadow-sm">
-          <div className="flex items-start justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Tooling Life Watch</span>
-            <Wrench className="h-4 w-4 text-violet-500" />
-          </div>
-          <div className="mt-3 font-mono text-2xl font-bold text-slate-900 dark:text-white">
-            {toolingRoster.filter(t => t.wearPercent > 80).length} Critical
-          </div>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Changeover scheduled for Shift 2</p>
-        </article>
-      </section>
-
-      {/* ==================== 3. PRODUCTION LINE MATRIX & LIVE DETAIL ==================== */}
-      <section className="grid grid-cols-1 gap-6 2xl:grid-cols-3">
-        {/* Left: Production Line Selector Cards */}
-        <div className="2xl:col-span-2 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wider font-mono text-slate-800 dark:text-slate-200 flex items-center gap-2">
-              <Factory className="h-4 w-4 text-amber-500" /> Active Shopfloor Production Lines
-            </h2>
-            <span className="text-xs text-slate-500 font-mono">Select line to view live SCADA telemetry</span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {productionLines.map(line => {
-              const isSelected = line.id === selectedLineId;
-              const isWarning = line.status === "Warning";
-              const taktRatio = (line.taktTimeSec / line.actualCycleTimeSec) * 100;
-
-              return (
-                <div
-                  key={line.id}
-                  onClick={() => setSelectedLineId(line.id)}
-                  className={`p-5 rounded-xl border transition-all cursor-pointer relative flex flex-col justify-between ${
-                    isSelected
-                      ? "border-amber-500 bg-amber-500/5 shadow-md"
-                      : "border-borderMuted bg-panel hover:border-slate-300 dark:hover:border-slate-700"
-                  }`}
+          {/* Tab Content Panels */}
+          <div className="p-4 sm:p-6 space-y-6">
+            <AnimatePresence mode="wait">
+              {/* ==================== TAB 1: OVERVIEW ==================== */}
+              {selectedTab === "Overview" && (
+                <motion.div
+                  key="overview"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4 sm:space-y-6"
                 >
-                  <div>
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <span className="text-[10px] font-mono font-bold uppercase text-slate-500 dark:text-slate-400">{line.type}</span>
-                        <h3 className="font-bold text-slate-900 dark:text-white text-sm mt-0.5">{line.name}</h3>
-                      </div>
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                        isWarning
-                          ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30"
-                          : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
-                      }`}>
-                        {line.status}
+                  {/* Top 4 KPI Metric Cards */}
+                  <motion.div
+                    variants={fadeUp}
+                    className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+                  >
+                    {/* KPI 1: Overall Plant OEE */}
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
+                        Overall Plant OEE
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={overallOEE} decimals={1} />
+                        <span className="text-[18px] font-medium text-white/55 ml-0.5">%</span>
+                      </p>
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+                        <motion.span
+                          className="block h-full rounded-full bg-[#2FBF71]"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${overallOEE}%` }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.1 }}
+                        />
                       </span>
                     </div>
 
-                    <div className="mt-3 text-xs text-slate-600 dark:text-slate-400 font-mono">
-                      Product: <strong className="text-slate-800 dark:text-slate-200">{line.currentProduct}</strong>
-                    </div>
-
-                    {/* Cycle Time vs Takt Time */}
-                    <div className="mt-3 space-y-1">
-                      <div className="flex justify-between text-[11px] font-mono">
-                        <span className="text-slate-500">Actual: <strong className="text-slate-800 dark:text-slate-200">{line.actualCycleTimeSec}s</strong></span>
-                        <span className="text-slate-500">Takt Target: <strong className="text-slate-800 dark:text-slate-200">{line.taktTimeSec}s</strong></span>
-                      </div>
-                      <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full transition-all ${taktRatio >= 95 ? "bg-emerald-500" : "bg-amber-500"}`}
-                          style={{ width: `${Math.min(100, taktRatio)}%` }}
+                    {/* KPI 2: First Pass Yield */}
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
+                        First Pass Yield (FPY)
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={firstPassYield} decimals={2} />
+                        <span className="text-[18px] font-medium text-white/55 ml-0.5">%</span>
+                      </p>
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+                        <motion.span
+                          className="block h-full rounded-full bg-[#E8A33D]"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${firstPassYield}%` }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.2 }}
                         />
+                      </span>
+                    </div>
+
+                    {/* KPI 3: AI Defect Recognition Precision */}
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
+                        AI Vision QA Precision
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={98.6} decimals={1} />
+                        <span className="text-[18px] font-medium text-white/55 ml-0.5">%</span>
+                      </p>
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+                        <motion.span
+                          className="block h-full rounded-full bg-[#3FC8D8]"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: "98.6%" }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.3 }}
+                        />
+                      </span>
+                    </div>
+
+                    {/* KPI 4: Active Shopfloor Warnings */}
+                    <div className="rounded-xl border border-[#F0526B]/30 bg-[#F0526B]/[0.07] p-4">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-[#F0526B]/80 sm:text-[11.5px]">
+                        Critical Shopfloor Alerts
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={1} />
+                      </p>
+                      <p className="mt-1 font-mono text-[11px] text-[#F0526B]/90 sm:text-[11.5px]">
+                        Line B2 CNC Thermal Warning · Action Assigned
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Mid Section Grid: 4 Detailed Metric Cards */}
+                  <motion.div
+                    variants={fadeUp}
+                    className="grid gap-4 sm:gap-6 lg:grid-cols-2"
+                  >
+                    {/* Card 1: Production Line OEE & Cycle Velocity */}
+                    <Card
+                      title="Shopfloor Line OEE & Cycle Velocity"
+                      accentColor="#E8A33D"
+                      badge={
+                        <span className="font-mono text-[11px] text-white/40">
+                          {productionLines.length} Cells Active
+                        </span>
+                      }
+                    >
+                      <div className="mt-4 space-y-3">
+                        {productionLines.map((line, idx) => {
+                          const oee = Math.round((line.availabilityPercent * line.performancePercent * line.qualityPercent) / 10000);
+                          const color = oee >= 85 ? "#2FBF71" : oee >= 75 ? "#E8A33D" : "#F0526B";
+                          return (
+                            <Meter
+                              key={line.id}
+                              label={line.name.split(" - ")[0]}
+                              percent={oee}
+                              display={`${oee}% OEE`}
+                              color={color}
+                              delay={0.1 * idx}
+                            />
+                          );
+                        })}
                       </div>
+                    </Card>
+
+                    {/* Card 2: Shift Output Yield */}
+                    <Card
+                      title="Shift Output Yield & Target Run"
+                      accentColor="#2FBF71"
+                      badge={
+                        <span className="font-mono text-[11px] text-white/40">
+                          {totalActualUnits.toLocaleString()} / {totalTargetUnits.toLocaleString()} units
+                        </span>
+                      }
+                    >
+                      <div className="mt-4 space-y-3">
+                        {productionLines.map((line, idx) => {
+                          const pct = Math.min(100, Math.round((line.actualUnitsShift / line.targetUnitsShift) * 100));
+                          return (
+                            <Meter
+                              key={line.id}
+                              label={line.currentProduct.slice(0, 18)}
+                              percent={pct}
+                              display={`${line.actualUnitsShift}/${line.targetUnitsShift}`}
+                              color="#2FBF71"
+                              delay={0.1 * idx}
+                            />
+                          );
+                        })}
+                      </div>
+                    </Card>
+
+                    {/* Card 3: Live Machine Telemetry Registers */}
+                    <Card
+                      title="Live Machine Telemetry Registers (Line A1)"
+                      accentColor="#3FC8D8"
+                      badge={
+                        <span className="font-mono text-[11px] text-[#2FBF71] flex items-center gap-1">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[#2FBF71] animate-pulse" /> S7-1500 PLC
+                        </span>
+                      }
+                    >
+                      <div className="mt-4 grid grid-cols-2 gap-2 font-mono text-xs">
+                        {plcTags.slice(0, 4).map(tag => (
+                          <div key={tag.tag} className="p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06] space-y-1">
+                            <span className="text-[10px] text-white/40 block">{tag.label}</span>
+                            <span className="text-white font-bold text-sm">
+                              {tag.value} <span className="text-white/40 text-[10px] font-normal">{tag.unit}</span>
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+
+                    {/* Card 4: AI Optical QA & Inspection Accuracy */}
+                    <Card
+                      title="AI Computer Vision QA Accuracy"
+                      accentColor="#8B5CF6"
+                      badge={
+                        <span className="font-mono text-[11px] text-white/40">
+                          60 FPS AOI Camera Feed
+                        </span>
+                      }
+                    >
+                      <div className="mt-4 space-y-3">
+                        {AI_QA_METRICS.map(([label, score], idx) => (
+                          <Meter
+                            key={label}
+                            label={label}
+                            percent={score}
+                            display={`${score}%`}
+                            color="#8B5CF6"
+                            delay={0.1 * idx}
+                          />
+                        ))}
+                      </div>
+                    </Card>
+                  </motion.div>
+
+                  {/* 3 Footer Operational Cards */}
+                  <motion.div
+                    variants={fadeUp}
+                    className="grid gap-3 sm:grid-cols-3"
+                  >
+                    {FOOTER_HIGHLIGHTS.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14] space-y-2"
+                      >
+                        <div className="flex justify-between items-center text-xs font-mono">
+                          <span className="text-white/40">{item.label}</span>
+                          <span
+                            className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+                            style={{ color: item.highlightTone, backgroundColor: `${item.highlightTone}15` }}
+                          >
+                            {item.highlight}
+                          </span>
+                        </div>
+                        <p className="text-lg font-bold text-white font-mono">{item.value}</p>
+                        <p className="text-xs text-white/50 leading-relaxed">{item.body}</p>
+                      </div>
+                    ))}
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* ==================== TAB 2: PRODUCTION LINES & TELEMETRY ==================== */}
+              {selectedTab === "Production Lines & Telemetry" && (
+                <motion.div
+                  key="lines"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid grid-cols-1 gap-6 lg:grid-cols-3"
+                >
+                  <div className="lg:col-span-2 space-y-4">
+                    <div className="flex items-center justify-between border-b border-white/[0.07] pb-3">
+                      <h3 className="font-bold text-white text-sm font-mono uppercase tracking-wider">
+                        Active Shopfloor Lines ({productionLines.length})
+                      </h3>
+                      <button
+                        onClick={() => setSimulationActive(!simulationActive)}
+                        className="text-xs font-mono text-[#E8A33D] hover:underline flex items-center gap-1.5"
+                      >
+                        {simulationActive ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+                        {simulationActive ? "Pause Telemetry Stream" : "Resume Stream"}
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {productionLines.map(line => {
+                        const isSelected = line.id === selectedLineId;
+                        const isWarning = line.status === "Warning";
+                        const oee = Math.round((line.availabilityPercent * line.performancePercent * line.qualityPercent) / 10000);
+                        return (
+                          <div
+                            key={line.id}
+                            onClick={() => setSelectedLineId(line.id)}
+                            className={`p-4 rounded-xl border cursor-pointer transition-all space-y-3 ${
+                              isSelected
+                                ? "border-[#E8A33D] bg-[#E8A33D]/[0.05] shadow-lg"
+                                : "border-white/[0.07] bg-white/[0.02] hover:border-white/[0.15]"
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <span className="text-[10px] font-mono text-white/40 block uppercase">{line.type}</span>
+                                <h4 className="font-bold text-white text-sm mt-0.5">{line.name}</h4>
+                              </div>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${
+                                isWarning
+                                  ? "border-[#E8A33D]/40 text-[#E8A33D] bg-[#E8A33D]/10"
+                                  : "border-[#2FBF71]/40 text-[#2FBF71] bg-[#2FBF71]/10"
+                              }`}>
+                                {line.status}
+                              </span>
+                            </div>
+
+                            <div className="text-xs font-mono text-white/60">
+                              Product: <strong className="text-white font-medium">{line.currentProduct}</strong>
+                            </div>
+
+                            <div className="pt-2 border-t border-white/[0.06] flex justify-between items-center text-xs font-mono">
+                              <span className="text-white/40">Shift Units: <strong className="text-white">{line.actualUnitsShift}/{line.targetUnitsShift}</strong></span>
+                              <span className="text-[#E8A33D] font-bold">{oee}% OEE</span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-500">Shift Progress: <strong>{line.actualUnitsShift}/{line.targetUnitsShift}</strong></span>
-                    <span className="text-amber-600 dark:text-amber-400 font-bold">OEE {Math.round((line.availabilityPercent * line.performancePercent * line.qualityPercent) / 10000)}%</span>
+                  {/* Right: Selected Line Telemetry */}
+                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 space-y-4">
+                    <div className="border-b border-white/[0.07] pb-3">
+                      <span className="text-[10px] font-mono text-[#E8A33D] uppercase block">Selected Machine Telemetry</span>
+                      <h4 className="text-white font-bold text-sm mt-0.5">{selectedLine.name}</h4>
+                      <p className="text-xs text-white/40 font-mono mt-0.5">{selectedLine.robotModel}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {plcTags.map(tag => (
+                        <div key={tag.tag} className="p-3 bg-white/[0.02] border border-white/[0.06] rounded-lg space-y-1">
+                          <div className="flex justify-between text-[10px] font-mono text-white/40">
+                            <span>{tag.tag}</span>
+                            <span className={tag.status === "Warning" ? "text-[#E8A33D]" : "text-[#2FBF71]"}>●</span>
+                          </div>
+                          <div className="text-xs font-semibold text-white truncate">{tag.label}</div>
+                          <div className="text-base font-bold text-white font-mono">
+                            {tag.value} <span className="text-xs font-normal text-white/40">{tag.unit}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      onClick={() => onCreateWorkOrder(`Calibration & Diagnostic Check: ${selectedLine.name}`, selectedLine.id, "High")}
+                      className="w-full py-2.5 bg-white/[0.06] hover:bg-white/[0.1] text-white font-mono text-xs font-bold rounded-lg border border-white/[0.1] transition-all flex items-center justify-center gap-2"
+                    >
+                      <SlidersHorizontal className="h-3.5 w-3.5 text-[#E8A33D]" />
+                      <span>Adjust Machine Control Setpoints</span>
+                    </button>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                </motion.div>
+              )}
 
-        {/* Right: Selected Line Live SCADA PLC Registers */}
-        <div className="rounded-xl border border-borderMuted bg-panel p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-borderMuted pb-3">
-            <div>
-              <span className="text-[10px] font-mono font-bold uppercase text-amber-600 dark:text-amber-400">Live PLC Stream</span>
-              <h3 className="font-bold text-slate-900 dark:text-white text-sm">{selectedLine.name}</h3>
-            </div>
-            <span className="flex items-center gap-1.5 text-[10px] font-mono bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> S7-1500 PLC
-            </span>
-          </div>
+              {/* ==================== TAB 3: VISION QA & DEFECTS ==================== */}
+              {selectedTab === "Vision QA & Defects" && (
+                <motion.div
+                  key="vision"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+                >
+                  {/* Optical AOI Canvas Simulator */}
+                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <span className="text-[10px] font-mono text-[#3FC8D8] uppercase block">High-Speed AOI Camera #04</span>
+                        <h4 className="text-white font-bold text-base mt-0.5">Optical Inspection AI Feed</h4>
+                      </div>
+                      <span className="px-2 py-1 rounded bg-[#3FC8D8]/10 text-[#3FC8D8] border border-[#3FC8D8]/30 text-[10px] font-mono">
+                        60 FPS LIVE
+                      </span>
+                    </div>
 
-          <div className="text-xs text-slate-600 dark:text-slate-400 font-mono">
-            Machinery: <strong className="text-slate-800 dark:text-slate-200">{selectedLine.robotModel}</strong>
-          </div>
+                    <div className="relative h-64 bg-[#08090C] rounded-xl border border-white/[0.08] flex items-center justify-center overflow-hidden">
+                      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:20px_20px] opacity-20" />
+                      
+                      <div className="relative z-10 w-4/5 h-4/5 rounded-lg border border-white/20 bg-white/[0.02] p-4 flex flex-col justify-between">
+                        <div className="flex justify-between text-[10px] font-mono text-[#3FC8D8]">
+                          <span>INSPECTING: {selectedDefect.component}</span>
+                          <span>BATCH: {selectedDefect.inspectedBatch}</span>
+                        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {plcTags.map(tag => (
-              <div key={tag.tag} className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-slate-800 space-y-1">
-                <div className="flex justify-between items-center text-[10px] font-mono text-slate-500">
-                  <span>{tag.tag}</span>
-                  <span className={tag.status === "Warning" ? "text-amber-500 font-bold" : "text-emerald-500"}>●</span>
-                </div>
-                <div className="text-[11px] font-semibold text-slate-800 dark:text-slate-200 truncate">{tag.label}</div>
-                <div className="text-lg font-bold font-mono text-slate-900 dark:text-white">
-                  {tag.value} <span className="text-xs font-normal text-slate-500">{tag.unit}</span>
-                </div>
-              </div>
-            ))}
-          </div>
+                        {/* Defect Bounding Box */}
+                        <div
+                          className="absolute border-2 border-[#F0526B] bg-[#F0526B]/20 rounded flex flex-col justify-between p-1"
+                          style={{
+                            left: `${selectedDefect.bbox.x}%`,
+                            top: `${selectedDefect.bbox.y}%`,
+                            width: `${selectedDefect.bbox.w}%`,
+                            height: `${selectedDefect.bbox.h}%`,
+                          }}
+                        >
+                          <span className="bg-[#F0526B] text-white font-mono text-[8px] font-bold px-1 rounded w-fit">
+                            {selectedDefect.defectType} ({selectedDefect.confidence}%)
+                          </span>
+                        </div>
 
-          <button
-            onClick={() => onCreateWorkOrder(`Calibration & Thermal Check: ${selectedLine.name}`, selectedLine.id, "High")}
-            className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-mono text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 transition-all flex items-center justify-center gap-2"
-          >
-            <SlidersHorizontal className="h-3.5 w-3.5" /> Adjust PLC Control Setpoints
-          </button>
-        </div>
-      </section>
+                        <div className="flex justify-between text-[9px] font-mono text-white/40">
+                          <span>SENSOR: CMOS 24.5MP Global Shutter</span>
+                          <span>AI MODEL: YOLOv9-MFG-v4.2</span>
+                        </div>
+                      </div>
+                    </div>
 
-      {/* ==================== 4. COMPUTER VISION AI DEFECT SCANNER ==================== */}
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {/* Optical AI Defect Visualizer */}
-        <article className="rounded-xl border border-borderMuted bg-panel p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-600 dark:text-cyan-400 font-mono flex items-center gap-1.5">
-                <Scan className="h-4 w-4" /> Deep Learning Visual QA Scanner
-              </p>
-              <h3 className="mt-1 text-base font-bold text-slate-900 dark:text-white">Optical Inspection Camera Feed (Camera #04)</h3>
-            </div>
-            <span className="text-[10px] font-mono bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 px-2 py-1 rounded border border-cyan-500/20">
-              60 FPS HIGH-SPEED AOI
-            </span>
-          </div>
-
-          {/* Visual AI Inspection Box Canvas Simulator */}
-          <div className="relative h-64 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center">
-            {/* Grid background simulation */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:24px_24px] opacity-40" />
-            
-            {/* Simulated Machined Component Wireframe */}
-            <div className="relative z-10 w-4/5 h-4/5 rounded-lg border-2 border-slate-700 bg-slate-900/80 p-4 flex flex-col justify-between">
-              <div className="flex justify-between text-[10px] font-mono text-cyan-400">
-                <span>INSPECTING: {selectedDefect.component}</span>
-                <span>LOT: {selectedDefect.inspectedBatch}</span>
-              </div>
-
-              {/* Bounding Box for Defect */}
-              <div
-                className="absolute border-2 border-rose-500 bg-rose-500/20 rounded flex flex-col justify-between p-1 transition-all"
-                style={{
-                  left: `${selectedDefect.bbox.x}%`,
-                  top: `${selectedDefect.bbox.y}%`,
-                  width: `${selectedDefect.bbox.w}%`,
-                  height: `${selectedDefect.bbox.h}%`,
-                }}
-              >
-                <span className="bg-rose-600 text-white font-mono text-[8px] font-bold px-1 rounded w-fit">
-                  {selectedDefect.defectType} ({selectedDefect.confidence}%)
-                </span>
-                <span className="h-1.5 w-1.5 bg-rose-400 rounded-full animate-ping self-end"></span>
-              </div>
-
-              <div className="flex justify-between items-end text-[9px] font-mono text-slate-500">
-                <span>SENSOR: CMOS 24.5MP Global Shutter</span>
-                <span>AI MODEL: YOLOv9-MFG-v4.2</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Defect action message */}
-          <div className="p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-lg text-xs font-mono flex items-start gap-2">
-            <AlertTriangle className="h-4 w-4 text-rose-600 dark:text-rose-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <strong className="text-rose-900 dark:text-rose-200">{selectedDefect.defectType} detected with {selectedDefect.confidence}% confidence.</strong>
-              <p className="text-rose-700 dark:text-rose-300 mt-0.5">{selectedDefect.actionTaken}</p>
-            </div>
-          </div>
-        </article>
-
-        {/* Real-time Defect Audit Queue & Tooling Watch */}
-        <article className="rounded-xl border border-borderMuted bg-panel p-5 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b border-borderMuted pb-3">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500 font-mono">Defect Incident Log</p>
-              <h3 className="mt-1 text-base font-bold text-slate-900 dark:text-white">Recent Vision QA Detections</h3>
-            </div>
-            <button onClick={() => onNavigate("compliance")} className="text-xs font-semibold text-amber-600 dark:text-amber-400 hover:underline">
-              View ISO Audit Trail
-            </button>
-          </div>
-
-          <div className="space-y-2.5">
-            {visionDefects.map(d => (
-              <div
-                key={d.id}
-                onClick={() => setSelectedDefectId(d.id)}
-                className={`p-3 rounded-lg border text-xs font-mono cursor-pointer transition-all ${
-                  selectedDefectId === d.id
-                    ? "bg-slate-100 dark:bg-slate-800/80 border-amber-500"
-                    : "bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 hover:border-slate-300"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold text-slate-900 dark:text-white">{d.component}</span>
-                  <span className="text-rose-600 dark:text-rose-400 font-bold">{d.confidence}% Match</span>
-                </div>
-                <div className="flex justify-between text-slate-500 text-[11px]">
-                  <span>{d.line} • {d.defectType}</span>
-                  <span>{d.timestamp}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Tooling Wear Predictor Section */}
-          <div className="pt-3 border-t border-borderMuted space-y-2">
-            <h4 className="text-xs font-bold font-mono text-slate-800 dark:text-slate-200 uppercase tracking-wider">Predictive Tooling Life Countdown</h4>
-            <div className="space-y-2">
-              {toolingRoster.slice(0, 2).map(t => (
-                <div key={t.id} className="p-2.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-lg text-xs font-mono flex items-center justify-between">
-                  <div>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 block">{t.name}</span>
-                    <span className="text-slate-500 text-[10px]">{t.line} • {t.remainingCycles} cycles remaining ({t.wearPercent}% worn)</span>
+                    <div className="p-3 rounded-lg border border-[#F0526B]/30 bg-[#F0526B]/10 text-xs font-mono text-white/80">
+                      <strong className="text-[#F0526B]">{selectedDefect.defectType} Detected:</strong> {selectedDefect.actionTaken}
+                    </div>
                   </div>
-                  <button
-                    onClick={() => onCreateWorkOrder(`Tool Replacement: ${t.name}`, t.line, "High")}
-                    className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded text-[10px] transition-all shadow-xs"
-                  >
-                    Schedule Change
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </article>
-      </section>
 
-      {/* ==================== 5. OEE SIX BIG LOSSES & DOWNTIME PARETO ==================== */}
-      <section className="grid grid-cols-1 gap-6 2xl:grid-cols-5">
-        
-        {/* Dual-Axis Pareto Analyzer */}
-        <article className="2xl:col-span-3 rounded-2xl border border-slate-700/60 bg-[#0d1017] p-5 shadow-xl space-y-4">
-          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-800 pb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-rose-400 font-mono">
-                  ISO 22400 Downtime Root Cause Pareto
-                </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-                  DUAL-AXIS 80/20 ANALYSIS
-                </span>
-              </div>
-              <h3 className="mt-0.5 text-base font-bold text-white font-display">Six Big Losses & Cumulative Loss (%)</h3>
-            </div>
-            <div className="flex items-center gap-3 text-[10px] font-mono text-slate-400">
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm bg-rose-500"></span> Downtime (Hrs)</span>
-              <span className="flex items-center gap-1.5"><span className="h-1.5 w-4 bg-cyan-400 rounded-full"></span> Pareto 80/20 Curve (%)</span>
-            </div>
-          </div>
+                  {/* Defect Incident Log */}
+                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 space-y-4">
+                    <div className="flex justify-between items-center border-b border-white/[0.07] pb-3">
+                      <h4 className="text-white font-bold text-sm font-mono uppercase tracking-wider">
+                        Recent Vision QA Detections
+                      </h4>
+                      <button onClick={() => onNavigate("quality")} className="text-xs text-[#E8A33D] font-mono hover:underline">
+                        Open Quality Engine
+                      </button>
+                    </div>
 
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={sixLossesData} margin={{ top: 10, right: 15, left: -10, bottom: 5 }}>
-                <defs>
-                  <linearGradient id="paretoCrimson" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ff0055" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#ff0055" stopOpacity={0.2} />
-                  </linearGradient>
-                  <linearGradient id="paretoAmber" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
-                    <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.2} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#94a3b8" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  interval={0}
-                />
-                <YAxis 
-                  yAxisId="left" 
-                  stroke="#94a3b8" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  unit=" hrs" 
-                />
-                <YAxis 
-                  yAxisId="right" 
-                  orientation="right" 
-                  stroke="#00f0ff" 
-                  fontSize={10} 
-                  tickLine={false} 
-                  unit="%" 
-                  domain={[0, 100]} 
-                />
-                <Tooltip
-                  contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", color: "#f8fafc", borderRadius: "8px", fontSize: "11px", fontFamily: "monospace" }}
-                  formatter={(val, name) => {
-                    if (name === "Cumulative %") return [`${val}%`, "Pareto Cumulative"];
-                    return [`${val} Hours ($${(Number(val) * 3000).toLocaleString()})`, "Downtime Loss"];
-                  }}
-                />
-                <Bar yAxisId="left" dataKey="lossHours" name="Downtime Loss (Hrs)" radius={[6, 6, 0, 0]}>
-                  {sixLossesData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-                <Line 
-                  yAxisId="right" 
-                  type="monotone" 
-                  dataKey="cumulativePercent" 
-                  name="Cumulative %" 
-                  stroke="#00f0ff" 
-                  strokeWidth={2.5} 
-                  dot={{ r: 4, fill: "#00f0ff", stroke: "#0f172a", strokeWidth: 2 }}
-                />
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Financial Impact Breakdown Matrix */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 border-t border-slate-800">
-            {sixLossesData.map((loss, idx) => (
-              <div key={idx} className="silver-card p-2.5 flex items-center justify-between gap-2 border-slate-800 bg-[#0a0d14]">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-base flex-shrink-0">{loss.icon}</span>
-                  <div className="min-w-0">
-                    <span className="text-[10px] font-mono text-white font-bold block truncate">{loss.name}</span>
-                    <span className="text-[9px] font-mono text-slate-400 block">{loss.category}</span>
+                    <div className="space-y-2.5">
+                      {visionDefects.map(d => (
+                        <div
+                          key={d.id}
+                          onClick={() => setSelectedDefectId(d.id)}
+                          className={`p-3 rounded-lg border text-xs font-mono cursor-pointer transition-all ${
+                            selectedDefectId === d.id
+                              ? "border-[#E8A33D] bg-[#E8A33D]/10"
+                              : "border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12]"
+                          }`}
+                        >
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-bold text-white">{d.component}</span>
+                            <span className="text-[#F0526B] font-bold">{d.confidence}% Match</span>
+                          </div>
+                          <div className="flex justify-between text-white/40 text-[10.5px]">
+                            <span>{d.line} • {d.defectType}</span>
+                            <span>{d.timestamp}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div className="text-right flex-shrink-0">
-                  <span className="text-xs font-mono font-bold text-rose-400 block">${loss.costDollars.toLocaleString()}</span>
-                  <span className="text-[9px] font-mono text-slate-400">{loss.lossHours}h</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </article>
+                </motion.div>
+              )}
 
-        {/* Telemetry Shift Trend (High-Contrast Energy vs OEE) */}
-        <article className="2xl:col-span-2 rounded-2xl border border-slate-700/60 bg-[#0d1017] p-5 shadow-xl flex flex-col justify-between">
-          <div className="mb-4 flex items-start justify-between border-b border-slate-800 pb-3">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400 font-mono">Shift Correlation Analytics</p>
-              <h3 className="mt-0.5 text-base font-bold text-white font-display">OEE % vs Power Demand (kW)</h3>
-            </div>
-            <Activity className="h-4 w-4 text-emerald-400" />
-          </div>
+              {/* ==================== TAB 4: OEE PARETO & ENERGY ==================== */}
+              {selectedTab === "OEE Pareto & Energy" && (
+                <motion.div
+                  key="pareto"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="space-y-6"
+                >
+                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 space-y-4">
+                    <div className="flex flex-wrap justify-between items-center gap-3 border-b border-white/[0.07] pb-3">
+                      <div>
+                        <span className="text-[10px] font-mono text-[#F0526B] uppercase block">ISO 22400 Downtime Root Cause Pareto</span>
+                        <h4 className="text-white font-bold text-base mt-0.5">Six Big Losses &amp; Cumulative Loss (%)</h4>
+                      </div>
+                      <div className="flex items-center gap-3 text-[10px] font-mono text-white/50">
+                        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-sm bg-[#F0526B]" /> Downtime (Hrs)</span>
+                        <span className="flex items-center gap-1.5"><span className="h-1 w-3 bg-[#3FC8D8] rounded-full" /> Cumulative %</span>
+                      </div>
+                    </div>
 
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={telemetryHistory} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="oeeGradientMulti" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00ff9d" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#00ff9d" stopOpacity={0.0} />
-                  </linearGradient>
-                  <linearGradient id="powerGradientMulti" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#00f0ff" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#00f0ff" stopOpacity={0.0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="time" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={10} domain={[0, 100]} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: "#0d1017", borderColor: "#334155", color: "#f8fafc", borderRadius: "8px", fontSize: "11px", fontFamily: "monospace" }} />
-                <Legend wrapperStyle={{ fontSize: "11px", paddingTop: "8px" }} />
-                <Area type="monotone" dataKey="oee" name="OEE Score %" stroke="#00ff9d" fill="url(#oeeGradientMulti)" strokeWidth={2.5} />
-                <Area type="monotone" dataKey="power" name="Power Load (kW)" stroke="#00f0ff" fill="url(#powerGradientMulti)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={sixLossesData} margin={{ top: 10, right: 15, left: -10, bottom: 5 }}>
+                          <CartesianGrid stroke="#1e293b" strokeDasharray="3 3" vertical={false} opacity={0.4} />
+                          <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} />
+                          <YAxis yAxisId="left" stroke="#64748b" fontSize={10} tickLine={false} unit="h" />
+                          <YAxis yAxisId="right" orientation="right" stroke="#3FC8D8" fontSize={10} tickLine={false} unit="%" domain={[0, 100]} />
+                          <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#334155", color: "#f8fafc", borderRadius: "8px", fontSize: "11px", fontFamily: "monospace" }} />
+                          <Bar yAxisId="left" dataKey="lossHours" radius={[4, 4, 0, 0]}>
+                            {sixLossesData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Bar>
+                          <Line yAxisId="right" type="monotone" dataKey="cumulativePercent" stroke="#3FC8D8" strokeWidth={2.5} dot={{ r: 4, fill: "#3FC8D8" }} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
-          <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 pt-3 border-t border-slate-800">
-            <span>PEAK LOAD: 94.2 kW</span>
-            <span className="text-emerald-400 font-bold">ENERGY EFFICIENCY: 92.4%</span>
+              {/* ==================== TAB 5: TOOLING & MAINTENANCE ==================== */}
+              {selectedTab === "Tooling & Maintenance" && (
+                <motion.div
+                  key="tooling"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid grid-cols-1 gap-6 lg:grid-cols-2"
+                >
+                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 space-y-4">
+                    <h4 className="text-white font-bold text-sm font-mono uppercase tracking-wider border-b border-white/[0.07] pb-3">
+                      Predictive Tooling Life Countdown
+                    </h4>
+
+                    <div className="space-y-3">
+                      {toolingRoster.map(t => (
+                        <div key={t.id} className="p-3.5 bg-white/[0.02] border border-white/[0.06] rounded-lg space-y-2 font-mono text-xs">
+                          <div className="flex justify-between items-center">
+                            <strong className="text-white">{t.name}</strong>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
+                              t.wearPercent > 80
+                                ? "border-[#F0526B]/40 text-[#F0526B] bg-[#F0526B]/10"
+                                : "border-[#2FBF71]/40 text-[#2FBF71] bg-[#2FBF71]/10"
+                            }`}>
+                              {t.status}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-white/50 text-[11px]">
+                            <span>{t.line} • {t.remainingCycles} cycles left</span>
+                            <span>{t.wearPercent}% worn</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full"
+                              style={{ width: `${t.wearPercent}%`, backgroundColor: t.wearPercent > 80 ? "#F0526B" : "#E8A33D" }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 space-y-4">
+                    <h4 className="text-white font-bold text-sm font-mono uppercase tracking-wider border-b border-white/[0.07] pb-3">
+                      Dispatch Tooling Maintenance Order
+                    </h4>
+                    <p className="text-xs text-white/50 leading-relaxed font-mono">
+                      Pre-emptive tooling changeovers during planned shift buffers prevent micro-stoppages and ensure Cpk dimension accuracy.
+                    </p>
+
+                    <button
+                      onClick={() => onCreateWorkOrder("Tool Changeover: End Mill Ø12mm", "Line B2", "High")}
+                      className="w-full py-3 bg-[#E8A33D] hover:bg-[#E8A33D]/90 text-black font-mono text-xs font-bold rounded-lg transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      <Wrench className="h-4 w-4" />
+                      <span>Schedule Line B2 Tool Change</span>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </article>
-      </section>
-    </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }

@@ -1,0 +1,186 @@
+/*
+ * Keyframes ported verbatim from the SICO Platform design source
+ * (claude.ai/design project "SICO Product Page Design"). These drive the
+ * ambient motion the design specifies — dashed schematic flow, pulsing status
+ * dots, the inspection scan sweep, packets travelling along a rail. Names are
+ * kept as-authored so a diff against the design source stays readable.
+ *
+ * Scroll-triggered entrances are NOT here: those are framer-motion in the
+ * section components, so they can be sequenced and can respect
+ * prefers-reduced-motion per element.
+ */
+
+@keyframes sicoDash {
+  to {
+    stroke-dashoffset: -320;
+  }
+}
+@keyframes sicoPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.6);
+  }
+}
+@keyframes sicoScan {
+  0% {
+    transform: translateY(-8%);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(760%);
+    opacity: 0;
+  }
+}
+@keyframes sicoTravel {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(var(--sico-run, 120px));
+    opacity: 0;
+  }
+}
+@keyframes sicoFall {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--sico-run, 90px));
+    opacity: 0;
+  }
+}
+@keyframes sicoBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.18;
+  }
+}
+@keyframes sicoDrift {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 40px 40px;
+  }
+}
+@keyframes sicoRun {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+@keyframes sicoRunV {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+@keyframes sicoSweep {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(400%);
+  }
+}
+@keyframes sicoMark {
+  0% {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes sicoBar {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* The design's ambient loops are decorative; stop them outright rather than
+   letting them run behind a reduced-motion preference. */
+@media (prefers-reduced-motion: reduce) {
+  .sico-page *,
+  .sico-page *::before,
+  .sico-page *::after {
+    animation: none !important;
+  }
+}
+
+/* Selection colour from the design source. */
+.sico-page ::selection {
+  background: #ded6ff;
+  color: #14110e;
+}
+
+/*
+ * Prevent framer-motion entrance variants (fadeLeft / fadeRight, ±28px
+ * translateX) from causing a transient horizontal scrollbar before they
+ * settle. `overflow-x: clip` cuts the paint plane without creating a new
+ * block-formatting context, so position:sticky elements inside sections
+ * (e.g. InspectionWorkflow's runtime panel) are unaffected.
+ */
+.sico-page section {
+  overflow-x: clip;
+}
+
+/*
+ * Ensure the page root never produces a horizontal scrollbar. This is the
+ * last-resort guard; the section-level clip above catches the actual sources.
+ */
+.sico-page {
+  overflow-x: hidden;
+}

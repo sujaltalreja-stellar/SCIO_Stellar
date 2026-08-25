@@ -323,7 +323,7 @@ export default function IndustrialCockpitHUD({ currentIndustry }: IndustrialCock
           </div>
 
           {/* 24-Band Animated Spectrum Graphic */}
-          <div className="h-64 flex items-end justify-between gap-1.5 pt-4 px-2 bg-[#0a0d14] rounded-xl border border-slate-800/80">
+          <div className="h-48 flex items-end justify-between gap-1 sm:gap-1.5 pt-4 px-3 bg-[#080A0D] rounded-xl border border-white/[0.05]">
             {spectrumBands.map((band, idx) => (
               <div key={idx} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer">
                 {/* Value tooltip on hover */}
@@ -332,19 +332,19 @@ export default function IndustrialCockpitHUD({ currentIndustry }: IndustrialCock
                 </span>
                 
                 {/* Bar */}
-                <div className="w-full bg-slate-900 rounded-t-sm overflow-hidden flex flex-col justify-end h-4/5">
+                <div className="w-full max-w-[14px] bg-white/[0.04] rounded-t-[2px] overflow-hidden flex flex-col justify-end h-4/5">
                   <div
-                    className="w-full rounded-t-sm transition-all duration-300"
+                    className="w-full rounded-t-[2px] transition-all duration-300"
                     style={{
                       height: `${band.amplitude}%`,
                       backgroundColor: band.color,
-                      boxShadow: `0 0 12px ${band.color}66`
+                      boxShadow: `0 0 8px ${band.color}44`
                     }}
                   />
                 </div>
 
                 {/* Frequency Label */}
-                <span className="text-[8px] font-mono text-slate-500 rotate-[-45deg] origin-center truncate mt-1">
+                <span className="text-[8px] font-mono text-white/35 truncate max-w-[24px]">
                   {band.freq}
                 </span>
               </div>

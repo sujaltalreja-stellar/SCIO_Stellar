@@ -1,35 +1,33 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  AlertTriangle,
+  Ship,
   Anchor,
-  ArrowUpRight,
-  CheckCircle2,
-  CircleAlert,
+  ShieldCheck,
+  AlertTriangle,
   Fuel,
   PackageSearch,
-  ShieldCheck,
-  Ship,
+  CheckCircle2,
+  CircleAlert,
+  ArrowUpRight,
+  Gauge,
+  Compass,
+  Radio,
+  FileText,
+  Activity,
+  Layers,
+  Sparkles,
+  ExternalLink,
+  Search,
+  Filter,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 import {
   MARITIME_FLEET,
   MARITIME_SUPPLY_ORDERS,
+  MARITIME_CREW,
 } from "../../config/industries";
 import type {
   BunkerLog,
@@ -47,33 +45,145 @@ type MaritimeControlCenterProps = {
   onOpenDeficiency: () => void;
 };
 
-const tooltipStyle = {
-  backgroundColor: "#0c0e17",
-  border: "1px solid #28333d",
-  borderRadius: "8px",
-  color: "#f5f7fb",
+// Motion easing & viewport constants
+const ENTRANCE = [0.22, 1, 0.36, 1] as const;
+const VIEWPORT_WIDE = { once: true, amount: 0.15 };
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: ENTRANCE },
+  },
 };
 
-const statusColors: Record<string, string> = {
-  "At Sea": "#2dd4bf",
-  "In Port": "#fbbf24",
-  Anchored: "#60a5fa",
-  Maintenance: "#fb7185",
-};
+const stagger = (delayChildren = 0.08, staggerChildren = 0.1) => ({
+  hidden: {},
+  visible: {
+    transition: {
+      delayChildren,
+      staggerChildren,
+    },
+  },
+});
 
-const severityScore: Record<MarineSafetyDeficiency["severity"], number> = {
-  Critical: 46,
-  High: 30,
-  Medium: 16,
-  Low: 8,
-};
+// Interactive Sub-tabs for Maritime Tower
+const TABS = [
+  "Overview",
+  "Fleet & Hull",
+  "Inspections & PSC",
+  "Bunkering & MRO",
+  "SOLAS Compliance",
+];
 
-const severityClass: Record<MarineSafetyDeficiency["severity"], string> = {
-  Critical: "text-rose-300 border-rose-500/30 bg-rose-500/10",
-  High: "text-orange-300 border-orange-500/30 bg-orange-500/10",
-  Medium: "text-amber-300 border-amber-500/30 bg-amber-500/10",
-  Low: "text-cyan-300 border-cyan-500/30 bg-cyan-500/10",
-};
+// Helper: Lightweight Animated CountUp
+function CountUp({
+  to,
+  decimals = 0,
+  duration = 1.2,
+}: {
+  to: number;
+  decimals?: number;
+  duration?: number;
+}) {
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    let startTimestamp: number | null = null;
+    let animationFrameId: number;
+
+    const step = (timestamp: number) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / (duration * 1000), 1);
+      // Ease out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setVal(easeOut * to);
+
+      if (progress < 1) {
+        animationFrameId = requestAnimationFrame(step);
+      } else {
+        setVal(to);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [to, duration]);
+
+  return <>{decimals > 0 ? val.toFixed(decimals) : Math.round(val)}</>;
+}
+
+// Reusable Dark Card Component from ControlTower theme
+function Card({
+  title,
+  children,
+  className = "",
+  accentColor = "#8B5CF6",
+  badge,
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+  accentColor?: string;
+  badge?: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 sm:p-5 transition-all hover:border-white/[0.12] ${className}`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-white/40 sm:text-[11.5px]">
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: accentColor }}
+          />
+          {title}
+        </p>
+        {badge}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// Reusable Meter Bar Component from ControlTower theme
+function Meter({
+  label,
+  value,
+  display,
+  percent,
+  color,
+  delay = 0,
+}: {
+  label: string;
+  value?: number | string;
+  display?: string | number;
+  percent: number;
+  color: string;
+  delay?: number;
+}) {
+  return (
+    <div className="grid grid-cols-[100px_minmax(0,1fr)_44px] items-center gap-3 sm:grid-cols-[130px_minmax(0,1fr)_48px]">
+      <span className="truncate font-mono text-[11px] text-white/50 sm:text-[11.5px]" title={label}>
+        {label}
+      </span>
+      <span className="h-1.5 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+        <motion.span
+          className="block h-full rounded-full"
+          style={{ background: color }}
+          initial={{ width: 0 }}
+          whileInView={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 1, ease: ENTRANCE, delay }}
+        />
+      </span>
+      <span className="text-right font-mono text-[11px] text-white/75 sm:text-[11.5px]">
+        {display ?? (typeof value === "number" ? `${value}%` : value)}
+      </span>
+    </div>
+  );
+}
 
 export default function MaritimeControlCenter({
   bunkerLogs,
@@ -83,32 +193,32 @@ export default function MaritimeControlCenter({
   onNavigate,
   onOpenDeficiency,
 }: MaritimeControlCenterProps) {
+  const [selectedTab, setSelectedTab] = useState("Overview");
+
+  // Calculations
   const averageAvailability = Math.round(
-    MARITIME_FLEET.reduce((total, vessel) => total + vessel.availabilityPercent, 0) /
+    MARITIME_FLEET.reduce((total, v) => total + v.availabilityPercent, 0) /
       MARITIME_FLEET.length,
   );
-  const atSeaCount = MARITIME_FLEET.filter((vessel) => vessel.status === "At Sea").length;
+  const atSeaCount = MARITIME_FLEET.filter((v) => v.status === "At Sea").length;
   const criticalDeficiencies = deficiencies.filter(
-    (deficiency) => deficiency.severity === "Critical" && deficiency.status !== "Resolved",
+    (d) => d.severity === "Critical" && d.status !== "Resolved",
   );
-  const openDeficiencies = deficiencies.filter((deficiency) => deficiency.status !== "Resolved");
-  const dueInspections = safetyInspections.filter((inspection) => inspection.status !== "Passed");
-  const supplyRiskOrders = MARITIME_SUPPLY_ORDERS.filter(
-    (order) =>
-      order.leadTimeDays > 14 ||
-      order.status === "Draft" ||
-      order.status === "Port Delivery Pending",
-  );
+  const openDeficiencies = deficiencies.filter((d) => d.status !== "Resolved");
+  const dueInspections = safetyInspections.filter((i) => i.status !== "Passed");
+  const failedInspections = safetyInspections.filter((i) => i.status === "Failed");
+
   const lowFuelVessels = bunkerLogs.filter(
     (log) => log.mgoROBMetricTons + log.hfoROBMetricTons < 200,
   );
+
   const clearanceSteps = clearances.reduce(
-    (total, clearance) =>
+    (total, c) =>
       total +
-      Number(clearance.customsCleared) +
-      Number(clearance.immigrationCleared) +
-      Number(clearance.portAgentNotified) +
-      Number(clearance.pilotageRequested),
+      Number(c.customsCleared) +
+      Number(c.immigrationCleared) +
+      Number(c.portAgentNotified) +
+      Number(c.pilotageRequested),
     0,
   );
   const clearanceReadiness = clearances.length
@@ -116,390 +226,784 @@ export default function MaritimeControlCenter({
     : 100;
   const inspectionReadiness = safetyInspections.length
     ? Math.round(
-        (safetyInspections.filter((inspection) => inspection.status === "Passed").length /
+        (safetyInspections.filter((i) => i.status === "Passed").length /
           safetyInspections.length) *
           100,
       )
     : 100;
-  const supplyReadiness = Math.round(
-    ((MARITIME_SUPPLY_ORDERS.length - supplyRiskOrders.length) /
-      MARITIME_SUPPLY_ORDERS.length) *
-      100,
+  const supplyRiskOrders = MARITIME_SUPPLY_ORDERS.filter(
+    (o) =>
+      o.leadTimeDays > 14 ||
+      o.status === "Draft" ||
+      o.status === "Port Delivery Pending",
   );
+
   const fleetReadiness = Math.round(
     averageAvailability * 0.45 +
       inspectionReadiness * 0.2 +
       clearanceReadiness * 0.2 +
-      supplyReadiness * 0.15,
+      (100 - (supplyRiskOrders.length / MARITIME_SUPPLY_ORDERS.length) * 100) * 0.15,
   );
 
-  const statusData = Object.keys(statusColors).map((status) => ({
-    name: status,
-    value: MARITIME_FLEET.filter((vessel) => vessel.status === status).length,
-    color: statusColors[status],
-  }));
+  const totalCriticalAlerts =
+    criticalDeficiencies.length +
+    failedInspections.length +
+    lowFuelVessels.length;
 
-  const vesselRiskData = MARITIME_FLEET.map((vessel) => {
-    const vesselDeficiencies = deficiencies.filter(
-      (deficiency) =>
-        deficiency.vesselId === vessel.vesselId && deficiency.status !== "Resolved",
-    );
-    const fuelLog = bunkerLogs.find((log) => log.vesselId === vessel.vesselId);
-    const totalFuel = fuelLog
-      ? fuelLog.mgoROBMetricTons + fuelLog.hfoROBMetricTons
-      : undefined;
-    const statusRisk = vessel.status === "Maintenance" ? 44 : vessel.status === "In Port" ? 10 : 0;
-    const fuelRisk = totalFuel === undefined ? 12 : totalFuel < 200 ? 36 : totalFuel < 350 ? 15 : 0;
-    const deficiencyRisk = vesselDeficiencies.reduce(
-      (total, deficiency) => total + severityScore[deficiency.severity],
-      0,
-    );
+  // Monthly Inspections & Voyage Volume (6 months historical)
+  const MARITIME_VOLUME = [
+    ["Mar 2026", 42],
+    ["Apr 2026", 58],
+    ["May 2026", 64],
+    ["Jun 2026", 71],
+    ["Jul 2026", 85],
+    ["Aug 2026", 94],
+  ] as const;
+  const MARITIME_VOLUME_MAX = 100;
 
-    return {
-      name: vessel.vesselName.replace("SCIO ", ""),
-      availability: vessel.availabilityPercent,
-      exposure: Math.min(100, statusRisk + fuelRisk + deficiencyRisk),
-      route: `${vessel.departurePort} - ${vessel.destinationPort}`,
-      status: vessel.status,
-      eta: vessel.eta,
-    };
+  // Fleet Vessel Class Distribution
+  const VESSEL_CLASSES = [
+    { label: "Container Ships", value: 2, color: "#8B5CF6" },
+    { label: "Bulk Carriers", value: 1, color: "#3FC8D8" },
+    { label: "Chemical Tankers", value: 1, color: "#E8A33D" },
+    { label: "Offshore / Tugs", value: 1, color: "#2FBF71" },
+  ];
+  const TOTAL_VESSELS = VESSEL_CLASSES.reduce((sum, v) => sum + v.value, 0);
+
+  // Vessel Seaworthiness & Zone Compliance
+  const VESSEL_SCORES = MARITIME_FLEET.map((vessel) => {
+    let color = "#2FBF71";
+    if (vessel.status === "Maintenance" || vessel.availabilityPercent < 60) {
+      color = "#F0526B";
+    } else if (vessel.availabilityPercent < 90) {
+      color = "#E8A33D";
+    }
+    return [
+      vessel.vesselName.replace("SCIO ", ""),
+      vessel.availabilityPercent,
+      color,
+      `${vessel.departurePort} → ${vessel.destinationPort}`,
+    ] as [string, number, string, string];
   });
 
-  const bunkerData = bunkerLogs.map((log) => {
-    const vessel = MARITIME_FLEET.find((item) => item.vesselId === log.vesselId);
-    return {
-      name: vessel?.vesselName.replace("SCIO ", "") ?? log.vesselId,
-      mgo: log.mgoROBMetricTons,
-      hfo: log.hfoROBMetricTons,
-      total: log.mgoROBMetricTons + log.hfoROBMetricTons,
-    };
-  });
+  // AI Marine Computer Vision & Anomaly Detection Accuracy
+  const AI_ACCURACY = [
+    ["Hull Fouling & Bio-Index", 99],
+    ["Propulsion Vibration FFT", 97],
+    ["Exhaust CII / MARPOL", 95],
+    ["AIS Route Drift Detection", 98],
+    ["Safety Gear CV OCR", 96],
+    ["Bunker Fuel Match", 99],
+  ] as const;
 
-  const supplyData = MARITIME_SUPPLY_ORDERS.map((order) => ({
-    name: order.poNumber.replace("MPO-", "PO "),
-    leadTime: order.leadTimeDays,
-    status: order.status,
-    atRisk:
-      order.leadTimeDays > 14 ||
-      order.status === "Draft" ||
-      order.status === "Port Delivery Pending",
-  }));
-
-  const actionQueue = [
-    ...criticalDeficiencies.map((item) => ({
-      key: item.id,
-      title: item.title,
-      detail: `${item.vesselId} - CAPA due ${item.targetResolutionDate}`,
-      category: "Critical CAPA",
-      severity: item.severity,
-      tab: "compliance",
-    })),
-    ...lowFuelVessels.map((log) => ({
-      key: `fuel-${log.vesselId}`,
-      title: "Low bunker reserve",
-      detail: `${log.vesselId} has ${log.mgoROBMetricTons + log.hfoROBMetricTons} MT remaining onboard`,
-      category: "Fuel risk",
-      severity: "High" as const,
-      tab: "fleet",
-    })),
-    ...dueInspections.map((item) => ({
-      key: item.equipmentId,
-      title: item.name,
-      detail: `${item.vesselId} safety inspection is ${item.status.toLowerCase()}`,
-      category: "Inspection",
-      severity: item.status === "Failed" ? ("Critical" as const) : ("Medium" as const),
-      tab: "compliance",
-    })),
-  ].slice(0, 5);
+  // Footer Operational Cards
+  const FOOTER_CARDS = [
+    {
+      label: "Bunker & Supply Bottlenecks",
+      value: `${supplyRiskOrders.length + lowFuelVessels.length}`,
+      highlight: "2 priority routes",
+      highlightTone: "#E8A33D",
+      body: "Rotterdam → Houston spares delayed 48h · Aux injector work order at risk",
+    },
+    {
+      label: "Active Maritime Crew",
+      value: `${MARITIME_CREW.length}`,
+      highlight: "4 working offline",
+      highlightTone: "#2FBF71",
+      body: "Encrypted offline voyage checklist payloads sync on satellite reconnect",
+    },
+    {
+      label: "Fleet Defect Trend · 90 Days",
+      value: "−24%",
+      highlight: "improving",
+      highlightTone: "#2FBF71",
+      body: "Machinery vibration findings down after ultrasonic condition-based maintenance",
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-[#071719] via-[#0c0e17] to-[#101322] p-6 shadow-[0_0_50px_rgba(34,211,238,0.08)]">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-1/3 h-px w-2/3 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent" />
-        <div className="relative flex flex-col justify-between gap-6 xl:flex-row xl:items-end">
-          <div>
-            <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">
-              <Anchor className="h-4 w-4" />
-              Maritime HQ - Connected Operations
+    <section className="bg-[#0B0D0F] rounded-2xl border border-white/[0.08] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-10 shadow-2xl">
+      <div className="mx-auto w-full max-w-[1360px] space-y-8">
+        
+        {/* ==================== 1. TOP HERO SECTION INTRO ==================== */}
+        <div className="flex flex-col justify-between gap-6 border-b border-white/[0.07] pb-8 xl:flex-row xl:items-end">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#8B5CF6]">
+              <Anchor className="h-3.5 w-3.5" />
+              01 — FLEET · MARITIME OPERATIONS CONTROL TOWER
             </div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Fleet Command Center</h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-              One operational view across vessel availability, bunker resilience, safety obligations,
-              port readiness, and supply-chain exposure.
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
+              One Control Tower for the Entire Maritime Fleet
+            </h1>
+            <p className="max-w-3xl text-sm leading-relaxed text-white/50 sm:text-[14.5px]">
+              Centralized, real-time visibility into vessel seaworthiness, Port State Control (PSC) inspection readiness,
+              bunker resilience, and critical SOLAS/MARPOL alerts — with vessel-level telemetry behind every number.
             </p>
           </div>
+
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => onNavigate("fleet")}
-              className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2 text-xs font-semibold text-cyan-200 transition hover:border-cyan-300/70 hover:bg-cyan-400/15"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.12] bg-[#101315] px-4 py-2.5 font-mono text-xs font-semibold text-white/80 transition-all hover:border-[#8B5CF6]/50 hover:bg-[#8B5CF6]/10 hover:text-white"
             >
-              View Fleet Grid <ArrowUpRight className="h-3.5 w-3.5" />
+              <Ship className="h-4 w-4 text-[#8B5CF6]" />
+              <span>Fleet AIS Registry</span>
+              <ArrowUpRight className="h-3.5 w-3.5 opacity-60" />
             </button>
             <button
               onClick={onOpenDeficiency}
-              className="inline-flex items-center gap-2 rounded-lg border border-rose-400/25 bg-rose-400/10 px-3.5 py-2 text-xs font-semibold text-rose-200 transition hover:border-rose-300/70 hover:bg-rose-400/15"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#F0526B]/30 bg-[#F0526B]/10 px-4 py-2.5 font-mono text-xs font-semibold text-[#F0526B] transition-all hover:border-[#F0526B]/60 hover:bg-[#F0526B]/20"
             >
-              <CircleAlert className="h-3.5 w-3.5" /> Report a finding
+              <CircleAlert className="h-4 w-4" />
+              <span>Report Finding / CAPA</span>
             </button>
           </div>
         </div>
-      </section>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        {[
-          {
-            label: "Fleet Readiness",
-            value: `${fleetReadiness}%`,
-            detail: "Weighted Operating Score",
-            icon: ShieldCheck,
-            color: "#00ff9d",
-            glow: "glow-emerald",
-          },
-          {
-            label: "Fleet Availability",
-            value: `${averageAvailability}%`,
-            detail: `${atSeaCount} vessels currently at sea`,
-            icon: Ship,
-            color: "#00f0ff",
-            glow: "glow-cyan",
-          },
-          {
-            label: "Critical Actions",
-            value: criticalDeficiencies.length + dueInspections.filter((item) => item.status === "Failed").length,
-            detail: "CAPA & failed safety checks",
-            icon: AlertTriangle,
-            color: "#ff0055",
-            glow: "glow-crimson",
-          },
-          {
-            label: "Bunker Watch",
-            value: lowFuelVessels.length,
-            detail: lowFuelVessels.length ? "Vessels below reserve" : "All reported reserves healthy",
-            icon: Fuel,
-            color: "#f59e0b",
-            glow: "glow-amber",
-          },
-          {
-            label: "Supply Exposure",
-            value: supplyRiskOrders.length,
-            detail: "Orders needing port clearance",
-            icon: PackageSearch,
-            color: "#a855f7",
-            glow: "glow-violet",
-          },
-        ].map((metric) => {
-          const Icon = metric.icon;
-          return (
-            <article key={metric.label} className={`silver-card p-4 rounded-xl border border-slate-700/60 bg-[#0d1017] shadow-xl relative overflow-hidden transition-all group hover:border-slate-500`}>
-              <div className="flex items-start justify-between gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 font-mono">{metric.label}</span>
-                <div className="p-1.5 rounded-lg bg-slate-900 border border-slate-800" style={{ color: metric.color }}>
-                  <Icon className="h-4 w-4" />
-                </div>
+        {/* ==================== 2. MAIN CONTROL TOWER SHELL ==================== */}
+        <motion.div
+          className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#101315] shadow-2xl"
+          variants={stagger(0.08, 0.12)}
+          initial="hidden"
+          whileInView="visible"
+          viewport={VIEWPORT_WIDE}
+        >
+          {/* Sub-Nav Header Bar */}
+          <motion.div
+            variants={fadeUp}
+            className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-b border-white/[0.07] bg-[#0E1113] px-4 py-3 sm:px-6"
+          >
+            <div className="flex items-center gap-4">
+              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/35">
+                CONTROL TOWER
+              </span>
+              <span className="h-3 w-[1px] bg-white/[0.1]" />
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                {TABS.map((tab) => {
+                  const isActive = selectedTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setSelectedTab(tab)}
+                      className={`relative px-3 py-1.5 text-xs font-medium transition-all rounded-md ${
+                        isActive
+                          ? "text-white bg-white/[0.06] font-semibold"
+                          : "text-white/40 hover:text-white/70 hover:bg-white/[0.02]"
+                      }`}
+                    >
+                      {tab}
+                      {isActive && (
+                        <motion.span
+                          layoutId="activeTabUnderline"
+                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[#8B5CF6]"
+                        />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-              <div className="mt-2 font-mono text-2xl font-black text-white" style={{ color: metric.color }}>{metric.value}</div>
-              <p className="mt-1 text-[11px] text-slate-400 font-mono truncate">{metric.detail}</p>
-              <div className="mt-3 w-full bg-slate-900 h-1 rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: "85%", backgroundColor: metric.color }} />
-              </div>
-            </article>
-          );
-        })}
-      </section>
-
-      <section className="grid grid-cols-1 gap-6 2xl:grid-cols-5">
-        <article className="2xl:col-span-3 rounded-xl border border-borderMuted bg-panel p-5 shadow-lg shadow-black/10">
-          <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">Fleet readiness matrix</p>
-              <h2 className="mt-1 text-base font-semibold text-textBright">Availability versus operational exposure</h2>
             </div>
-            <span className="rounded border border-borderMuted bg-panelLight px-2 py-1 text-[10px] font-mono text-textMuted">LIVE COMMAND VIEW</span>
-          </div>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={vesselRiskData} margin={{ top: 8, right: 4, left: -18, bottom: 0 }} barGap={6}>
-                <CartesianGrid stroke="#202638" strokeDasharray="3 4" vertical={false} />
-                <XAxis dataKey="name" stroke="#7e87a2" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#7e87a2" fontSize={10} domain={[0, 100]} tickLine={false} axisLine={false} />
-                <Tooltip
-                  contentStyle={tooltipStyle}
-                  cursor={{ fill: "rgba(34, 211, 238, 0.05)" }}
-                  formatter={(value, name) => [`${value}%`, name === "availability" ? "Availability" : "Operational exposure"]}
-                  labelFormatter={(label) => {
-                    const vessel = vesselRiskData.find((item) => item.name === label);
-                    return vessel ? `${label} - ${vessel.route}` : label;
-                  }}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: "11px", color: "#a7b0c3", paddingTop: "12px" }}
-                  formatter={(value) => (value === "availability" ? "Availability" : "Operational exposure")}
-                />
-                <Bar dataKey="availability" fill="#2dd4bf" radius={[5, 5, 0, 0]} maxBarSize={34} />
-                <Bar dataKey="exposure" fill="#fb7185" radius={[5, 5, 0, 0]} maxBarSize={34} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </article>
 
-        <article className="2xl:col-span-2 rounded-xl border border-borderMuted bg-panel p-5 shadow-lg shadow-black/10">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-300">Operating posture</p>
-              <h2 className="mt-1 text-base font-semibold text-textBright">Fleet status distribution</h2>
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[#2FBF71]">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2FBF71] opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2FBF71]" />
+              </span>
+              <span>Live · Global AIS Fleet Feed · {MARITIME_FLEET.length} Vessels</span>
             </div>
-            <Anchor className="h-5 w-5 text-cyan-400" />
-          </div>
-          <div className="relative h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Tooltip contentStyle={tooltipStyle} formatter={(value) => [`${value} vessel${Number(value) === 1 ? "" : "s"}`, "Count"]} />
-                <Pie data={statusData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={88} paddingAngle={4} stroke="none">
-                  {statusData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center pt-2">
-              <span className="font-mono text-3xl font-semibold text-white">{MARITIME_FLEET.length}</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-slate-400">Vessels</span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {statusData.map((item) => (
-              <div key={item.name} className="flex items-center justify-between rounded-md bg-panelLight/60 px-2.5 py-2 text-xs">
-                <span className="flex items-center gap-2 text-textMuted"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />{item.name}</span>
-                <span className="font-mono font-semibold text-textBright">{item.value}</span>
-              </div>
-            ))}
-          </div>
-        </article>
-      </section>
+          </motion.div>
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <article className="rounded-xl border border-borderMuted bg-panel p-5 shadow-lg shadow-black/10">
-          <div className="mb-5 flex items-start justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber-300">Bunker resilience</p>
-              <h2 className="mt-1 text-base font-semibold text-textBright">Fuel remaining onboard by vessel</h2>
-            </div>
-            <button onClick={() => onNavigate("fleet")} className="text-xs font-semibold text-cyan-300 hover:text-cyan-200">Open fuel log</button>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={bunkerData} margin={{ top: 5, right: 0, left: -18, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="mgoFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.42} />
-                    <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.02} />
-                  </linearGradient>
-                  <linearGradient id="hfoFill" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.34} />
-                    <stop offset="95%" stopColor="#fbbf24" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="#202638" strokeDasharray="3 4" vertical={false} />
-                <XAxis dataKey="name" stroke="#7e87a2" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#7e87a2" fontSize={10} tickLine={false} axisLine={false} unit=" MT" />
-                <Tooltip contentStyle={tooltipStyle} formatter={(value, name) => [`${value} MT`, String(name).toUpperCase()]} />
-                <Legend wrapperStyle={{ fontSize: "11px", color: "#a7b0c3", paddingTop: "8px" }} />
-                <Area type="monotone" dataKey="hfo" name="HFO" stroke="#fbbf24" fill="url(#hfoFill)" strokeWidth={2} />
-                <Area type="monotone" dataKey="mgo" name="MGO" stroke="#38bdf8" fill="url(#mgoFill)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          <p className="mt-2 text-xs text-slate-400">
-            Reserve threshold: <span className="font-mono text-amber-300">200 MT</span>. {lowFuelVessels.length ? `${lowFuelVessels.length} vessel requires replenishment planning.` : "All reported bunker reserves are above threshold."}
-          </p>
-        </article>
+          {/* Tab Content Panels */}
+          <div className="p-4 sm:p-6 space-y-6">
+            <AnimatePresence mode="wait">
+              {selectedTab === "Overview" && (
+                <motion.div
+                  key="overview"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4 sm:space-y-6"
+                >
+                  {/* Top 4 KPI Metric Cards */}
+                  <motion.div
+                    variants={fadeUp}
+                    className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+                  >
+                    {/* KPI 1: Fleet Seaworthiness */}
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
+                        Fleet Seaworthiness
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={fleetReadiness} decimals={1} />
+                        <span className="text-[18px] font-medium text-white/55 ml-0.5">%</span>
+                      </p>
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+                        <motion.span
+                          className="block h-full rounded-full bg-[#2FBF71]"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${fleetReadiness}%` }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.1 }}
+                        />
+                      </span>
+                    </div>
 
-        <article className="rounded-xl border border-borderMuted bg-panel p-5 shadow-lg shadow-black/10">
-          <div className="mb-5 flex items-start justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-violet-300">Supply-chain exposure</p>
-              <h2 className="mt-1 text-base font-semibold text-textBright">Marine order lead-time watch</h2>
-            </div>
-            <button onClick={() => onNavigate("supply")} className="text-xs font-semibold text-cyan-300 hover:text-cyan-200">Open procurement</button>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={supplyData} layout="vertical" margin={{ top: 0, right: 18, left: 18, bottom: 0 }}>
-                <CartesianGrid stroke="#202638" strokeDasharray="3 4" horizontal={false} />
-                <XAxis type="number" stroke="#7e87a2" fontSize={10} tickLine={false} axisLine={false} unit=" d" />
-                <YAxis type="category" dataKey="name" stroke="#7e87a2" fontSize={10} width={48} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(value) => [`${value} days`, "Lead time"]} />
-                <Bar dataKey="leadTime" radius={[0, 5, 5, 0]} maxBarSize={22}>
-                  {supplyData.map((entry) => (
-                    <Cell key={entry.name} fill={entry.atRisk ? "#fb7185" : "#a78bfa"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
-            <span>Orders at risk: <strong className="font-mono text-rose-300">{supplyRiskOrders.length}</strong></span>
-            <span>Clearance readiness: <strong className="font-mono text-cyan-300">{clearanceReadiness}%</strong></span>
-          </div>
-        </article>
-      </section>
+                    {/* KPI 2: PSC & Class Compliance */}
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
+                        PSC & Class Compliance
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={inspectionReadiness} decimals={1} />
+                        <span className="text-[18px] font-medium text-white/55 ml-0.5">%</span>
+                      </p>
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+                        <motion.span
+                          className="block h-full rounded-full bg-[#8B5CF6]"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${inspectionReadiness}%` }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.2 }}
+                        />
+                      </span>
+                    </div>
 
-      <section className="grid grid-cols-1 gap-6 2xl:grid-cols-5">
-        <article className="2xl:col-span-3 rounded-xl border border-borderMuted bg-panel p-5">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-rose-300">Priority response queue</p>
-              <h2 className="mt-1 text-base font-semibold text-textBright">Events requiring operational ownership</h2>
-            </div>
-            <button onClick={onOpenDeficiency} className="inline-flex items-center gap-1.5 rounded border border-borderMuted bg-panelLight px-3 py-1.5 text-xs font-semibold text-textBright hover:border-cyan-400/50">
-              <CircleAlert className="h-3.5 w-3.5 text-cyan-300" /> New finding
-            </button>
-          </div>
-          <div className="space-y-2">
-            {actionQueue.length ? actionQueue.map((action) => (
-              <button
-                key={action.key}
-                onClick={() => onNavigate(action.tab)}
-                className="group flex w-full items-center gap-3 rounded-lg border border-borderMuted/80 bg-panelLight/40 px-3.5 py-3 text-left transition hover:border-cyan-400/35 hover:bg-panelLight"
-              >
-                <span className={`rounded border px-2 py-0.5 text-[10px] font-bold uppercase ${severityClass[action.severity]}`}>{action.severity}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold text-textBright">{action.title}</span>
-                  <span className="mt-0.5 block truncate text-xs text-textMuted">{action.category} - {action.detail}</span>
-                </span>
-                <ArrowUpRight className="h-4 w-4 shrink-0 text-textMuted transition group-hover:text-cyan-300" />
-              </button>
-            )) : (
-              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-5 text-sm text-emerald-200">
-                <CheckCircle2 className="mr-2 inline h-4 w-4" /> No critical maritime events require intervention.
-              </div>
-            )}
-          </div>
-        </article>
+                    {/* KPI 3: AI Telemetry & Vision Accuracy */}
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
+                        AI Anomaly Detection Precision
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={97.4} decimals={1} />
+                        <span className="text-[18px] font-medium text-white/55 ml-0.5">%</span>
+                      </p>
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
+                        <motion.span
+                          className="block h-full rounded-full bg-[#3FC8D8]"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: "97.4%" }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.3 }}
+                        />
+                      </span>
+                    </div>
 
-        <article className="2xl:col-span-2 rounded-xl border border-borderMuted bg-panel p-5">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-300">Connected operational chain</p>
-          <h2 className="mt-1 text-base font-semibold text-textBright">From vessel event to action</h2>
-          <div className="mt-5 space-y-3">
-            {[
-              ["01", "Vessel & asset", `${MARITIME_FLEET.length} vessels monitored`, "fleet"],
-              ["02", "Safety & compliance", `${openDeficiencies.length} open findings / ${dueInspections.length} due`, "compliance"],
-              ["03", "Maintenance", "Dispatch corrective work and crew", "work-orders"],
-              ["04", "MRO & supply", `${supplyRiskOrders.length} orders need attention`, "supply"],
-            ].map(([step, label, detail, tab]) => (
-              <button key={step} onClick={() => onNavigate(tab)} className="flex w-full items-center gap-3 rounded-lg border border-borderMuted/60 bg-panelLight/30 p-3 text-left transition hover:border-emerald-400/35 hover:bg-panelLight">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-400/25 bg-emerald-400/10 font-mono text-xs font-bold text-emerald-300">{step}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-sm font-semibold text-textBright">{label}</span>
-                  <span className="block truncate text-xs text-textMuted">{detail}</span>
-                </span>
-                <ArrowUpRight className="h-4 w-4 text-textMuted" />
-              </button>
-            ))}
+                    {/* KPI 4: Critical Marine Alerts */}
+                    <div className="rounded-xl border border-[#F0526B]/30 bg-[#F0526B]/[0.07] p-4">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-[#F0526B]/80 sm:text-[11.5px]">
+                        Critical Marine Alerts
+                      </p>
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
+                        <CountUp to={totalCriticalAlerts} />
+                      </p>
+                      <p className="mt-3 font-mono text-[11px] text-[#F0526B] sm:text-[11.5px]">
+                        {criticalDeficiencies.length} CAPA overdue · {lowFuelVessels.length} low bunker reserves
+                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Middle Row 1: Monthly Voyage/Inspection Volume + Vessel Type Radial Donut */}
+                  <motion.div
+                    variants={fadeUp}
+                    className="grid gap-4 lg:grid-cols-[1.35fr_1fr]"
+                  >
+                    <Card
+                      title="Monthly PSC Inspections & Voyage Volume"
+                      accentColor="#8B5CF6"
+                    >
+                      <div className="mt-5 space-y-3.5">
+                        {MARITIME_VOLUME.map(([month, count], index) => (
+                          <Meter
+                            key={month}
+                            label={month}
+                            display={`${count} audits`}
+                            percent={(count / MARITIME_VOLUME_MAX) * 100}
+                            color="#8B5CF6"
+                            delay={index * 0.08}
+                          />
+                        ))}
+                      </div>
+                    </Card>
+
+                    <Card
+                      title="Fleet Vessel Class Distribution"
+                      accentColor="#3FC8D8"
+                    >
+                      <div className="mt-4 flex flex-col sm:flex-row items-center gap-6">
+                        <div className="relative h-[118px] w-[118px] shrink-0">
+                          <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+                            {VESSEL_CLASSES.map((type, index) => {
+                              const fraction = type.value / TOTAL_VESSELS;
+                              const offset = VESSEL_CLASSES.slice(0, index).reduce(
+                                (sum, prev) => sum + prev.value / TOTAL_VESSELS,
+                                0,
+                              );
+                              return (
+                                <motion.circle
+                                  key={type.label}
+                                  cx="50"
+                                  cy="50"
+                                  r="40"
+                                  fill="none"
+                                  stroke={type.color}
+                                  strokeWidth="12"
+                                  pathLength={1}
+                                  strokeDashoffset={-offset}
+                                  initial={{ strokeDasharray: "0 1" }}
+                                  whileInView={{ strokeDasharray: `${fraction} ${1 - fraction}` }}
+                                  viewport={{ once: true, amount: 0.6 }}
+                                  transition={{
+                                    duration: 0.9,
+                                    ease: ENTRANCE,
+                                    delay: 0.15 + index * 0.1,
+                                  }}
+                                />
+                              );
+                            })}
+                          </svg>
+                          <span className="absolute inset-0 grid place-items-center text-center">
+                            <span>
+                              <span className="block text-[22px] font-bold leading-none text-white">
+                                <CountUp to={TOTAL_VESSELS} />
+                              </span>
+                              <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
+                                Vessels
+                              </span>
+                            </span>
+                          </span>
+                        </div>
+
+                        <ul className="min-w-0 flex-1 space-y-2.5 w-full">
+                          {VESSEL_CLASSES.map((type) => (
+                            <li key={type.label} className="flex items-center justify-between gap-2 text-xs">
+                              <span className="flex items-center gap-2 truncate">
+                                <span
+                                  className="h-2 w-2 shrink-0 rounded-full"
+                                  style={{ background: type.color }}
+                                />
+                                <span className="truncate text-white/70">{type.label}</span>
+                              </span>
+                              <span className="font-mono text-white/90 font-semibold">
+                                {type.value} units
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </Card>
+                  </motion.div>
+
+                  {/* Middle Row 2: Seaworthiness by Vessel/Zone + AI Precision */}
+                  <motion.div
+                    variants={fadeUp}
+                    className="grid gap-4 lg:grid-cols-2"
+                  >
+                    <Card
+                      title="Seaworthiness & Readiness by Vessel"
+                      accentColor="#2FBF71"
+                      badge={
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-white/40">
+                          {atSeaCount} active at sea
+                        </span>
+                      }
+                    >
+                      <div className="mt-5 space-y-3.5">
+                        {VESSEL_SCORES.map(([vessel, percent, color], index) => (
+                          <Meter
+                            key={vessel}
+                            label={vessel}
+                            display={`${percent}%`}
+                            percent={percent}
+                            color={color}
+                            delay={index * 0.07}
+                          />
+                        ))}
+                      </div>
+                    </Card>
+
+                    <Card
+                      title="AI Maritime Sensor & CV Precision"
+                      accentColor="#3FC8D8"
+                      badge={
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-[#3FC8D8]/80">
+                          SCIO Maritime Engine v4.2
+                        </span>
+                      }
+                    >
+                      <div className="mt-5 space-y-3.5">
+                        {AI_ACCURACY.map(([metric, percent], index) => (
+                          <Meter
+                            key={metric}
+                            label={metric}
+                            display={`${percent}%`}
+                            percent={percent}
+                            color="#3FC8D8"
+                            delay={index * 0.07}
+                          />
+                        ))}
+                      </div>
+                    </Card>
+                  </motion.div>
+
+                  {/* Bottom Row: 3 Operational Telemetry Footer Cards */}
+                  <motion.div
+                    variants={fadeUp}
+                    className="grid gap-3 sm:grid-cols-3"
+                  >
+                    {FOOTER_CARDS.map((card) => (
+                      <div
+                        key={card.label}
+                        className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]"
+                      >
+                        <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/35 sm:text-[11.5px]">
+                          {card.label}
+                        </p>
+                        <p className="mt-3 flex items-baseline gap-2">
+                          <span className="text-[26px] font-semibold leading-none text-white">
+                            {card.value}
+                          </span>
+                          <span
+                            className="text-[12.5px] font-medium"
+                            style={{ color: card.highlightTone }}
+                          >
+                            {card.highlight}
+                          </span>
+                        </p>
+                        <p className="mt-2.5 text-[12.5px] leading-relaxed text-white/40">
+                          {card.body}
+                        </p>
+                      </div>
+                    ))}
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* ==================== TAB: FLEET & HULL ==================== */}
+              {selectedTab === "Fleet & Hull" && (
+                <motion.div
+                  key="fleet-tab"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.07] pb-4">
+                      <div>
+                        <h3 className="text-sm font-semibold text-white">
+                          Fleet Hull & Propulsion Status
+                        </h3>
+                        <p className="text-xs text-white/40 mt-0.5">
+                          Real-time AIS speed, charter utilization, and route coordinates
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => onNavigate("fleet")}
+                        className="font-mono text-xs text-[#8B5CF6] hover:underline flex items-center gap-1"
+                      >
+                        <span>Deep Fleet Table</span>
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="mt-4 divide-y divide-white/[0.05]">
+                      {MARITIME_FLEET.map((vessel) => (
+                        <div
+                          key={vessel.vesselId}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.02] text-[#8B5CF6]">
+                              <Ship className="h-4 w-4" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-sm text-white">
+                                  {vessel.vesselName}
+                                </span>
+                                <span className="font-mono text-[10px] text-white/35">
+                                  {vessel.voyageNumber}
+                                </span>
+                              </div>
+                              <p className="text-xs text-white/40 mt-0.5">
+                                {vessel.departurePort} → {vessel.destinationPort} · ETA {vessel.eta}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-6">
+                            <div className="text-right">
+                              <span className="font-mono text-xs text-white">
+                                {vessel.speedKts} kts
+                              </span>
+                              <span className="block font-mono text-[10px] text-white/40">
+                                AIS Speed
+                              </span>
+                            </div>
+                            <div className="text-right">
+                              <span
+                                className="font-mono text-xs font-semibold"
+                                style={{
+                                  color:
+                                    vessel.availabilityPercent > 90
+                                      ? "#2FBF71"
+                                      : vessel.availabilityPercent > 60
+                                      ? "#E8A33D"
+                                      : "#F0526B",
+                                }}
+                              >
+                                {vessel.availabilityPercent}%
+                              </span>
+                              <span className="block font-mono text-[10px] text-white/40">
+                                Availability
+                              </span>
+                            </div>
+                            <span
+                              className={`rounded px-2 py-0.5 font-mono text-[10px] uppercase font-bold border ${
+                                vessel.status === "At Sea"
+                                  ? "border-[#2FBF71]/30 bg-[#2FBF71]/10 text-[#2FBF71]"
+                                  : vessel.status === "In Port"
+                                  ? "border-[#3FC8D8]/30 bg-[#3FC8D8]/10 text-[#3FC8D8]"
+                                  : vessel.status === "Anchored"
+                                  ? "border-[#E8A33D]/30 bg-[#E8A33D]/10 text-[#E8A33D]"
+                                  : "border-[#F0526B]/30 bg-[#F0526B]/10 text-[#F0526B]"
+                              }`}
+                            >
+                              {vessel.status}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ==================== TAB: INSPECTIONS & PSC ==================== */}
+              {selectedTab === "Inspections & PSC" && (
+                <motion.div
+                  key="inspections-tab"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.07] pb-4">
+                      <div>
+                        <h3 className="text-sm font-semibold text-white">
+                          Port State Control (PSC) & Marine Deficiencies
+                        </h3>
+                        <p className="text-xs text-white/40 mt-0.5">
+                          Audit findings, corrective action plans (CAPA), and scheduled resolutions
+                        </p>
+                      </div>
+                      <button
+                        onClick={onOpenDeficiency}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-[#F0526B]/30 bg-[#F0526B]/10 px-3 py-1.5 font-mono text-xs font-semibold text-[#F0526B] hover:bg-[#F0526B]/20"
+                      >
+                        <CircleAlert className="h-3.5 w-3.5" />
+                        <span>Log Deficiency</span>
+                      </button>
+                    </div>
+
+                    <div className="mt-4 space-y-3">
+                      {deficiencies.map((def) => (
+                        <div
+                          key={def.id}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-white/[0.05] bg-white/[0.01] p-3.5 hover:border-white/[0.1] transition-all"
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`rounded px-1.5 py-0.5 font-mono text-[10px] uppercase font-bold border ${
+                                  def.severity === "Critical"
+                                    ? "border-[#F0526B]/30 bg-[#F0526B]/10 text-[#F0526B]"
+                                    : def.severity === "High"
+                                    ? "border-[#E8A33D]/30 bg-[#E8A33D]/10 text-[#E8A33D]"
+                                    : "border-[#3FC8D8]/30 bg-[#3FC8D8]/10 text-[#3FC8D8]"
+                                }`}
+                              >
+                                {def.severity}
+                              </span>
+                              <span className="font-semibold text-sm text-white">
+                                {def.title}
+                              </span>
+                            </div>
+                            <p className="text-xs text-white/40">
+                              Vessel: <span className="text-white/70">{def.vesselId}</span> · Category: {def.category} · Target Due: {def.targetResolutionDate}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-3 self-start sm:self-center">
+                            <span
+                              className={`font-mono text-xs ${
+                                def.status === "Resolved"
+                                  ? "text-[#2FBF71]"
+                                  : "text-[#E8A33D]"
+                              }`}
+                            >
+                              {def.status}
+                            </span>
+                            <button
+                              onClick={() => onNavigate("compliance")}
+                              className="rounded border border-white/[0.1] bg-white/[0.03] px-2.5 py-1 text-xs font-mono text-white/70 hover:text-white hover:border-white/[0.2]"
+                            >
+                              CAPA Plan
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ==================== TAB: BUNKERING & MRO ==================== */}
+              {selectedTab === "Bunkering & MRO" && (
+                <motion.div
+                  key="bunkering-tab"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Card title="Fuel Remaining Onboard (ROB)" accentColor="#E8A33D">
+                      <div className="mt-4 space-y-3">
+                        {bunkerLogs.map((log) => {
+                          const totalFuel = log.mgoROBMetricTons + log.hfoROBMetricTons;
+                          const isLow = totalFuel < 200;
+                          return (
+                            <div
+                              key={log.vesselId}
+                              className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.01] p-3"
+                            >
+                              <div>
+                                <span className="font-semibold text-sm text-white">
+                                  {log.vesselId}
+                                </span>
+                                <p className="font-mono text-xs text-white/40 mt-0.5">
+                                  MGO: {log.mgoROBMetricTons} MT · HFO: {log.hfoROBMetricTons} MT (Sulfur {log.sulfurContentPercent}%)
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <span
+                                  className={`font-mono text-sm font-bold ${
+                                    isLow ? "text-[#F0526B]" : "text-[#2FBF71]"
+                                  }`}
+                                >
+                                  {totalFuel} MT
+                                </span>
+                                <span className="block font-mono text-[10px] text-white/35">
+                                  {isLow ? "Low Reserve" : "Healthy"}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </Card>
+
+                    <Card title="Critical Marine Procurement (MRO)" accentColor="#8B5CF6">
+                      <div className="mt-4 space-y-3">
+                        {MARITIME_SUPPLY_ORDERS.map((order) => (
+                          <div
+                            key={order.poNumber}
+                            className="flex items-center justify-between rounded-lg border border-white/[0.04] bg-white/[0.01] p-3"
+                          >
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs font-semibold text-white">
+                                  {order.poNumber}
+                                </span>
+                                <span className="text-xs text-white/60">
+                                  {order.itemDescription}
+                                </span>
+                              </div>
+                              <p className="font-mono text-[11px] text-white/40 mt-0.5">
+                                Dest: {order.portDestination} · Lead: {order.leadTimeDays}d
+                              </p>
+                            </div>
+                            <span className="font-mono text-[11px] text-[#3FC8D8]">
+                              {order.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </Card>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* ==================== TAB: SOLAS COMPLIANCE ==================== */}
+              {selectedTab === "SOLAS Compliance" && (
+                <motion.div
+                  key="solas-tab"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
+                >
+                  <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-5">
+                    <div className="flex items-center justify-between border-b border-white/[0.07] pb-4">
+                      <div>
+                        <h3 className="text-sm font-semibold text-white">
+                          SOLAS & LSA Safety Equipment Inspections
+                        </h3>
+                        <p className="text-xs text-white/40 mt-0.5">
+                          Liferafts, Pyrotechnics, CO2 Systems, and Survival Craft Readiness
+                        </p>
+                      </div>
+                      <span className="font-mono text-xs text-[#2FBF71]">
+                        Compliance Rate: {inspectionReadiness}%
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      {safetyInspections.map((item) => (
+                        <div
+                          key={item.equipmentId}
+                          className="rounded-lg border border-white/[0.05] bg-white/[0.01] p-3.5 space-y-2"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <span className="font-semibold text-xs text-white leading-tight">
+                              {item.name}
+                            </span>
+                            <span
+                              className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-bold border ${
+                                item.status === "Passed"
+                                  ? "border-[#2FBF71]/30 bg-[#2FBF71]/10 text-[#2FBF71]"
+                                  : item.status === "Due"
+                                  ? "border-[#E8A33D]/30 bg-[#E8A33D]/10 text-[#E8A33D]"
+                                  : "border-[#F0526B]/30 bg-[#F0526B]/10 text-[#F0526B]"
+                              }`}
+                            >
+                              {item.status}
+                            </span>
+                          </div>
+                          <p className="font-mono text-[11px] text-white/40">
+                            Vessel: {item.vesselId}
+                          </p>
+                          <p className="font-mono text-[11px] text-white/40">
+                            Expiry: {item.expiryDate}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </article>
-      </section>
-    </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }

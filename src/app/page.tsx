@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  Building2, Ship, Zap, Truck, Shield, AlertTriangle, Plus, 
-  X, User, MessageSquare, Anchor, ClipboardList, Activity, Navigation, ShoppingCart, UserCheck, Terminal, Download, FileText, Gauge
+import {
+  Building2, Ship, Zap, Truck, Shield, AlertTriangle, Plus,
+  X, User, MessageSquare, Anchor, ClipboardList, Activity, Navigation, ShoppingCart, UserCheck, Terminal, Download, FileText, Gauge,
+  Search, Filter, CheckCircle2, Clock, ArrowRight, Package, DollarSign, Calendar, Cpu, Boxes, ThermometerSnowflake, Globe
 } from "lucide-react";
-import { 
+import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 
@@ -30,6 +31,11 @@ import FinanceModule from "../components/energy/finance/FinanceModule";
 import ERPSyncHub from "../components/energy/erp/ERPSyncHub";
 import MaritimeControlCenter from "../components/maritime/MaritimeControlCenter";
 import ManufacturingControlCenter from "../components/manufacturing/ManufacturingControlCenter";
+import { ProductionPlanningModule } from "../components/manufacturing/ProductionPlanningModule";
+import { QualityTraceabilityModule } from "../components/manufacturing/QualityTraceabilityModule";
+import { AssetMaintenanceModule } from "../components/manufacturing/AssetMaintenanceModule";
+import { MaterialsSupplyChainModule } from "../components/manufacturing/MaterialsSupplyChainModule";
+import { AIManufacturingIntelligence } from "../components/manufacturing/AIManufacturingIntelligence";
 import LogisticsControlCenter from "../components/logistics/LogisticsControlCenter";
 import IndustrialCockpitHUD from "../components/visuals/IndustrialCockpitHUD";
 
@@ -39,11 +45,12 @@ import {
   WorkOrderSeed, MarineSafetyDeficiency, SafetyEquipmentInspection
 } from "../config/industries";
 import StellarHomePage from "../components/landing/StellarHomePage";
+import ResourcesHub from "../components/resources/ResourcesHub";
 import GenerativeVisualCopilot from "../components/ai/GenerativeVisualCopilot";
 import { mockDb } from "../config/energyMockDb";
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<"landing" | "platform">("landing");
+  const [viewMode, setViewMode] = useState<"landing" | "platform" | "resources">("landing");
   const [currentIndustry, setCurrentIndustry] = useState<string>("energy");
   const [activeTab, setActiveTab] = useState<string>("energy-dashboard");
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
@@ -71,6 +78,8 @@ export default function App() {
       const tab = urlParams.get("tab");
       handleLaunchPlatform(industry || undefined, tab || undefined);
       window.history.replaceState(null, "", window.location.pathname);
+    } else if (urlParams.get("view") === "resources" || urlParams.get("tab") === "resources") {
+      setViewMode("resources");
     }
   }, []);
 
@@ -89,13 +98,13 @@ export default function App() {
   const [createWoModalOpen, setCreateWoModalOpen] = useState<boolean>(false);
   const [selectedAsset, setSelectedAsset] = useState<any>(null);
   const [selectedWorkOrder, setSelectedWorkOrder] = useState<WorkOrderSeed | null>(null);
-  
+
   // Work Order Form State
   const [newWoTitle, setNewWoTitle] = useState("");
   const [newWoAssetId, setNewWoAssetId] = useState("");
   const [newWoPriority, setNewWoPriority] = useState("High");
   const [newWoNotes, setNewWoNotes] = useState("");
-  
+
   // Deficiency Reporter Form States (Maritime)
   const [deficiencyModalOpen, setDeficiencyModalOpen] = useState<boolean>(false);
   const [newDefTitle, setNewDefTitle] = useState("");
@@ -123,6 +132,10 @@ export default function App() {
   const [safetyInspections, setSafetyInspections] = useState(MARITIME_SAFETY_INSPECTIONS);
   const [deficiencies, setDeficiencies] = useState<MarineSafetyDeficiency[]>(MARITIME_DEFICIENCIES);
   const [crew] = useState(MARITIME_CREW);
+  const [supplyOrders, setSupplyOrders] = useState(MARITIME_SUPPLY_ORDERS);
+  const [supplySearch, setSupplySearch] = useState("");
+  const [supplyStatusFilter, setSupplyStatusFilter] = useState("all");
+  const [selectedTrackPo, setSelectedTrackPo] = useState<any>(null);
 
   // Energy Operations Specialized State
   const [activeEnergyNode, setActiveEnergyNode] = useState<string>("Infrastructure");
@@ -287,7 +300,7 @@ export default function App() {
           const industryData = nextSeeds[indKey];
           industryData.assets = industryData.assets.map(asset => {
             const updatedDetails = { ...asset.details };
-            
+
             if (updatedDetails.Temperature) {
               const tempNum = parseFloat(updatedDetails.Temperature);
               if (!isNaN(tempNum)) {
@@ -361,7 +374,7 @@ export default function App() {
       assignedTeam: "Onsite Technical Crew",
       assignedPerson: "AI Dispatcher",
       createdDate: new Date().toISOString().split('T')[0],
-      dueDate: new Date(Date.now() + 3*24*60*60*1000).toISOString().split('T')[0],
+      dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       estimatedDuration: "2 Hours",
       requiredParts: [],
       notes: newWoNotes
@@ -393,7 +406,7 @@ export default function App() {
       severity: newDefSeverity as any,
       status: "Open",
       findingDate: new Date().toISOString().split('T')[0],
-      targetResolutionDate: new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0]
+      targetResolutionDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
     };
 
     setDeficiencies(prev => [newDef, ...prev]);
@@ -496,7 +509,7 @@ export default function App() {
   };
 
   const getIndustryIcon = (ind: string) => {
-    switch(ind) {
+    switch (ind) {
       case "maritime": return <Ship className="h-5 w-5" />;
       case "energy": return <Zap className="h-5 w-5" />;
       case "logistics": return <Truck className="h-5 w-5" />;
@@ -505,7 +518,7 @@ export default function App() {
   };
 
   const getPriorityColor = (prio: string) => {
-    switch(prio) {
+    switch (prio) {
       case "Critical": return "text-critical border-critical/30 bg-critical/10";
       case "High": return "text-high border-high/30 bg-high/10";
       case "Medium": return "text-medium border-medium/30 bg-medium/10";
@@ -514,7 +527,7 @@ export default function App() {
   };
 
   const getStatusColor = (status: string) => {
-    switch(status) {
+    switch (status) {
       case "healthy":
       case "Valid":
       case "Completed":
@@ -560,32 +573,42 @@ export default function App() {
   }
 
   if (viewMode === "landing") {
-    return <StellarHomePage onLaunchPlatform={handleLaunchPlatform} />;
+    return (
+      <StellarHomePage
+        onLaunchPlatform={handleLaunchPlatform}
+        onOpenResources={() => setViewMode("resources")}
+      />
+    );
+  }
+
+  if (viewMode === "resources") {
+    return (
+      <ResourcesHub
+        onBackToHome={() => setViewMode("landing")}
+        onLaunchPlatform={handleLaunchPlatform}
+      />
+    );
   }
 
   return (
-    <div className="flex h-screen bg-[#08090d] text-slate-100 font-sans overflow-hidden">
-      
+    <div className="flex h-screen bg-[#F8FAFC] dark:bg-[#08090d] text-slate-900 dark:text-slate-100 font-sans overflow-hidden transition-colors">
+
       {/* SIDEBAR */}
-      <aside className={`scio-sidebar border-r border-slate-800/80 bg-[#0d1017] flex flex-col transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"}`}>
-        <div className="h-16 flex items-center px-4 border-b border-slate-800 justify-between">
+      <aside className={`scio-sidebar border-r border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0d1017] flex flex-col transition-all duration-300 ${sidebarOpen ? "w-64" : "w-16"}`}>
+        <div className="h-16 flex items-center px-4 border-b border-slate-200 dark:border-slate-800 justify-between">
           {sidebarOpen ? (
             <div className="flex items-center space-x-3 flex-1 min-w-0">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600 p-[1px] shadow-md flex-shrink-0">
-                <div className="h-full w-full bg-[#0d1017] rounded-[7px] flex items-center justify-center font-mono font-black text-slate-100 text-sm tracking-wider">
-                  S
-                </div>
+              <div className="h-8 w-8 rounded-lg bg-black dark:bg-white text-white dark:text-black shadow-md flex items-center justify-center font-mono font-black text-sm tracking-wider shrink-0">
+                S
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="font-bold text-xs tracking-widest text-slate-100 uppercase truncate font-mono">STELLAR SCIO</span>
-                <span className="text-[9px] text-slate-500 font-mono tracking-wider">MISSION CONTROL</span>
+                <span className="font-bold text-xs tracking-widest text-[#090D16] dark:text-slate-100 uppercase truncate font-mono">STELLAR SCIO</span>
+                <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono tracking-wider">MISSION CONTROL</span>
               </div>
             </div>
           ) : (
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-slate-200 via-slate-400 to-slate-600 p-[1px] shadow-md mx-auto flex items-center justify-center">
-              <div className="h-full w-full bg-[#0d1017] rounded-[7px] flex items-center justify-center font-mono font-black text-slate-100 text-xs">
-                S
-              </div>
+            <div className="h-8 w-8 rounded-lg bg-black dark:bg-white text-white dark:text-black shadow-md mx-auto flex items-center justify-center font-mono font-black text-xs">
+              S
             </div>
           )}
           {sidebarOpen && (
@@ -620,20 +643,19 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${
-                    isActive
-                      ? "bg-gradient-to-r from-slate-800/90 to-slate-900/60 border-l-2 border-slate-200 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] font-semibold"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                  }`}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
+                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                    }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
                   </div>
                   {sidebarOpen && tab.badge && (
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-slate-700 bg-slate-800 text-slate-300 font-bold">
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold">
                       {tab.badge}
                     </span>
                   )}
@@ -658,22 +680,97 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${
-                    isActive
-                      ? "bg-gradient-to-r from-slate-800/90 to-slate-900/60 border-l-2 border-slate-200 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] font-semibold"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                  }`}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
+                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                    }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-emerald-400 dark:text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
                   </div>
                   {sidebarOpen && tab.badge && (
-                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${
-                      isActive ? "bg-slate-700 text-slate-200 border-slate-600" : "bg-slate-900 text-slate-500 border-slate-800"
-                    }`}>
+                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${isActive
+                        ? "bg-slate-800 text-white border-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
+                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:border-slate-800"
+                      }`}>
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })
+          ) : currentIndustry === "manufacturing" ? (
+            [
+              { id: "dashboard", label: "Control Center", icon: <Building2 className="h-4 w-4" /> },
+              { id: "planning", label: "Production Planning", icon: <Calendar className="h-4 w-4" />, badge: "Gantt" },
+              { id: "quality", label: "Quality & Traceability", icon: <Shield className="h-4 w-4" />, badge: "AI AOI" },
+              { id: "maintenance", label: "Asset & Maintenance", icon: <ClipboardList className="h-4 w-4" /> },
+              { id: "materials", label: "Materials & Supply", icon: <ShoppingCart className="h-4 w-4" />, badge: "BOM" },
+              { id: "compliance", label: "Compliance & Safety", icon: <Shield className="h-4 w-4" />, badge: "IATF" },
+              { id: "ai-intelligence", label: "AI Manufacturing Intel", icon: <Cpu className="h-4 w-4" />, badge: "AI" }
+            ].map(tab => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
+                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                    }`}
+                >
+                  <div className="flex items-center space-x-3 truncate">
+                    <span className={isActive ? "text-amber-400 dark:text-amber-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
+                      {tab.icon}
+                    </span>
+                    {sidebarOpen && <span className="truncate">{tab.label}</span>}
+                  </div>
+                  {sidebarOpen && tab.badge && (
+                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${isActive
+                        ? "bg-slate-800 text-white border-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 font-bold"
+                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 font-bold"
+                      }`}>
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })
+          ) : currentIndustry === "logistics" ? (
+            [
+              { id: "dashboard", label: "Control Center", icon: <Building2 className="h-4 w-4" /> },
+              { id: "fleet-map", label: "Live GPS Fleet Map", icon: <Globe className="h-4 w-4" />, badge: "LIVE" },
+              { id: "shipments", label: "Multimodal Freight", icon: <Truck className="h-4 w-4" />, badge: "GPS" },
+              { id: "cold-chain", label: "Cold-Chain IoT", icon: <ThermometerSnowflake className="h-4 w-4" />, badge: "Reefer" },
+              { id: "warehouses", label: "Distribution Hubs", icon: <Boxes className="h-4 w-4" /> },
+              { id: "supply", label: "Procurement & POs", icon: <Navigation className="h-4 w-4" />, badge: "EDI" },
+              { id: "demurrage-ai", label: "Demurrage & Route AI", icon: <Zap className="h-4 w-4" />, badge: "AI" },
+              { id: "compliance", label: "Customs & Safety", icon: <Shield className="h-4 w-4" />, badge: "C-TPAT" }
+            ].map(tab => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
+                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                    }`}
+                >
+                  <div className="flex items-center space-x-3 truncate">
+                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
+                      {tab.icon}
+                    </span>
+                    {sidebarOpen && <span className="truncate">{tab.label}</span>}
+                  </div>
+                  {sidebarOpen && tab.badge && (
+                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${isActive
+                        ? "bg-slate-800 text-white border-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 font-bold"
+                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 font-bold"
+                      }`}>
                       {tab.badge}
                     </span>
                   )}
@@ -694,14 +791,13 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${
-                    isActive
-                      ? "bg-gradient-to-r from-slate-800/90 to-slate-900/60 border-l-2 border-slate-200 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] font-semibold"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
-                  }`}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
+                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                    }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
@@ -713,10 +809,10 @@ export default function App() {
         </nav>
 
         {/* SIDEBAR FOOTER */}
-        <div className="p-3 border-t border-slate-800 text-center">
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 text-center">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-full py-2 bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg text-[11px] font-mono border border-slate-800 transition-all"
+            className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 dark:bg-slate-900/80 dark:hover:bg-slate-800 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg text-[11px] font-mono border border-slate-200 dark:border-slate-800 transition-all"
           >
             {sidebarOpen ? "« Collapse Menu" : "»"}
           </button>
@@ -724,16 +820,16 @@ export default function App() {
       </aside>
 
       {/* MAIN VIEWPORT */}
-      <div className="flex-1 flex flex-col min-w-0 bg-[#08090d]">
-        
+      <div className="flex-1 flex flex-col min-w-0 bg-[#F1F5F9]/60 dark:bg-[#08090d] transition-colors">
+
         {/* EXECUTIVE TOP HEADER */}
-        <header className="h-16 border-b border-slate-800/80 bg-[#0d1017] px-6 flex items-center justify-between relative z-50 shadow-md">
+        <header className="h-16 border-b border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0d1017] px-6 flex items-center justify-between relative z-50 shadow-xs dark:shadow-md transition-colors">
           <div className="flex items-center space-x-4">
-            
+
             {/* Back to Homepage Gateway */}
             <button
               onClick={() => setViewMode("landing")}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/60 rounded-lg text-xs font-mono text-slate-300 hover:text-white transition-all shadow-sm"
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 hover:text-slate-900 dark:bg-slate-900/90 dark:hover:bg-slate-800 dark:border-slate-700/60 dark:text-slate-300 dark:hover:text-white transition-all shadow-xs"
               title="Return to Stellar SCIO Product Homepage"
             >
               <span>← Product Overview</span>
@@ -743,30 +839,30 @@ export default function App() {
             <div className="relative z-50">
               <button
                 onClick={() => setIndustryDropdownOpen(!industryDropdownOpen)}
-                className="flex items-center space-x-2.5 px-3 py-1.5 bg-gradient-to-b from-[#1c2230] to-[#121620] border border-slate-700/60 hover:border-slate-500 rounded-lg text-xs font-mono font-bold text-slate-100 transition-all shadow-sm"
+                className="flex items-center space-x-2.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 dark:bg-gradient-to-b dark:from-[#1c2230] dark:to-[#121620] dark:border-slate-700/60 hover:border-slate-400 dark:hover:border-slate-500 rounded-lg text-xs font-mono font-bold text-slate-800 dark:text-slate-100 transition-all shadow-xs"
               >
-                <span className="text-cyan-400">{getIndustryIcon(currentIndustry)}</span>
+                <span className="text-cyan-600 dark:text-cyan-400">{getIndustryIcon(currentIndustry)}</span>
                 <span className="uppercase tracking-wider">
                   {currentIndustry === "energy" ? "Utilities & Energy" :
-                   currentIndustry === "manufacturing" ? "Manufacturing 4.0" :
-                   currentIndustry === "maritime" ? "Maritime Fleet" :
-                   currentIndustry === "logistics" ? "Logistics & Supply" : "Operations"}
+                    currentIndustry === "manufacturing" ? "Manufacturing 4.0" :
+                      currentIndustry === "maritime" ? "Maritime Fleet" :
+                        currentIndustry === "logistics" ? "Logistics & Supply" : "Operations"}
                 </span>
-                <span className="text-slate-500 text-[10px]">▼</span>
+                <span className="text-slate-400 dark:text-slate-500 text-[10px]">▼</span>
               </button>
 
               {industryDropdownOpen && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40 bg-transparent" 
-                    onClick={() => setIndustryDropdownOpen(false)} 
+                  <div
+                    className="fixed inset-0 z-40 bg-transparent"
+                    onClick={() => setIndustryDropdownOpen(false)}
                   />
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-[#11151f] border border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 backdrop-blur-xl">
+                  <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-[#11151f] border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 backdrop-blur-xl">
                     {[
-                      { id: "energy", name: "Utilities & Energy", desc: "SCADA & Power Grid OCC", icon: <Zap className="h-4 w-4 text-cyan-400" /> },
-                      { id: "manufacturing", name: "Manufacturing 4.0", desc: "OEE Engine & Vision QA", icon: <Building2 className="h-4 w-4 text-amber-400" /> },
-                      { id: "maritime", name: "Maritime Fleet", desc: "AIS Navigation & Bunkering", icon: <Ship className="h-4 w-4 text-purple-400" /> },
-                      { id: "logistics", name: "Logistics & Supply Chain", desc: "Multimodal Cargo & Cold Chain", icon: <Truck className="h-4 w-4 text-emerald-400" /> }
+                      { id: "energy", name: "Utilities & Energy", desc: "SCADA & Power Grid OCC", icon: <Zap className="h-4 w-4 text-emerald-600 dark:text-cyan-400" /> },
+                      { id: "manufacturing", name: "Manufacturing 4.0", desc: "OEE Engine & Vision QA", icon: <Building2 className="h-4 w-4 text-amber-600 dark:text-amber-400" /> },
+                      { id: "maritime", name: "Maritime Fleet", desc: "AIS Navigation & Bunkering", icon: <Ship className="h-4 w-4 text-violet-600 dark:text-purple-400" /> },
+                      { id: "logistics", name: "Logistics & Supply Chain", desc: "Multimodal Cargo & Cold Chain", icon: <Truck className="h-4 w-4 text-cyan-600 dark:text-emerald-400" /> }
                     ].map((ind) => (
                       <button
                         key={ind.id}
@@ -775,16 +871,15 @@ export default function App() {
                           setIndustryDropdownOpen(false);
                           setActiveTab(ind.id === "energy" ? "energy-dashboard" : "dashboard");
                         }}
-                        className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-mono text-left transition-all relative z-50 ${
-                          currentIndustry === ind.id
-                            ? "bg-slate-800 text-white font-bold border-l-2 border-cyan-400"
-                            : "text-slate-300 hover:bg-slate-800/60 hover:text-white"
-                        }`}
+                        className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-mono text-left transition-all relative z-50 ${currentIndustry === ind.id
+                            ? "bg-slate-100 text-slate-900 font-bold border-l-2 border-emerald-600 dark:bg-slate-800 dark:text-white dark:border-cyan-400"
+                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white"
+                          }`}
                       >
                         <div className="flex-shrink-0">{ind.icon}</div>
                         <div className="flex flex-col min-w-0">
-                          <span className="font-bold text-white truncate">{ind.name}</span>
-                          <span className="text-[10px] text-slate-400 truncate">{ind.desc}</span>
+                          <span className="font-bold text-slate-900 dark:text-white truncate">{ind.name}</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{ind.desc}</span>
                         </div>
                       </button>
                     ))}
@@ -794,48 +889,47 @@ export default function App() {
             </div>
 
             {/* Platform Uplink Live Beacon */}
-            <div className="hidden lg:flex items-center space-x-3 px-3 py-1 bg-slate-900/80 border border-slate-800 rounded-lg text-[10px] font-mono text-slate-400">
-              <span className="flex items-center gap-1.5 text-emerald-400 font-bold">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div className="hidden lg:flex items-center space-x-3 px-3 py-1 bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-mono text-slate-600 dark:text-slate-400">
+              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 UPLINK ACTIVE
               </span>
-              <span className="text-slate-600">|</span>
-              <span className="text-cyan-300 font-mono">14ms LATENCY</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-300 font-bold">NERC-CIP / ISO-27001 SECURED</span>
+              <span className="text-slate-300 dark:text-slate-600">|</span>
+              <span className="text-cyan-700 dark:text-cyan-300 font-mono">14ms LATENCY</span>
+              <span className="text-slate-300 dark:text-slate-600">|</span>
+              <span className="text-slate-700 dark:text-slate-300 font-bold">NERC-CIP / ISO-27001 SECURED</span>
             </div>
           </div>
 
           <div className="flex items-center space-x-3">
-            <button 
+            <button
               onClick={() => setShowCockpitHUD(!showCockpitHUD)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${
-                showCockpitHUD
-                  ? "bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-[0_0_12px_rgba(0,240,255,0.2)]"
-                  : "bg-slate-900 text-slate-300 border-slate-700/60 hover:border-slate-500"
-              }`}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${showCockpitHUD
+                  ? "bg-cyan-50 text-cyan-700 border-cyan-300 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/40 shadow-xs"
+                  : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700/60 dark:hover:border-slate-500"
+                }`}
             >
-              <Gauge className="h-3.5 w-3.5 text-cyan-400" />
+              <Gauge className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
               <span>{showCockpitHUD ? "⚡ HUD: ACTIVE" : "⚡ Telemetry HUD"}</span>
             </button>
 
-            <button 
+            <button
               onClick={() => setCopilotOpen(true)}
-              className="flex items-center space-x-2 px-3.5 py-1.5 bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 hover:from-indigo-900 hover:to-purple-900 text-indigo-200 border border-indigo-500/30 rounded-lg text-xs font-mono font-semibold transition-all shadow-sm"
+              className="flex items-center space-x-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-gradient-to-r dark:from-indigo-950 dark:via-slate-900 dark:to-purple-950 dark:hover:from-indigo-900 dark:hover:to-purple-900 dark:text-indigo-200 dark:border dark:border-indigo-500/30 rounded-lg text-xs font-mono font-bold transition-all shadow-xs"
             >
-              <MessageSquare className="h-3.5 w-3.5 text-indigo-400 animate-pulse" />
+              <MessageSquare className="h-3.5 w-3.5 text-white dark:text-indigo-400 animate-pulse" />
               <span>Ask AI Copilot</span>
             </button>
 
-            <button 
+            <button
               onClick={() => setCreateWoModalOpen(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-gradient-to-b from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 border border-slate-500/40 text-slate-100 rounded-lg text-xs font-mono font-semibold transition-all shadow-xs"
+              className="flex items-center space-x-1.5 px-3 py-1.5 bg-black hover:bg-slate-800 text-white dark:bg-gradient-to-b dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700 border border-transparent dark:border-slate-500/40 dark:text-slate-100 rounded-lg text-xs font-mono font-semibold transition-all shadow-xs"
             >
-              <Plus className="h-3.5 w-3.5 text-slate-200" />
+              <Plus className="h-3.5 w-3.5 text-white dark:text-slate-200" />
               <span>New Work Order</span>
             </button>
 
-            <div className="h-8 w-8 rounded-lg chrome-plate flex items-center justify-center border border-slate-600/40 text-slate-300">
+            <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 flex items-center justify-center">
               <User className="h-4 w-4" />
             </div>
           </div>
@@ -849,39 +943,7 @@ export default function App() {
             <IndustrialCockpitHUD currentIndustry={currentIndustry} />
           )}
 
-          {/* ==================== ENERGY OCC TELEMETRY BANNER ==================== */}
-          {currentIndustry === "energy" && stats && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-panel border border-borderMuted p-4 rounded-xl shadow-sm">
-              <div className="flex flex-col">
-                <span className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Portfolio Installed Capacity</span>
-                <span className="text-lg font-bold text-textBright font-mono">
-                  {(stats.totalCapacity / 1000).toFixed(2)} GW
-                </span>
-              </div>
-              <div className="flex flex-col border-t sm:border-t-0 sm:border-l border-borderMuted/30 pt-3 sm:pt-0 sm:pl-4">
-                <span className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Live Generation Output</span>
-                <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400 font-mono flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  {stats.totalLivePower.toLocaleString(undefined, { maximumFractionDigits: 1 })} MW
-                </span>
-              </div>
-              <div className="flex flex-col border-t lg:border-t-0 lg:border-l border-borderMuted/30 pt-3 lg:pt-0 lg:pl-4">
-                <span className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Fleet Reliability Factor</span>
-                <span className="text-lg font-bold text-textBright font-mono">
-                  {stats.averageHealth.toFixed(1)}%
-                </span>
-              </div>
-              <div className="flex flex-col border-t lg:border-t-0 lg:border-l border-borderMuted/30 pt-3 lg:pt-0 lg:pl-4">
-                <span className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Grid Alarm Incidents</span>
-                <span className={`text-lg font-bold font-mono flex items-center gap-1.5 ${
-                  stats.activeAlarmsCount > 0 ? "text-rose-600 dark:text-red-500 font-semibold" : "text-textMuted"
-                }`}>
-                  {stats.activeAlarmsCount} Active
-                </span>
-              </div>
-            </div>
-          )}
-          
+
           {/* ==================== MARITIME CENTRALIZED CONTROL CENTER ==================== */}
           {activeTab === "dashboard" && currentIndustry === "maritime" && (
             <MaritimeControlCenter
@@ -894,30 +956,114 @@ export default function App() {
             />
           )}
 
-          {/* ==================== MANUFACTURING 4.0 CONTROL CENTER ==================== */}
-          {activeTab === "dashboard" && currentIndustry === "manufacturing" && (
-            <ManufacturingControlCenter
-              onNavigate={setActiveTab}
-              onCreateWorkOrder={(title, assetId, prio) => {
-                setNewWoTitle(title);
-                setNewWoAssetId(assetId);
-                setNewWoPriority(prio);
-                setCreateWoModalOpen(true);
-              }}
-            />
+          {/* ==================== MANUFACTURING 4.0 OPERATING SYSTEM MODULES ==================== */}
+          {currentIndustry === "manufacturing" && (
+            <>
+              {activeTab === "dashboard" && (
+                <ManufacturingControlCenter
+                  onNavigate={setActiveTab}
+                  onCreateWorkOrder={(title, assetId, prio) => {
+                    setNewWoTitle(title);
+                    setNewWoAssetId(assetId);
+                    setNewWoPriority(prio);
+                    setCreateWoModalOpen(true);
+                  }}
+                />
+              )}
+              {activeTab === "planning" && (
+                <ProductionPlanningModule />
+              )}
+              {activeTab === "quality" && (
+                <QualityTraceabilityModule />
+              )}
+              {activeTab === "maintenance" && (
+                <AssetMaintenanceModule />
+              )}
+              {activeTab === "materials" && (
+                <MaterialsSupplyChainModule />
+              )}
+              {activeTab === "ai-intelligence" && (
+                <AIManufacturingIntelligence />
+              )}
+            </>
           )}
 
           {/* ==================== LOGISTICS & SUPPLY CHAIN COMMAND CENTER ==================== */}
-          {activeTab === "dashboard" && currentIndustry === "logistics" && (
-            <LogisticsControlCenter
-              onNavigate={setActiveTab}
-              onCreateWorkOrder={(title, assetId, prio) => {
-                setNewWoTitle(title);
-                setNewWoAssetId(assetId);
-                setNewWoPriority(prio);
-                setCreateWoModalOpen(true);
-              }}
-            />
+          {currentIndustry === "logistics" && (
+            <>
+              {activeTab === "dashboard" && (
+                <LogisticsControlCenter
+                  initialSubTab="Overview"
+                  onNavigate={setActiveTab}
+                  onCreateWorkOrder={(title, assetId, prio) => {
+                    setNewWoTitle(title);
+                    setNewWoAssetId(assetId);
+                    setNewWoPriority(prio);
+                    setCreateWoModalOpen(true);
+                  }}
+                />
+              )}
+              {activeTab === "fleet-map" && (
+                <LogisticsControlCenter
+                  initialSubTab="Live GPS Fleet Map"
+                  onNavigate={setActiveTab}
+                  onCreateWorkOrder={(title, assetId, prio) => {
+                    setNewWoTitle(title);
+                    setNewWoAssetId(assetId);
+                    setNewWoPriority(prio);
+                    setCreateWoModalOpen(true);
+                  }}
+                />
+              )}
+              {activeTab === "shipments" && (
+                <LogisticsControlCenter
+                  initialSubTab="Multimodal Shipments"
+                  onNavigate={setActiveTab}
+                  onCreateWorkOrder={(title, assetId, prio) => {
+                    setNewWoTitle(title);
+                    setNewWoAssetId(assetId);
+                    setNewWoPriority(prio);
+                    setCreateWoModalOpen(true);
+                  }}
+                />
+              )}
+              {activeTab === "cold-chain" && (
+                <LogisticsControlCenter
+                  initialSubTab="Cold-Chain IoT & Sensors"
+                  onNavigate={setActiveTab}
+                  onCreateWorkOrder={(title, assetId, prio) => {
+                    setNewWoTitle(title);
+                    setNewWoAssetId(assetId);
+                    setNewWoPriority(prio);
+                    setCreateWoModalOpen(true);
+                  }}
+                />
+              )}
+              {activeTab === "warehouses" && (
+                <LogisticsControlCenter
+                  initialSubTab="Distribution Hubs & Bays"
+                  onNavigate={setActiveTab}
+                  onCreateWorkOrder={(title, assetId, prio) => {
+                    setNewWoTitle(title);
+                    setNewWoAssetId(assetId);
+                    setNewWoPriority(prio);
+                    setCreateWoModalOpen(true);
+                  }}
+                />
+              )}
+              {activeTab === "demurrage-ai" && (
+                <LogisticsControlCenter
+                  initialSubTab="Demurrage & Route AI"
+                  onNavigate={setActiveTab}
+                  onCreateWorkOrder={(title, assetId, prio) => {
+                    setNewWoTitle(title);
+                    setNewWoAssetId(assetId);
+                    setNewWoPriority(prio);
+                    setCreateWoModalOpen(true);
+                  }}
+                />
+              )}
+            </>
           )}
 
           {/* ==================== GENERIC CONTROL CENTER TAB (Other fallback) ==================== */}
@@ -965,9 +1111,9 @@ export default function App() {
                               💡 Recommendation: <span className="text-textMuted font-normal">{ins.recommendation}</span>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center space-x-2 self-start md:self-center">
-                            <button 
+                            <button
                               onClick={() => {
                                 setNewWoTitle(`Emergency Check: ${ins.targetEntity}`);
                                 setNewWoAssetId(ins.targetEntity);
@@ -1032,10 +1178,10 @@ export default function App() {
           {/* ==================== PLANT INFRASTRUCTURE REGISTRY ==================== */}
           {activeTab === "energy-infra" && (
             selectedPlantId ? (
-              <PlantDetailsView 
-                plantId={selectedPlantId} 
-                onBack={() => setSelectedPlantId(null)} 
-                onSelectAsset={() => setActiveTab("energy-assets")} 
+              <PlantDetailsView
+                plantId={selectedPlantId}
+                onBack={() => setSelectedPlantId(null)}
+                onSelectAsset={() => setActiveTab("energy-assets")}
               />
             ) : (
               <PlantDirectory onSelectPlant={(id) => { setSelectedPlantId(id); }} />
@@ -1141,7 +1287,7 @@ export default function App() {
                 {MARITIME_FLEET.map(voy => {
                   const fuelLog = bunkerLogs.find(b => b.vesselId === voy.vesselId);
                   const fuelCost = fuelLog ? (fuelLog.mgoROBMetricTons * 850) + (fuelLog.hfoROBMetricTons * 600) : 0;
-                  
+
                   const voyageRevenue = voy.charterRatePerDay * 15;
                   const voyageOPEX = fuelCost + 45000;
                   const netProfit = voyageRevenue - voyageOPEX;
@@ -1157,7 +1303,7 @@ export default function App() {
                           {netProfit > 150000 ? "High Yield" : "Low Margin"}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-1.5 text-xs font-mono">
                         <div className="flex justify-between">
                           <span className="text-textMuted">Charter Income:</span>
@@ -1319,7 +1465,7 @@ export default function App() {
                             </span>
                           </td>
                           <td className="py-3 px-4">
-                            <button 
+                            <button
                               onClick={() => setSelectedAsset(asset)}
                               className="px-2.5 py-1 bg-panelLight border border-borderMuted hover:border-textMuted text-xs rounded text-textBright"
                             >
@@ -1377,14 +1523,14 @@ export default function App() {
                           <td className="py-3 px-4 text-textMuted font-mono">{wo.dueDate}</td>
                           <td className="py-3 px-4 space-x-2">
                             {wo.status !== "Completed" && wo.status !== "Verified" && (
-                              <button 
+                              <button
                                 onClick={() => handleUpdateWoStatus(wo.id, "Completed")}
                                 className="px-2 py-1 bg-healthy/10 border border-healthy/30 text-healthy hover:bg-healthy/20 text-xs rounded font-semibold"
                               >
                                 Close & Complete
                               </button>
                             )}
-                            <button 
+                            <button
                               onClick={() => setSelectedWorkOrder(wo)}
                               className="px-2 py-1 bg-panelLight border border-borderMuted hover:border-textMuted text-xs rounded text-textBright"
                             >
@@ -1407,7 +1553,7 @@ export default function App() {
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted mb-4">
                   {currentIndustry === "maritime" ? "Marine MRO Spare Parts & Consumables" : "Critical Spares & MRO Catalog"}
                 </h2>
-                
+
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
@@ -1453,7 +1599,7 @@ export default function App() {
               <div className="bg-panel border border-borderMuted rounded-lg p-5">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted">Operations Compliance Certificates & Regulatory Records</h2>
-                  
+
                   {currentIndustry === "maritime" && (
                     <div className="flex space-x-2">
                       <button
@@ -1486,9 +1632,9 @@ export default function App() {
                         </div>
                         <p className="text-xs text-textMuted">Regulatory Body: {cmp.authority} | Expiry: {cmp.expiryDate}</p>
                       </div>
-                      
+
                       {cmp.status !== "Valid" && (
-                        <button 
+                        <button
                           onClick={() => {
                             setNewWoTitle(`Audit Check: ${cmp.title}`);
                             setNewWoAssetId("Regulatory Compliance Desk");
@@ -1585,7 +1731,7 @@ export default function App() {
                                               assignedTeam: "Vessel Technical Crew",
                                               assignedPerson: crewMember?.name || "Onsite Duty Engineer",
                                               createdDate: new Date().toISOString().split('T')[0],
-                                              dueDate: new Date(Date.now() + 24*60*60*1000).toISOString().split('T')[0],
+                                              dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                                               estimatedDuration: "4 Hours",
                                               requiredParts: [],
                                               notes: `Automatically generated due to safety inspection failure on ${ins.name}.`
@@ -1671,45 +1817,299 @@ export default function App() {
             </div>
           )}
 
-          {/* ==================== PROCUREMENT & SUPPLY TAB (Maritime Only) ==================== */}
+          {/* ==================== PROCUREMENT & SUPPLY TAB ==================== */}
           {activeTab === "supply" && (
-            <div className="space-y-6">
-              <div className="bg-panel border border-borderMuted rounded-lg p-5">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-textMuted mb-4">Marine Purchase Requests & Port Delivery Logistics</h2>
+            <section className="bg-[#0B0D0F] rounded-2xl border border-white/[0.08] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-10 shadow-2xl space-y-8">
+              {/* Top Hero Section Intro */}
+              <div className="flex flex-col justify-between gap-6 border-b border-white/[0.07] pb-6 xl:flex-row xl:items-end">
+                <div className="space-y-2.5">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#3FC8D8]">
+                    <Navigation className="h-3.5 w-3.5" />
+                    01 — GLOBAL PROCUREMENT · PORT &amp; FREIGHT DELIVERY LOGISTICS
+                  </div>
+                  <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                    Purchase Requests &amp; Port Delivery Console
+                  </h1>
+                  <p className="max-w-3xl text-sm leading-relaxed text-white/50">
+                    Live tracking of critical engine spares, emergency kits, and berth delivery waybills with automated SAP integration.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      const newPo = {
+                        poNumber: `MPO-${Math.floor(88409 + Math.random() * 100)}`,
+                        vesselId: "vess-01 (Stellar Navigator)",
+                        itemDescription: "Auxiliary Generator Lube Oil Injector Pack",
+                        qtyRequested: 4,
+                        status: "PR Approved" as const,
+                        supplierName: "Industrial Spares Inc.",
+                        portDestination: "Houston Port Terminal 3",
+                        leadTimeDays: 4,
+                        totalCost: 12800,
+                        orderDate: new Date().toISOString().split('T')[0],
+                        etaDate: new Date(Date.now() + 4*24*60*60*1000).toISOString().split('T')[0],
+                        sku: "SKU-GEN-INJ-44",
+                        priority: "High" as const
+                      };
+                      setSupplyOrders(prev => [newPo, ...prev]);
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 px-4 py-2.5 font-mono text-xs font-bold text-white transition-all hover:opacity-90 shadow-md"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Create Purchase Order</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Top 4 KPI Cards */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                  <div className="flex justify-between items-center">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40">Total PO Volume</p>
+                    <span className="font-mono text-[10px] text-[#2FBF71] bg-[#2FBF71]/10 px-1.5 py-0.5 rounded border border-[#2FBF71]/30">SAP Live</span>
+                  </div>
+                  <p className="mt-3 text-[30px] font-semibold leading-none tracking-[-0.03em] text-white">
+                    $168,800
+                  </p>
+                  <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-white/40">8 Active Orders</span>
+                    <span className="text-[#2FBF71] font-bold">+12.4% MoM</span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                  <div className="flex justify-between items-center">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40">In-Transit to Berth</p>
+                    <Truck className="h-4 w-4 text-[#3FC8D8]" />
+                  </div>
+                  <p className="mt-3 text-[30px] font-semibold leading-none tracking-[-0.03em] text-white">
+                    2 Orders
+                  </p>
+                  <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-white/40">Hamburg &amp; Houston</span>
+                    <span className="text-[#3FC8D8] font-bold">98.2% On-Time</span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                  <div className="flex justify-between items-center">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40">Pending Approvals</p>
+                    <ClipboardList className="h-4 w-4 text-[#E8A33D]" />
+                  </div>
+                  <p className="mt-3 text-[30px] font-semibold leading-none tracking-[-0.03em] text-white">
+                    2 Orders
+                  </p>
+                  <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-white/40">Ready for Signoff</span>
+                    <span className="text-[#E8A33D] font-bold">$37,600 Est.</span>
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                  <div className="flex justify-between items-center">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40">Supplier SLA Rate</p>
+                    <Shield className="h-4 w-4 text-[#8B5CF6]" />
+                  </div>
+                  <p className="mt-3 text-[30px] font-semibold leading-none tracking-[-0.03em] text-white">
+                    99.1%
+                  </p>
+                  <div className="mt-3 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-white/40">Certified Vendors</span>
+                    <span className="text-[#8B5CF6] font-bold">4.8d Lead Time</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Table Shell */}
+              <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#101315] shadow-2xl">
+                {/* Table Control Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.07] bg-[#0E1113] px-5 py-4">
+                  <div className="relative min-w-[280px] flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/40" />
+                    <input
+                      type="text"
+                      value={supplySearch}
+                      onChange={(e) => setSupplySearch(e.target.value)}
+                      placeholder="Search PO#, Vessel, SKU, Port, Supplier..."
+                      className="w-full pl-9 pr-3 py-2 rounded-lg border border-white/[0.1] bg-[#08090C] text-xs font-mono text-white placeholder:text-white/30 focus:outline-none focus:border-[#3FC8D8]"
+                    />
+                  </div>
+
+                  {/* Status Filter Chips */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {["all", "PO Sent", "Port Delivery Pending", "PR Approved", "Draft"].map((st) => (
+                      <button
+                        key={st}
+                        onClick={() => setSupplyStatusFilter(st)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+                          supplyStatusFilter === st
+                            ? "bg-[#3FC8D8] text-black font-bold shadow-md"
+                            : "bg-white/[0.03] text-white/50 hover:text-white hover:bg-white/[0.06]"
+                        }`}
+                      >
+                        {st === "all" ? "All Orders" : st}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Data Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-borderMuted text-xs text-textMuted uppercase font-mono">
-                        <th className="py-3 px-4">PO Number</th>
-                        <th className="py-3 px-4">Vessel Destination</th>
-                        <th className="py-3 px-4">Spare Part / Requirement</th>
-                        <th className="py-3 px-4">Qty</th>
-                        <th className="py-3 px-4">Port Destination</th>
-                        <th className="py-3 px-4">Supplier</th>
-                        <th className="py-3 px-4">Status</th>
+                      <tr className="border-b border-white/[0.07] text-[11px] text-white/40 uppercase font-mono bg-white/[0.01]">
+                        <th className="py-3 px-5 font-bold">PO Number &amp; SKU</th>
+                        <th className="py-3 px-5 font-bold">Destination</th>
+                        <th className="py-3 px-5 font-bold">Part Description</th>
+                        <th className="py-3 px-5 font-bold">Qty &amp; Total ($)</th>
+                        <th className="py-3 px-5 font-bold">Port &amp; ETA</th>
+                        <th className="py-3 px-5 font-bold">Supplier</th>
+                        <th className="py-3 px-5 font-bold">Status</th>
+                        <th className="py-3 px-5 font-bold text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-borderMuted/30 text-sm">
-                      {MARITIME_SUPPLY_ORDERS.map(po => (
-                        <tr key={po.poNumber} className="hover:bg-panelLight/30">
-                          <td className="py-3 px-4 font-mono font-bold text-textBright">{po.poNumber}</td>
-                          <td className="py-3 px-4 text-textMuted">{po.vesselId}</td>
-                          <td className="py-3 px-4 font-medium text-textBright">{po.itemDescription}</td>
-                          <td className="py-3 px-4 text-textMuted font-mono">{po.qtyRequested}</td>
-                          <td className="py-3 px-4 text-textMuted">{po.portDestination}</td>
-                          <td className="py-3 px-4 text-textMuted">{po.supplierName}</td>
-                          <td className="py-3 px-4">
-                            <span className={`px-2 py-0.5 rounded border text-xs font-semibold ${getStatusColor(po.status)}`}>
-                              {po.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
+                    <tbody className="divide-y divide-white/[0.05] text-xs font-mono">
+                      {supplyOrders
+                        .filter(po => {
+                          const matchesStatus = supplyStatusFilter === "all" || po.status === supplyStatusFilter;
+                          const matchesSearch = supplySearch === "" ||
+                            po.poNumber.toLowerCase().includes(supplySearch.toLowerCase()) ||
+                            po.itemDescription.toLowerCase().includes(supplySearch.toLowerCase()) ||
+                            po.vesselId.toLowerCase().includes(supplySearch.toLowerCase()) ||
+                            po.supplierName.toLowerCase().includes(supplySearch.toLowerCase()) ||
+                            po.portDestination.toLowerCase().includes(supplySearch.toLowerCase());
+                          return matchesStatus && matchesSearch;
+                        })
+                        .map(po => {
+                          const isDelivered = po.status === "Delivered";
+                          const isPending = po.status === "Port Delivery Pending";
+                          const isSent = po.status === "PO Sent";
+                          const isApproved = po.status === "PR Approved";
+                          
+                          const badgeColor = isDelivered ? "#2FBF71" : isPending ? "#3FC8D8" : isSent ? "#8B5CF6" : "#E8A33D";
+
+                          return (
+                            <tr key={po.poNumber} className="hover:bg-white/[0.02] transition-colors">
+                              <td className="py-4 px-5 font-bold">
+                                <span className="block text-[#3FC8D8] font-bold">{po.poNumber}</span>
+                                <span className="text-[10px] text-white/40 font-normal">{po.sku || "SKU-GENERIC"}</span>
+                              </td>
+                              <td className="py-4 px-5 text-white font-semibold">{po.vesselId}</td>
+                              <td className="py-4 px-5 text-white">
+                                <span className="block font-bold">{po.itemDescription}</span>
+                                <span className="text-[10.5px] text-white/40">Order Date: {po.orderDate || "2026-08-20"}</span>
+                              </td>
+                              <td className="py-4 px-5 text-white">
+                                <span className="font-bold">{po.qtyRequested} units</span>
+                                <span className="block text-[#2FBF71] font-bold">${(po.totalCost || (po.qtyRequested * 2400)).toLocaleString()}</span>
+                              </td>
+                              <td className="py-4 px-5 text-white">
+                                <span className="block font-bold">{po.portDestination}</span>
+                                <span className="text-[10.5px] text-white/40">ETA: {po.etaDate || "2026-08-27"} ({po.leadTimeDays}d lead)</span>
+                              </td>
+                              <td className="py-4 px-5 text-white/60">{po.supplierName}</td>
+                              <td className="py-4 px-5">
+                                <span
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold"
+                                  style={{
+                                    color: badgeColor,
+                                    backgroundColor: `${badgeColor}15`,
+                                    border: `1px solid ${badgeColor}40`
+                                  }}
+                                >
+                                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: badgeColor }} />
+                                  <span>{po.status}</span>
+                                </span>
+                              </td>
+                              <td className="py-4 px-5 text-right space-x-2 whitespace-nowrap">
+                                <button
+                                  onClick={() => setSelectedTrackPo(po)}
+                                  className="px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-[#3FC8D8] border border-[#3FC8D8]/30 font-bold text-[11px] transition-all"
+                                >
+                                  Track Delivery
+                                </button>
+                                {po.status === "PR Approved" && (
+                                  <button
+                                    onClick={() => {
+                                      setSupplyOrders(prev => prev.map(o => o.poNumber === po.poNumber ? { ...o, status: "PO Sent" } : o));
+                                    }}
+                                    className="px-3 py-1.5 rounded-lg bg-[#2FBF71]/10 hover:bg-[#2FBF71]/20 text-[#2FBF71] border border-[#2FBF71]/30 font-bold text-[11px] transition-all"
+                                  >
+                                    Dispatch PO
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
+
+              {/* Delivery Waypoint Tracker Drawer / Modal */}
+              {selectedTrackPo && (
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div className="bg-[#101315] border border-white/[0.1] rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl text-white">
+                    <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                      <div>
+                        <span className="text-[10px] font-mono uppercase font-bold text-white/40 block">Port Delivery Waypoint Tracker</span>
+                        <h3 className="font-bold text-sm font-mono text-[#3FC8D8]">{selectedTrackPo.poNumber} · {selectedTrackPo.itemDescription}</h3>
+                      </div>
+                      <button onClick={() => setSelectedTrackPo(null)} className="h-7 w-7 rounded-full bg-white/[0.06] text-white/60 hover:text-white flex items-center justify-center">✕</button>
+                    </div>
+
+                    <div className="space-y-4 text-xs font-mono">
+                      <div className="p-3.5 rounded-xl bg-[#08090C] border border-white/[0.06] space-y-1.5">
+                        <p className="flex justify-between"><span className="text-white/40">Destination:</span> <span className="font-bold text-white">{selectedTrackPo.vesselId}</span></p>
+                        <p className="flex justify-between"><span className="text-white/40">Port Terminal:</span> <span className="font-bold text-white">{selectedTrackPo.portDestination}</span></p>
+                        <p className="flex justify-between"><span className="text-white/40">Estimated Berth Delivery:</span> <span className="font-bold text-[#2FBF71]">{selectedTrackPo.etaDate || "2026-08-26"}</span></p>
+                        <p className="flex justify-between"><span className="text-white/40">Total Valuation:</span> <span className="font-bold text-white">${(selectedTrackPo.totalCost || 18400).toLocaleString()}</span></p>
+                      </div>
+
+                      {/* Timeline Waypoint Steps */}
+                      <div className="space-y-3 pt-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">Live Logistics Pipeline:</span>
+                        <div className="space-y-2.5">
+                          <div className="flex items-center gap-3">
+                            <span className="h-6 w-6 rounded-full bg-[#2FBF71] text-black flex items-center justify-center font-bold text-[10px]">✓</span>
+                            <div>
+                              <p className="font-bold text-white">PR Authorized &amp; SAP PO Dispatched</p>
+                              <p className="text-[10.5px] text-white/40">Electronic EDI transmitted to {selectedTrackPo.supplierName}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="h-6 w-6 rounded-full bg-[#2FBF71] text-black flex items-center justify-center font-bold text-[10px]">✓</span>
+                            <div>
+                              <p className="font-bold text-white">Customs Clearance &amp; Port Gate Check-In</p>
+                              <p className="text-[10.5px] text-white/40">Cleared through {selectedTrackPo.portDestination} Terminal Inspection</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="h-6 w-6 rounded-full bg-[#3FC8D8] animate-pulse text-black flex items-center justify-center font-bold text-[10px]">●</span>
+                            <div>
+                              <p className="font-bold text-[#3FC8D8]">Final Berth Transit (Barge / Crane Load)</p>
+                              <p className="text-[10.5px] text-white/40">Scheduled for shipside handover upon vessel mooring</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-white/[0.08] flex justify-end">
+                      <button
+                        onClick={() => setSelectedTrackPo(null)}
+                        className="px-4 py-2 rounded-lg bg-white/[0.06] hover:bg-white/[0.1] text-white text-xs font-mono font-bold transition-all"
+                      >
+                        Close Tracker
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
           )}
 
           {/* ==================== CREW OPERATIONS TAB (Maritime Only) ==================== */}
@@ -1780,7 +2180,7 @@ export default function App() {
                   <div className="lg:col-span-1 space-y-4">
                     <div className="bg-panelLight/40 p-4 border border-borderMuted/50 rounded-lg space-y-3">
                       <h3 className="text-xs font-semibold uppercase tracking-wider text-textMuted font-mono">Select Diagnostic Script</h3>
-                      
+
                       <button
                         onClick={() => {
                           setCopilotQuery("Run Voyage Fuel Efficiency Scan");
@@ -1819,7 +2219,7 @@ export default function App() {
                         <span>Terminal Output Console</span>
                         <span>SCIO OS v1.0.9</span>
                       </div>
-                      
+
                       <div className="flex-1 overflow-y-auto space-y-4 p-2">
                         <div>
                           <span className="text-emerald-400">guest@scio-hq:~$ </span>

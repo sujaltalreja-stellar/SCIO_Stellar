@@ -104,6 +104,11 @@ export interface MarineProcurementOrder {
   supplierName: string;
   portDestination: string;
   leadTimeDays: number;
+  totalCost?: number;
+  orderDate?: string;
+  etaDate?: string;
+  sku?: string;
+  priority?: "Critical" | "High" | "Normal";
 }
 
 export interface CrewMember {
