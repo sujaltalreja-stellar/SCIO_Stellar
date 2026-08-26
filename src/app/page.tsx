@@ -46,7 +46,6 @@ import {
 } from "../config/industries";
 import StellarHomePage from "../components/landing/StellarHomePage";
 import ResourcesHub from "../components/resources/ResourcesHub";
-import GenerativeVisualCopilot from "../components/ai/GenerativeVisualCopilot";
 import ScioSentinelOrb from "../components/ai/ScioSentinelOrb";
 import ContactHub from "../components/contact/ContactHub";
 import { mockDb } from "../config/energyMockDb";
@@ -2341,13 +2340,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* ==================== AI COPILOT GENERATIVE VISUAL PANEL ==================== */}
-      <GenerativeVisualCopilot
-        isOpen={copilotOpen}
-        onClose={() => setCopilotOpen(false)}
-        currentIndustry={currentIndustry}
-        onNavigateTab={(tab) => setActiveTab(tab)}
-      />
 
       {/* ==================== CREATE WORK ORDER MODAL ==================== */}
       {createWoModalOpen && (
