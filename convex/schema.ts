@@ -234,5 +234,24 @@ export default defineSchema({
       frequencyHz: v.number(),
       uptimePercent: v.number(),
     })
+  }),
+
+  // Industry-Wise Chatbot Conversation History
+  chatHistory: defineTable({
+    industry: v.string(), // "home" | "energy" | "maritime" | "manufacturing" | "logistics"
+    sessionId: v.optional(v.string()),
+    sender: v.string(), // "user" | "bot"
+    text: v.string(),
+    timestamp: v.string(),
+    provider: v.optional(v.string()),
+    suggestedAction: v.optional(
+      v.object({
+        type: v.string(),
+        label: v.string(),
+        payload: v.optional(v.any()),
+      })
+    ),
   })
+    .index("by_industry", ["industry"])
+    .index("by_industry_and_timestamp", ["industry", "timestamp"])
 });

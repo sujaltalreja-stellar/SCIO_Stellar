@@ -94,10 +94,21 @@ export const getAlarms = query({
 });
 
 // Maritime Fleet & Safety
-export const getMaritimeVessels = query({
+export const getMaritimeSafety = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("maritimeVessels").collect();
+    return await ctx.db.query("maritimeSafety").collect();
+  },
+});
+
+// Industry-Wise Chat History Query
+export const getChatHistory = query({
+  args: { industry: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("chatHistory")
+      .withIndex("by_industry", (q) => q.eq("industry", args.industry))
+      .collect();
   },
 });
 

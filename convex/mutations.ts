@@ -86,3 +86,39 @@ export const adjustStock = mutation({
     }
   },
 });
+
+// Industry-Wise Chatbot Mutations
+export const saveChatMessage = mutation({
+  args: {
+    industry: v.string(),
+    sessionId: v.optional(v.string()),
+    sender: v.string(),
+    text: v.string(),
+    timestamp: v.string(),
+    provider: v.optional(v.string()),
+    suggestedAction: v.optional(
+      v.object({
+        type: v.string(),
+        label: v.string(),
+        payload: v.optional(v.any()),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("chatHistory", args);
+  },
+});
+
+export const clearChatHistory = mutation({
+  args: { industry: v.string() },
+  handler: async (ctx, args) => {
+    const records = await ctx.db
+      .query("chatHistory")
+      .withIndex("by_industry", (q) => q.eq("industry", args.industry))
+      .collect();
+
+    for (const record of records) {
+      await ctx.db.delete(record._id);
+    }
+  },
+});
