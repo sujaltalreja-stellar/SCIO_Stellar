@@ -228,187 +228,55 @@ html.light .theme-toggle-knob {
 }
 
 /* ================================================================
-   6. COMPLETE, BULLETPROOF LIGHT MODE OVERHAUL
+   6. CLEAN & RELIABLE LIGHT/DARK THEME SYSTEM
    ================================================================ */
 html[data-theme="light"],
 html.light {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: #f8fafc;
+  color: #0f172a;
 
   /* Surfaces */
   main,
-  main > div,
-  .bg-background,
-  div[class*="bg-background"] {
-    background-color: #f8fafc !important;
-  }
-
-  aside,
-  header,
-  .bg-panel,
-  .glass-panel,
-  .glow-card,
-  .cockpit-panel,
-  .silver-card,
-  article,
-  div[class*="bg-panel"],
-  div[class*="bg-zinc-950"],
-  div[class*="bg-slate-950"],
-  div[class*="bg-zinc-900"],
-  div[class*="bg-slate-900"],
-  div[class*="bg-[#08090d]"],
-  div[class*="bg-[#0f1219]"],
-  div[class*="bg-[#11141f]"],
-  div[class*="bg-[#0c0e17]"],
-  div[class*="bg-[#090b10]"] {
-    background: #ffffff !important;
-    border-color: #e2e8f0 !important;
-    color: #0f172a !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important;
-  }
-
-  .bg-panelLight,
-  .chrome-plate,
-  div[class*="bg-panelLight"],
-  div[class*="bg-slate-800"],
-  div[class*="bg-zinc-800"],
-  div[class*="bg-slate-900/50"],
-  div[class*="bg-slate-900/40"] {
-    background: #f8fafc !important;
-    border-color: #e2e8f0 !important;
-  }
-
-  /* Borders */
-  .border-borderMuted,
-  div[class*="border-zinc-"],
-  div[class*="border-slate-"],
-  header[class*="border-"],
-  aside[class*="border-"],
-  section[class*="border-"],
-  article[class*="border-"] {
-    border-color: #e2e8f0 !important;
+  .bg-background {
+    background-color: #f8fafc;
   }
 
   /* Headings & Text */
-  h1, h2, h3, h4, h5, h6,
-  strong,
-  .text-textBright,
-  div[class*="text-textBright"],
-  span[class*="text-textBright"],
-  div[class*="text-zinc-100"],
-  span[class*="text-zinc-100"],
-  div[class*="text-zinc-200"],
-  span[class*="text-zinc-200"],
-  div[class*="text-slate-100"],
-  span[class*="text-slate-100"],
-  div[class*="text-slate-200"],
-  span[class*="text-slate-200"] {
-    color: #0f172a !important;
+  .text-textBright {
+    color: #0f172a;
   }
 
-  p,
-  .text-textMuted,
-  div[class*="text-textMuted"],
-  span[class*="text-textMuted"],
-  div[class*="text-zinc-400"],
-  span[class*="text-zinc-400"],
-  div[class*="text-slate-400"],
-  span[class*="text-slate-400"],
-  div[class*="text-zinc-500"],
-  span[class*="text-zinc-500"],
-  div[class*="text-slate-500"],
-  span[class*="text-slate-500"] {
-    color: #64748b !important;
-  }
-
-  span.text-white,
-  div.text-white,
-  h1.text-white,
-  h2.text-white,
-  h3.text-white,
-  h4.text-white,
-  p.text-white,
-  b.text-white {
-    color: #0f172a !important;
-  }
-
-  button[class*="bg-emerald-"],
-  button[class*="bg-blue-"],
-  button[class*="bg-amber-"],
-  button[class*="bg-purple-"],
-  button[class*="bg-cyan-"],
-  button[class*="bg-rose-"],
-  button[class*="bg-indigo-"] {
-    color: #ffffff !important;
-  }
-
-  button[class*="bg-emerald-"] *,
-  button[class*="bg-blue-"] *,
-  button[class*="bg-amber-"] *,
-  button[class*="bg-purple-"] *,
-  button[class*="bg-cyan-"] *,
-  button[class*="bg-rose-"] * {
-    color: #ffffff !important;
+  .text-textMuted {
+    color: #64748b;
   }
 
   /* Sidebar */
-  aside {
-    background: #ffffff !important;
-    border-color: #e2e8f0 !important;
+  aside.scio-sidebar {
+    background: #ffffff;
+    border-color: #e2e8f0;
   }
 
-  aside button {
-    color: #475569 !important;
+  aside.scio-sidebar button {
+    color: #475569;
   }
 
-  aside button:hover {
-    background-color: #f1f5f9 !important;
-    color: #0f172a !important;
-  }
-
-  aside button[class*="border-r-2"] {
-    background-color: #ecfdf5 !important;
-    color: #047857 !important;
-    border-color: #10b981 !important;
-    font-weight: 600 !important;
-  }
-
-  aside button[class*="border-r-2"] * {
-    color: #047857 !important;
+  aside.scio-sidebar button:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
   }
 
   /* Inputs */
-  input,
+  input:not([type="hidden"]),
   select,
   textarea {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #0f172a !important;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
   }
 
   input::placeholder,
   textarea::placeholder {
-    color: #94a3b8 !important;
-  }
-
-  /* Tables */
-  table thead tr {
-    background-color: #f8fafc !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-  }
-  table thead th {
-    color: #475569 !important;
-    font-weight: 600 !important;
-  }
-  table tbody tr {
-    background-color: #ffffff !important;
-    border-bottom: 1px solid #f1f5f9 !important;
-  }
-  table tbody tr:hover {
-    background-color: #f8fafc !important;
-  }
-  table tbody td {
-    color: #334155 !important;
+    color: #94a3b8;
   }
 }
 

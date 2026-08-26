@@ -174,9 +174,8 @@ function Meter({
           className="block h-full rounded-full"
           style={{ background: color }}
           initial={{ width: 0 }}
-          whileInView={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 1, ease: ENTRANCE, delay }}
+          animate={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+          transition={{ duration: 0.8, ease: ENTRANCE, delay }}
         />
       </span>
       <span className="text-right font-mono text-[11px] text-slate-950 dark:text-white font-black sm:text-[11.5px]">
@@ -437,10 +436,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                   className="space-y-4 sm:space-y-6"
                 >
                   {/* Top 4 KPI Metric Cards */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-                  >
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     {/* KPI 1: Total Grid Pool */}
                     <div className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-slate-300 dark:hover:border-white/[0.14] shadow-xs dark:shadow-none">
                       <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-slate-900 dark:text-white/60 font-bold sm:text-[11.5px]">
@@ -454,9 +450,8 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                         <motion.span
                           className="block h-full rounded-full bg-[#06B6D4] dark:bg-[#3FC8D8]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: "99.9%" }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.1 }}
+                          animate={{ width: "99.9%" }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.1 }}
                         />
                       </span>
                     </div>
@@ -474,9 +469,8 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                         <motion.span
                           className="block h-full rounded-full bg-[#10B981] dark:bg-[#2FBF71]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${loadFactor}%` }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.2 }}
+                          animate={{ width: `${loadFactor}%` }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.2 }}
                         />
                       </span>
                     </div>
@@ -494,9 +488,8 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                         <motion.span
                           className="block h-full rounded-full bg-[#7C3AED] dark:bg-[#8B5CF6]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${fleetHealth}%` }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.3 }}
+                          animate={{ width: `${fleetHealth}%` }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.3 }}
                         />
                       </span>
                     </div>
@@ -514,13 +507,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                         1 IGBT junction overheat · 1 Yaw offset discrepancy
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Middle Row 1: Generation Dispatch Waveform + Generation Mix Radial Donut */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-4 lg:grid-cols-[1.35fr_1fr]"
-                  >
+                  <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
                     <Card
                       title="Multi-Source Generation Profile · 14-Day Power Dispatch"
                       accentColor="#10B981"
@@ -602,6 +592,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                                   fill="transparent"
                                   stroke={item.color}
                                   strokeWidth="4.2"
+                                  pathLength={1}
                                   strokeDasharray={`${fraction} ${1 - fraction}`}
                                   strokeDashoffset={-offset}
                                   initial={{ strokeDasharray: "0 1" }}
@@ -646,13 +637,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                         </ul>
                       </div>
                     </Card>
-                  </motion.div>
+                  </div>
 
                   {/* Middle Row 2: Cluster Availability & AI SCADA Sensor Precision */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-4 lg:grid-cols-2"
-                  >
+                  <div className="grid gap-4 lg:grid-cols-2">
                     <Card
                       title="Cluster Availability & SCADA Readiness"
                       accentColor="#10B981"
@@ -698,13 +686,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                         ))}
                       </div>
                     </Card>
-                  </motion.div>
+                  </div>
 
                   {/* Bottom Row: 3 Operational Telemetry Footer Cards */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-3 sm:grid-cols-3"
-                  >
+                  <div className="grid gap-3 sm:grid-cols-3">
                     {FOOTER_CARDS.map((card) => (
                       <div
                         key={card.label}
@@ -729,7 +714,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                         </p>
                       </div>
                     ))}
-                  </motion.div>
+                  </div>
                 </motion.div>
               )}
 

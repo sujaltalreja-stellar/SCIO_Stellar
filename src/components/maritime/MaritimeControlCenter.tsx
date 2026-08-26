@@ -72,9 +72,9 @@ const stagger = (delayChildren = 0.08, staggerChildren = 0.1) => ({
 const TABS = [
   "Overview",
   "Fleet & Hull",
-  "Inspections & PSC",
+  "Inspections & Safety",
   "Bunkering & MRO",
-  "SOLAS Compliance",
+  "Safety Equipment",
 ];
 
 // Helper: Lightweight Animated CountUp
@@ -173,9 +173,8 @@ function Meter({
           className="block h-full rounded-full"
           style={{ background: color }}
           initial={{ width: 0 }}
-          whileInView={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 1, ease: ENTRANCE, delay }}
+          animate={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+          transition={{ duration: 0.8, ease: ENTRANCE, delay }}
         />
       </span>
       <span className="text-right font-mono text-[11px] text-white/75 sm:text-[11.5px]">
@@ -288,11 +287,11 @@ export default function MaritimeControlCenter({
 
   // AI Marine Computer Vision & Anomaly Detection Accuracy
   const AI_ACCURACY = [
-    ["Hull Fouling & Bio-Index", 99],
+    ["Hull Cleanliness Index", 99],
     ["Propulsion Vibration FFT", 97],
-    ["Exhaust CII / MARPOL", 95],
+    ["Exhaust & Fuel Efficiency", 95],
     ["AIS Route Drift Detection", 98],
-    ["Safety Gear CV OCR", 96],
+    ["Safety Gear Inspection CV", 96],
     ["Bunker Fuel Match", 99],
   ] as const;
 
@@ -336,8 +335,8 @@ export default function MaritimeControlCenter({
               One Control Tower for the Entire Maritime Fleet
             </h1>
             <p className="max-w-3xl text-sm leading-relaxed text-white/50 sm:text-[14.5px]">
-              Centralized, real-time visibility into vessel seaworthiness, Port State Control (PSC) inspection readiness,
-              bunker resilience, and critical SOLAS/MARPOL alerts — with vessel-level telemetry behind every number.
+              Centralized, real-time visibility into vessel seaworthiness, port safety inspection readiness,
+              fuel resilience, and routine equipment walkthroughs — with vessel-level telemetry behind every number.
             </p>
           </div>
 
@@ -426,10 +425,7 @@ export default function MaritimeControlCenter({
                   className="space-y-4 sm:space-y-6"
                 >
                   {/* Top 4 KPI Metric Cards */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-                  >
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     {/* KPI 1: Fleet Seaworthiness */}
                     <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
                       <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
@@ -443,9 +439,8 @@ export default function MaritimeControlCenter({
                         <motion.span
                           className="block h-full rounded-full bg-[#2FBF71]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${fleetReadiness}%` }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.1 }}
+                          animate={{ width: `${fleetReadiness}%` }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.1 }}
                         />
                       </span>
                     </div>
@@ -463,9 +458,8 @@ export default function MaritimeControlCenter({
                         <motion.span
                           className="block h-full rounded-full bg-[#8B5CF6]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${inspectionReadiness}%` }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.2 }}
+                          animate={{ width: `${inspectionReadiness}%` }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.2 }}
                         />
                       </span>
                     </div>
@@ -483,9 +477,8 @@ export default function MaritimeControlCenter({
                         <motion.span
                           className="block h-full rounded-full bg-[#3FC8D8]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: "97.4%" }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.3 }}
+                          animate={{ width: "97.4%" }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.3 }}
                         />
                       </span>
                     </div>
@@ -502,13 +495,10 @@ export default function MaritimeControlCenter({
                         {criticalDeficiencies.length} CAPA overdue · {lowFuelVessels.length} low bunker reserves
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Middle Row 1: Monthly Voyage/Inspection Volume + Vessel Type Radial Donut */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-4 lg:grid-cols-[1.35fr_1fr]"
-                  >
+                  <div className="grid gap-4 lg:grid-cols-[1.35fr_1fr]">
                     <Card
                       title="Monthly PSC Inspections & Voyage Volume"
                       accentColor="#8B5CF6"
@@ -546,60 +536,59 @@ export default function MaritimeControlCenter({
                                   cx="50"
                                   cy="50"
                                   r="40"
-                                  fill="none"
+                                  fill="transparent"
                                   stroke={type.color}
-                                  strokeWidth="12"
-                                  pathLength={1}
-                                  strokeDashoffset={-offset}
-                                  initial={{ strokeDasharray: "0 1" }}
-                                  whileInView={{ strokeDasharray: `${fraction} ${1 - fraction}` }}
-                                  viewport={{ once: true, amount: 0.6 }}
+                                  strokeWidth="10"
+                                  strokeDasharray={`${fraction * 251.2} ${251.2}`}
+                                  strokeDashoffset={-offset * 251.2}
+                                  initial={{ strokeDasharray: "0 251.2" }}
+                                  animate={{
+                                    strokeDasharray: `${fraction * 251.2} ${251.2}`,
+                                  }}
                                   transition={{
-                                    duration: 0.9,
+                                    duration: 0.8,
                                     ease: ENTRANCE,
-                                    delay: 0.15 + index * 0.1,
+                                    delay: 0.1 + index * 0.05,
                                   }}
                                 />
                               );
                             })}
                           </svg>
-                          <span className="absolute inset-0 grid place-items-center text-center">
-                            <span>
-                              <span className="block text-[22px] font-bold leading-none text-white">
-                                <CountUp to={TOTAL_VESSELS} />
-                              </span>
-                              <span className="mt-1 block font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">
-                                Vessels
-                              </span>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <span className="text-xl font-bold leading-none text-white">
+                              {TOTAL_VESSELS}
                             </span>
-                          </span>
+                            <span className="font-mono text-[9px] uppercase tracking-wider text-white/40">
+                              Vessels
+                            </span>
+                          </div>
                         </div>
 
-                        <ul className="min-w-0 flex-1 space-y-2.5 w-full">
+                        <div className="flex-1 space-y-2 w-full">
                           {VESSEL_CLASSES.map((type) => (
-                            <li key={type.label} className="flex items-center justify-between gap-2 text-xs">
-                              <span className="flex items-center gap-2 truncate">
+                            <div
+                              key={type.label}
+                              className="flex items-center justify-between text-xs font-mono"
+                            >
+                              <div className="flex items-center gap-2">
                                 <span
-                                  className="h-2 w-2 shrink-0 rounded-full"
+                                  className="h-2 w-2 rounded-full"
                                   style={{ background: type.color }}
                                 />
-                                <span className="truncate text-white/70">{type.label}</span>
+                                <span className="text-white/70">{type.label}</span>
+                              </div>
+                              <span className="font-bold text-white">
+                                {type.value} ({Math.round((type.value / TOTAL_VESSELS) * 100)}%)
                               </span>
-                              <span className="font-mono text-white/90 font-semibold">
-                                {type.value} units
-                              </span>
-                            </li>
+                            </div>
                           ))}
-                        </ul>
+                        </div>
                       </div>
                     </Card>
-                  </motion.div>
+                  </div>
 
-                  {/* Middle Row 2: Seaworthiness by Vessel/Zone + AI Precision */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-4 lg:grid-cols-2"
-                  >
+                  {/* Middle Row 2: Seaworthiness by Vessel + AI Precision */}
+                  <div className="grid gap-4 lg:grid-cols-2">
                     <Card
                       title="Seaworthiness & Readiness by Vessel"
                       accentColor="#2FBF71"
@@ -645,13 +634,10 @@ export default function MaritimeControlCenter({
                         ))}
                       </div>
                     </Card>
-                  </motion.div>
+                  </div>
 
                   {/* Bottom Row: 3 Operational Telemetry Footer Cards */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-3 sm:grid-cols-3"
-                  >
+                  <div className="grid gap-3 sm:grid-cols-3">
                     {FOOTER_CARDS.map((card) => (
                       <div
                         key={card.label}
@@ -676,7 +662,7 @@ export default function MaritimeControlCenter({
                         </p>
                       </div>
                     ))}
-                  </motion.div>
+                  </div>
                 </motion.div>
               )}
 
@@ -782,8 +768,8 @@ export default function MaritimeControlCenter({
                 </motion.div>
               )}
 
-              {/* ==================== TAB: INSPECTIONS & PSC ==================== */}
-              {selectedTab === "Inspections & PSC" && (
+              {/* ==================== TAB: INSPECTIONS & SAFETY ==================== */}
+              {selectedTab === "Inspections & Safety" && (
                 <motion.div
                   key="inspections-tab"
                   initial={{ opacity: 0, y: 10 }}
@@ -941,10 +927,10 @@ export default function MaritimeControlCenter({
                 </motion.div>
               )}
 
-              {/* ==================== TAB: SOLAS COMPLIANCE ==================== */}
-              {selectedTab === "SOLAS Compliance" && (
+              {/* ==================== TAB: SAFETY EQUIPMENT INSPECTIONS ==================== */}
+              {selectedTab === "Safety Equipment" && (
                 <motion.div
-                  key="solas-tab"
+                  key="safety-tab"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -955,14 +941,14 @@ export default function MaritimeControlCenter({
                     <div className="flex items-center justify-between border-b border-white/[0.07] pb-4">
                       <div>
                         <h3 className="text-sm font-semibold text-white">
-                          SOLAS & LSA Safety Equipment Inspections
+                          Lifeboats & Safety Equipment Inspections
                         </h3>
                         <p className="text-xs text-white/40 mt-0.5">
-                          Liferafts, Pyrotechnics, CO2 Systems, and Survival Craft Readiness
+                          Liferafts, Fire Extinguishing Systems, Emergency Gear, and Survival Craft Readiness
                         </p>
                       </div>
                       <span className="font-mono text-xs text-[#2FBF71]">
-                        Compliance Rate: {inspectionReadiness}%
+                        Inspection Readiness: {inspectionReadiness}%
                       </span>
                     </div>
 

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      width: 1200px;
+      height: 630px;
+      background: #06080D;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #F8FAFC;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* Subtle Architectural Grid */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Main Card Frame */
+    .card {
+      width: 1120px;
+      height: 550px;
+      background: #0D111A;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 36px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 20px;
+    }
+    .brand-title {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: monospace;
+      letter-spacing: 2px;
+      color: #94A3B8;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    .badge {
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-size: 11px;
+      font-weight: 700;
+      font-family: monospace;
+      letter-spacing: 1.5px;
+      color: #F8FAFC;
+      text-transform: uppercase;
+    }
+
+    /* Main Content: Problem vs Solution Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 20px 0;
+    }
+
+    .section-box {
+      background: #131824;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .section-box.solution-box {
+      border-color: rgba(79, 70, 229, 0.35);
+      background: rgba(13, 17, 26, 0.95);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .problem-label { color: #EF4444; }
+    .solution-label { color: #818CF8; }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFFFFF;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .section-body {
+      font-size: 13px;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+
+    .tags-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .tag-item {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #CBD5E1;
+    }
+
+    /* Footer: Official Domain & Contact Channels */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 18px;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #94A3B8;
+    }
+    .contact-item {
+      color: #FFFFFF;
+    }
+    .domain-badge {
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: #F8FAFC;
+      padding: 8px 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+
+  <div class="card">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <div class="brand-title">STELLAR SCIO</div>
+        <div class="brand-sub">Stellar Mind &bull; Operations Intelligence</div>
+      </div>
+      <div class="badge">
+        ENTERPRISE CONTROL TOWER
+      </div>
+    </div>
+
+    <!-- Problem & Solution Section -->
+    <div class="content-grid">
+      <!-- The Operational Problem -->
+      <div class="section-box">
+        <div>
+          <div class="section-label problem-label">&bull; THE OPERATIONAL CHALLENGE</div>
+          <div class="section-title">Equipment Downtime &amp; Supply Blind Spots</div>
+          <div class="section-body">
+            Unscheduled machine stops, cold-chain temperature excursions, demurrage delays, and fragmented telemetry across SCADA, PLC, and ERP data silos create costly operational friction.
+          </div>
+        </div>
+        <div class="tags-list">
+          <div class="tag-item">Unscheduled Stops</div>
+          <div class="tag-item">Demurrage Risk</div>
+          <div class="tag-item">Cold-Chain Excursions</div>
+          <div class="tag-item">Data Silos</div>
+        </div>
+      </div>
+
+      <!-- The SCIO Solution -->
+      <div class="section-box solution-box">
+        <div>
+          <div class="section-label solution-label">&bull; THE SCIO SOLUTION</div>
+          <div class="section-title">Unified Telemetry &amp; Autonomous Action</div>
+          <div class="section-body">
+            SCIO connects machine sensors, vessel AIS, and SCADA historians to build real-time digital twins, deliver predictive failure alerts, and dispatch automated MRO work orders.
+          </div>
+        </div>
+        <div class="tags-list">
+          <div class="tag-item">Maritime AIS Tracking</div>
+          <div class="tag-item">Smart Grid SCADA</div>
+          <div class="tag-item">Digital Twin OEE</div>
+          <div class="tag-item">Sentinel AI Copilot</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer: Contact & Domain -->
+    <div class="footer">
+      <div class="contact-row">
+        <div>Platform: <span class="contact-item">stellarscio.app</span></div>
+        <div>&bull;</div>
+        <div>Twitter: <span class="contact-item">@StellarMind_ai</span></div>
+        <div>&bull;</div>
+        <div>LinkedIn: <span class="contact-item">@stellarmindai</span></div>
+      </div>
+      <div class="domain-badge">
+        stellarscio.app &rarr;
+      </div>
+    </div>
+  </div>
+</body>
+</html>

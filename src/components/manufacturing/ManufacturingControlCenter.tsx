@@ -178,9 +178,8 @@ function Meter({
           className="block h-full rounded-full"
           style={{ background: color }}
           initial={{ width: 0 }}
-          whileInView={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 1, ease: ENTRANCE, delay }}
+          animate={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+          transition={{ duration: 0.8, ease: ENTRANCE, delay }}
         />
       </span>
       <span className="text-right font-mono text-[11px] text-white/75 sm:text-[11.5px]">
@@ -553,10 +552,7 @@ export default function ManufacturingControlCenter({
                   className="space-y-4 sm:space-y-6"
                 >
                   {/* Top 4 KPI Metric Cards */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-                  >
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     {/* KPI 1: Overall Plant OEE */}
                     <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
                       <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
@@ -570,9 +566,8 @@ export default function ManufacturingControlCenter({
                         <motion.span
                           className="block h-full rounded-full bg-[#2FBF71]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${overallOEE}%` }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.1 }}
+                          animate={{ width: `${overallOEE}%` }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.1 }}
                         />
                       </span>
                     </div>
@@ -590,9 +585,8 @@ export default function ManufacturingControlCenter({
                         <motion.span
                           className="block h-full rounded-full bg-[#E8A33D]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${firstPassYield}%` }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.2 }}
+                          animate={{ width: `${firstPassYield}%` }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.2 }}
                         />
                       </span>
                     </div>
@@ -610,9 +604,8 @@ export default function ManufacturingControlCenter({
                         <motion.span
                           className="block h-full rounded-full bg-[#3FC8D8]"
                           initial={{ width: 0 }}
-                          whileInView={{ width: "98.6%" }}
-                          viewport={{ once: true, amount: 0.6 }}
-                          transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.3 }}
+                          animate={{ width: "98.6%" }}
+                          transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.3 }}
                         />
                       </span>
                     </div>
@@ -629,13 +622,10 @@ export default function ManufacturingControlCenter({
                         Line B2 CNC Thermal Warning · Action Assigned
                       </p>
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Mid Section Grid: 4 Detailed Metric Cards */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-4 sm:gap-6 lg:grid-cols-2"
-                  >
+                  <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
                     {/* Card 1: Production Line OEE & Cycle Velocity */}
                     <Card
                       title="Shopfloor Line OEE & Cycle Velocity"
@@ -736,13 +726,10 @@ export default function ManufacturingControlCenter({
                         ))}
                       </div>
                     </Card>
-                  </motion.div>
+                  </div>
 
                   {/* 3 Footer Operational Cards */}
-                  <motion.div
-                    variants={fadeUp}
-                    className="grid gap-3 sm:grid-cols-3"
-                  >
+                  <div className="grid gap-3 sm:grid-cols-3">
                     {FOOTER_HIGHLIGHTS.map((item, idx) => (
                       <div
                         key={idx}
@@ -761,7 +748,7 @@ export default function ManufacturingControlCenter({
                         <p className="text-xs text-white/50 leading-relaxed">{item.body}</p>
                       </div>
                     ))}
-                  </motion.div>
+                  </div>
                 </motion.div>
               )}
 

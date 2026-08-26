@@ -31,6 +31,7 @@ import {
   Cpu,
   BarChart3
 } from "lucide-react";
+import ScioSentinelOrb from "../ai/ScioSentinelOrb";
 
 interface ResourcesHubProps {
   onBackToHome: () => void;
@@ -72,9 +73,9 @@ const RESOURCES_DATA: ResourceItem[] = [
     subtitle: "Predicting 500kV step-up transformer thermal breakdown 18 days in advance across a 2.4 GW multi-source grid.",
     client: "Mojave Clean Power Consortium (2.4 GW Solar + Wind)",
     author: {
-      name: "Dr. Elena Rostova",
-      role: "VP of Grid Telemetry & PowerOps",
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80"
+      name: "StellarMind PowerOps Lab",
+      role: "Grid Telemetry & Operational Intelligence",
+      avatar: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=200&q=80"
     },
     date: "18 August 2026",
     readTime: "6 min read",
@@ -105,30 +106,30 @@ const RESOURCES_DATA: ResourceItem[] = [
     type: "case-study",
     sector: "maritime",
     sectorLabel: "Maritime Fleet & Port Operations",
-    title: "Trans-Pacific Container Lines Eliminates $640k in Demurrage and Achieves Zero PSC Detentions",
-    subtitle: "Real-time AIS speed curves, encrypted offline voyage checklists, and automated SOLAS/MARPOL compliance.",
+    title: "Trans-Pacific Container Lines Eliminates $640k in Port Delays and Achieves 100% Inspection Pass Rate",
+    subtitle: "Real-time vessel speed curves, encrypted offline voyage checklists, and automated safety equipment inspections.",
     client: "Pacific Horizon Shipping (32 Mega-Vessels)",
     author: {
-      name: "Capt. Marcus Vance",
-      role: "Director of Fleet Safety & Compliance",
-      avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=200&q=80"
+      name: "StellarMind Maritime Lab",
+      role: "Fleet Safety & Maritime Operations",
+      avatar: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=200&q=80"
     },
     date: "12 August 2026",
     readTime: "7 min read",
     heroImg: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
     metrics: [
-      { label: "PSC Detentions", value: "0 in 18 Mos", color: "#10B981" },
-      { label: "Demurrage Avoidance", value: "$640,000", color: "#06B6D4" },
+      { label: "Inspection Pass Rate", value: "100%", color: "#10B981" },
+      { label: "Port Delay Avoidance", value: "$640,000", color: "#06B6D4" },
       { label: "On-Schedule Berth Rate", value: "97.5%", color: "#7C3AED" },
     ],
-    tags: ["Maritime", "AIS", "SOLAS", "Bunkering", "MARPOL"],
-    summary: "Pacific Horizon operates 32 ultra-large container vessels on the Shanghai–Rotterdam corridor. Communication blackouts in open waters left shore managers blind to bunker reserve drawdowns and safety equipment certificate expirations.",
-    challenge: "Vessels frequently arrived at European destination ports with pending safety deficiencies, triggering stringent Port State Control (PSC) detention orders and costing over $45,000 per idle day.",
-    solution: "Deployed SCIO's Maritime Operations Control Tower with encrypted satellite synchronization, allowing crew to complete offline inspection checklists and monitoring bunker ROB fuel margins in real-time.",
+    tags: ["Maritime", "Fleet GPS", "Safety Inspections", "Fuel Logs", "Maintenance"],
+    summary: "Pacific Horizon operates 32 ultra-large container vessels on the Shanghai–Rotterdam corridor. Communication blackouts in open waters left shore managers blind to fuel reserve drawdowns and safety equipment certificate expirations.",
+    challenge: "Vessels frequently arrived at European destination ports with pending equipment checklists, triggering unexpected inspection delays and costing over $45,000 per idle day.",
+    solution: "Deployed SCIO's Maritime Operations Control Tower with encrypted satellite synchronization, allowing crew to complete offline inspection checklists and monitoring fuel margins in real-time.",
     results: [
-      "Achieved 100% Port State Control pass rate with zero detentions across 18 consecutive months.",
-      "Saved $640,000 in port demurrage through AI-calculated just-in-time steaming arrival curves.",
-      "Maintained Grade A rating for MARPOL Annex VI Carbon Intensity Indicator (CII).",
+      "Achieved 100% port safety inspection pass rate across 18 consecutive months.",
+      "Saved $640,000 in port delay penalties through AI-calculated just-in-time steaming arrival curves.",
+      "Maintained optimal fuel efficiency and low emissions ratings across all routes.",
       "Unified vessel engine room telemetry with headquarters ERP procurement ledgers."
     ],
     architecture: [
@@ -146,9 +147,9 @@ const RESOURCES_DATA: ResourceItem[] = [
     subtitle: "Sub-second hydraulic vibration telemetry and automated closed-loop MRO purchase order drafting.",
     client: "Apex Advanced Robotics & EV Assembly",
     author: {
-      name: "Sujal Talreja",
-      role: "Chief Architect, Industrial AI Systems",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+      name: "StellarMind Robotics Lab",
+      role: "Industrial AI & Automation Systems",
+      avatar: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=200&q=80"
     },
     date: "04 August 2026",
     readTime: "5 min read",
@@ -183,9 +184,9 @@ const RESOURCES_DATA: ResourceItem[] = [
     subtitle: "End-to-end IoT telematics (-18.4°C threshold) and predictive port customs clearance triage.",
     client: "Nordic Cold-Chain Intermodal (1,400 TEU)",
     author: {
-      name: "Henrik Lindqvist",
-      role: "VP of Global Supply Chain Operations",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80"
+      name: "StellarMind Supply Chain Lab",
+      role: "Multimodal Logistics & Telematics",
+      avatar: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=200&q=80"
     },
     date: "28 July 2026",
     readTime: "6 min read",
@@ -219,9 +220,9 @@ const RESOURCES_DATA: ResourceItem[] = [
     title: "Why 24-Band FFT Spectral Sampling Outperforms Threshold Alarms in Heavy Machinery",
     subtitle: "Decomposing analog vibration into fundamental rotational harmonics and ultrasonic micro-signatures.",
     author: {
-      name: "Dr. Elena Rostova",
-      role: "VP of Grid Telemetry & PowerOps",
-      avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=200&q=80"
+      name: "StellarMind DSP Engineering",
+      role: "Signal Processing & Vibration FFT",
+      avatar: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=200&q=80"
     },
     date: "20 August 2026",
     readTime: "8 min read",
@@ -245,9 +246,9 @@ const RESOURCES_DATA: ResourceItem[] = [
     title: "Zero Rip-and-Replace: Bridging Legacy SCADA OPC-UA with Cloud ERPs in Under 48 Hours",
     subtitle: "A technical blueprint for non-invasive, bi-directional enterprise operational intelligence.",
     author: {
-      name: "Sujal Talreja",
-      role: "Chief Architect, Industrial AI Systems",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
+      name: "StellarMind Core Systems",
+      role: "Platform Architecture & Zero-ETL",
+      avatar: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=200&q=80"
     },
     date: "15 August 2026",
     readTime: "7 min read",
@@ -468,7 +469,9 @@ export default function ResourcesHub({ onBackToHome, onLaunchPlatform }: Resourc
 
                 <div className="pt-6 border-t border-slate-200 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <img src={featured.author.avatar} alt={featured.author.name} className="h-9 w-9 rounded-full object-cover border border-slate-300" />
+                    <div className="h-9 w-9 rounded-full bg-slate-950 text-white flex items-center justify-center font-mono font-bold text-xs shadow-xs">
+                      S
+                    </div>
                     <div>
                       <p className="text-xs font-bold text-slate-900">{featured.author.name}</p>
                       <p className="text-[10.5px] font-mono text-slate-500">{featured.author.role}</p>
@@ -618,7 +621,9 @@ export default function ResourcesHub({ onBackToHome, onLaunchPlatform }: Resourc
                 {/* Author & Client Info */}
                 <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-200">
                   <div className="flex items-center gap-3">
-                    <img src={selectedArticle.author.avatar} alt={selectedArticle.author.name} className="h-11 w-11 rounded-full object-cover border" />
+                    <div className="h-11 w-11 rounded-full bg-slate-950 text-white flex items-center justify-center font-mono font-bold text-sm shadow-xs">
+                      S
+                    </div>
                     <div>
                       <p className="text-sm font-bold text-slate-900">{selectedArticle.author.name}</p>
                       <p className="text-xs font-mono text-slate-500">{selectedArticle.author.role}</p>
@@ -726,6 +731,9 @@ export default function ResourcesHub({ onBackToHome, onLaunchPlatform }: Resourc
           </div>
         )}
       </AnimatePresence>
+
+      {/* 24/7 Sentinel AI Guide */}
+      <ScioSentinelOrb onLaunchPlatform={onLaunchPlatform} />
 
     </div>
   );

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to SCIO Private Beta</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #06080D;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #F8FAFC;
+    }
+    table {
+      border-spacing: 0;
+    }
+    .wrapper {
+      width: 100%;
+      table-layout: fixed;
+      background-color: #06080D;
+      padding: 40px 0;
+    }
+    .main {
+      background-color: #0D111A;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+    .header {
+      padding: 32px 32px 24px;
+      background: linear-gradient(180deg, #131824 0%, #0D111A 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .logo-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #FFFFFF;
+      color: #090D16;
+      font-weight: 900;
+      font-size: 14px;
+      font-family: monospace;
+      letter-spacing: 1px;
+    }
+    .content {
+      padding: 32px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin: 0 0 12px;
+      line-height: 1.25;
+    }
+    p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #94A3B8;
+      margin: 0 0 20px;
+    }
+    .pass-card {
+      background: #06080D;
+      border: 1px solid #10B981;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin: 24px 0;
+    }
+    .pass-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #64748B;
+      font-weight: 700;
+      font-family: monospace;
+    }
+    .pass-token {
+      font-size: 22px;
+      font-weight: 900;
+      color: #10B981;
+      font-family: monospace;
+      margin-top: 6px;
+      letter-spacing: 2px;
+    }
+    .steps-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 24px 0;
+    }
+    .step-item {
+      padding: 8px 0;
+      font-size: 13px;
+      color: #CBD5E1;
+      display: flex;
+      align-items: center;
+    }
+    .step-num {
+      display: inline-block;
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      border-radius: 50%;
+      background: rgba(79, 70, 229, 0.2);
+      color: #818CF8;
+      font-weight: 800;
+      font-size: 11px;
+      margin-right: 12px;
+    }
+    .button-row {
+      text-align: center;
+      margin: 32px 0 16px;
+    }
+    .cta-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: #2563EB;
+      color: #FFFFFF !important;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 9999px;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+    .footer {
+      padding: 24px 32px;
+      background-color: #06080D;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+      font-size: 11px;
+      color: #64748B;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="main">
+      <div class="header">
+        <div class="logo-badge">STELLAR SCIO</div>
+        <div style="margin-top: 8px; font-size: 11px; font-family: monospace; color: #10B981; font-weight: 700;">
+          ● PRIVATE EARLY ACCESS COHORT (v2.4)
+        </div>
+      </div>
+      
+      <div class="content">
+        <h1>Welcome to the SCIO Private Beta</h1>
+        <p>
+          Thank you for applying to the SCIO Operational AI Platform Beta. Your application has been registered with Formspree, and your organization's sandbox workspace is now ready.
+        </p>
+
+        <div class="pass-card">
+          <div class="pass-label">Your Early Access Token</div>
+          <div class="pass-token">SCIO-BETA-PASS-88F2</div>
+        </div>
+
+        <div class="steps-box">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #94A3B8; margin-bottom: 12px; font-family: monospace;">
+            Next Steps in Your Onboarding:
+          </div>
+          <div class="step-item">
+            <span class="step-num">1</span>
+            <span>Launch the Interactive Operational Control Center (OCC) sandbox</span>
+          </div>
+          <div class="step-item">
+            <span class="step-num">2</span>
+            <span>Review live telemetry feeds, vibration FFT models &amp; automated work orders</span>
+          </div>
+          <div class="step-item">
+            <span class="step-num">3</span>
+            <span>Our Technical Architecture lead will reach out to provision your custom OPC-UA/SCADA edge node connector</span>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <a href="https://stellarscio.com" class="cta-btn">
+            Access Beta Platform Now &rarr;
+          </a>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p style="margin: 0; font-size: 11px; color: #64748B;">
+          &copy; 2026 Stellar SCIO Inc. Operational AI Platform &bull; All Rights Reserved.
+        </p>
+        <p style="margin: 6px 0 0; font-size: 10px; color: #475569;">
+          You received this email because you registered for the SCIO Early Access Beta.
+        </p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

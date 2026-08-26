@@ -49,13 +49,17 @@ import {
   Fuel,
   PackageSearch,
   Filter,
-  BookOpen
+  BookOpen,
+  Copy
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useForm, ValidationError } from "@formspree/react";
+import ScioSentinelOrb from "../ai/ScioSentinelOrb";
 
 interface StellarHomePageProps {
   onLaunchPlatform: (industry?: string, tab?: string) => void;
   onOpenResources?: () => void;
+  onOpenContact?: () => void;
 }
 
 // Crisp High-Contrast Black & White Design System
@@ -125,9 +129,9 @@ const stagger = (delayChildren = 0.08, staggerChildren = 0.1) => ({
 const MARITIME_TABS = [
   "Overview",
   "Fleet & AIS Tracking",
-  "Inspections & PSC",
+  "Inspections & Safety",
   "Bunkering & MRO",
-  "SOLAS Compliance",
+  "Safety Equipment",
 ];
 
 // CountUp Helper for Control Tower numerals
@@ -181,7 +185,6 @@ function DashboardCard({
   );
 }
 
-// Reusable Meter Bar Component
 function DashboardMeter({
   label,
   value,
@@ -207,9 +210,8 @@ function DashboardMeter({
           className="block h-full rounded-full"
           style={{ background: color }}
           initial={{ width: 0 }}
-          whileInView={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 1, ease: ENTRANCE, delay }}
+          animate={{ width: `${Math.min(100, Math.max(0, percent))}%` }}
+          transition={{ duration: 0.8, ease: ENTRANCE, delay }}
         />
       </span>
       <span className="text-right font-mono text-[11px] text-white font-black sm:text-[11.5px]">
@@ -285,12 +287,393 @@ function SectionIntro({
   );
 }
 
-export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: StellarHomePageProps) {
+// Formspree-Powered Join Beta Modal Component (Form ID: mrpznygn)
+function BetaFormModal({
+  isOpen,
+  onClose,
+  onLaunchPlatform,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onLaunchPlatform: (e: React.MouseEvent, industry: string, tab?: string) => void;
+}) {
+  const [state, handleSubmit] = useForm("mrpznygn");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        className="border rounded-2xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl font-sans my-8"
+        style={{ background: C.nightRaised, borderColor: C.lineDark, color: C.chalk }}
+      >
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400">
+              <Sparkles className="h-5 w-5" />
+            </span>
+            <div>
+              <h3 className="font-extrabold text-base sm:text-lg text-white tracking-tight">
+                Join SCIO Beta Program (v2.4)
+              </h3>
+              <p className="font-mono text-[10.5px] text-emerald-400 font-bold tracking-wide mt-0.5 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                EARLY ACCESS COHORT &bull; INSTANT SANDBOX PROVISIONING
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors font-mono text-base"
+          >
+            ✕
+          </button>
+        </div>
+
+        {state.succeeded ? (
+          <div className="py-6 text-center space-y-4 font-sans">
+            <div
+              className="h-16 w-16 rounded-full border-2 mx-auto flex items-center justify-center shadow-xl"
+              style={{ background: "rgba(16,185,129,0.15)", borderColor: C.green, color: C.green }}
+            >
+              <CheckCircle2 className="h-9 w-9" />
+            </div>
+            <div className="space-y-1.5">
+              <h4 className="text-xl font-black text-white">Application Received!</h4>
+              <p className="text-xs sm:text-sm text-white/70 max-w-md mx-auto leading-relaxed">
+                Thank you for applying to the SCIO Private Beta. Your application has been received, and sandbox credentials have been provisioned for your organization.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-black/60 border border-emerald-500/30 text-center font-mono space-y-1">
+              <span className="text-[10.5px] text-white/50 uppercase tracking-widest block font-bold">
+                Your Early Access Passcode
+              </span>
+              <span className="text-base sm:text-lg font-black text-emerald-400 tracking-widest">
+                SCIO-BETA-PASS-88F2
+              </span>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-white/70 font-sans text-left space-y-1.5">
+              <div className="font-bold text-white/90 font-mono text-[11px] uppercase tracking-wider">What happens next:</div>
+              <p className="flex items-center gap-2">&bull; <span>Instant access to our interactive OCC dashboard sandbox.</span></p>
+              <p className="flex items-center gap-2">&bull; <span>Our technical team will reach out within 2 hours to connect your edge devices.</span></p>
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href="/?launch=1&industry=energy&tab=energy-dashboard"
+                onClick={(e) => {
+                  onLaunchPlatform(e, "energy", "energy-dashboard");
+                  onClose();
+                }}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs font-mono bg-white text-black hover:bg-slate-100 inline-flex items-center justify-center gap-2 shadow-lg hover:scale-[1.02] transition-all"
+              >
+                <span>Launch Beta Sandbox Now</span>
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+              <button
+                onClick={onClose}
+                className="w-full sm:w-auto px-5 py-3 rounded-xl font-bold text-xs font-mono text-white/70 hover:text-white border border-white/10 hover:bg-white/5 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-3.5 text-xs font-sans">
+            {/* Row 1: Name & Work Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="beta-name" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                  Full Name *
+                </label>
+                <input
+                  id="beta-name"
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="e.g. Alex Morgan"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-sans focus:outline-none text-white focus:border-indigo-400 transition-colors"
+                  style={{ background: C.night, borderColor: C.lineDark }}
+                />
+                <ValidationError prefix="Name" field="name" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+              </div>
+
+              <div>
+                <label htmlFor="beta-email" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                  Corporate Work Email *
+                </label>
+                <input
+                  id="beta-email"
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="alex@enterprise.com"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white focus:border-indigo-400 transition-colors"
+                  style={{ background: C.night, borderColor: C.lineDark }}
+                />
+                <ValidationError prefix="Email" field="email" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+              </div>
+            </div>
+
+            {/* Row 2: Company & Role */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="beta-company" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                  Company / Organization *
+                </label>
+                <input
+                  id="beta-company"
+                  type="text"
+                  name="company"
+                  required
+                  placeholder="e.g. Global Energy Corp"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-sans focus:outline-none text-white focus:border-indigo-400 transition-colors"
+                  style={{ background: C.night, borderColor: C.lineDark }}
+                />
+                <ValidationError prefix="Company" field="company" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+              </div>
+
+              <div>
+                <label htmlFor="beta-role" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                  Job Role / Title
+                </label>
+                <input
+                  id="beta-role"
+                  type="text"
+                  name="role"
+                  placeholder="e.g. VP Operations / Chief Engineer"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-sans focus:outline-none text-white focus:border-indigo-400 transition-colors"
+                  style={{ background: C.night, borderColor: C.lineDark }}
+                />
+                <ValidationError prefix="Role" field="role" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+              </div>
+            </div>
+
+            {/* Row 3: Industry & Fleet Scale */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="beta-industry" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                  Primary Operating Sector *
+                </label>
+                <select
+                  id="beta-industry"
+                  name="industry"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-sans focus:outline-none text-white focus:border-indigo-400 transition-colors"
+                  style={{ background: C.night, borderColor: C.lineDark }}
+                >
+                  <option value="Renewable Energy & Power Utilities">Renewable Energy &amp; Power Utilities</option>
+                  <option value="Maritime Fleet & Port Operations">Maritime Fleet &amp; Port Operations</option>
+                  <option value="Manufacturing 4.0 & Industrial OEE">Manufacturing 4.0 &amp; Industrial OEE</option>
+                  <option value="Multimodal Cold-Chain & Supply Chain">Multimodal Cold-Chain &amp; Supply Chain</option>
+                  <option value="Mining & Heavy Equipment">Mining &amp; Heavy Equipment</option>
+                  <option value="Critical Infrastructure & Smart Grid">Critical Infrastructure &amp; Smart Grid</option>
+                </select>
+                <ValidationError prefix="Industry" field="industry" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+              </div>
+
+              <div>
+                <label htmlFor="beta-fleetSize" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                  Fleet / Monitored Asset Scale
+                </label>
+                <select
+                  id="beta-fleetSize"
+                  name="fleetSize"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-sans focus:outline-none text-white focus:border-indigo-400 transition-colors"
+                  style={{ background: C.night, borderColor: C.lineDark }}
+                >
+                  <option value="1-10 Assets (Pilot Sandbox)">1 – 10 Assets / Machines (Pilot Sandbox)</option>
+                  <option value="10-50 Assets (Regional Deployment)">10 – 50 Assets (Regional Deployment)</option>
+                  <option value="50-250 Assets (Multi-Site Rollout)">50 – 250 Assets (Multi-Site Rollout)</option>
+                  <option value="250+ Assets (Global Enterprise Scale)">250+ Assets (Global Enterprise Scale)</option>
+                </select>
+                <ValidationError prefix="Fleet Size" field="fleetSize" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+              </div>
+            </div>
+
+            {/* Row 4: Phone / WhatsApp (Optional) */}
+            <div>
+              <label htmlFor="beta-phone" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                Phone / WhatsApp (Optional for rapid onboarding)
+              </label>
+              <input
+                id="beta-phone"
+                type="tel"
+                name="phone"
+                placeholder="+1 (555) 000-0000"
+                className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white focus:border-indigo-400 transition-colors"
+                style={{ background: C.night, borderColor: C.lineDark }}
+              />
+              <ValidationError prefix="Phone" field="phone" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+            </div>
+
+            {/* Row 5: Message / Requirements */}
+            <div>
+              <label htmlFor="beta-message" className="block mb-1 font-mono text-[10px] uppercase font-bold text-white/70">
+                Current Systems &amp; Key Priorities (Optional)
+              </label>
+              <textarea
+                id="beta-message"
+                name="message"
+                rows={2}
+                placeholder="e.g. Connecting OPC-UA telemetry across 8 gas turbines and syncing work orders with SAP PM."
+                className="w-full px-3.5 py-2.5 border rounded-xl font-sans focus:outline-none text-white focus:border-indigo-400 transition-colors resize-none"
+                style={{ background: C.night, borderColor: C.lineDark }}
+              />
+              <ValidationError prefix="Message" field="message" errors={state.errors} className="text-red-400 text-[10.5px] mt-1 block font-mono" />
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={state.submitting}
+                className="w-full py-3.5 font-bold text-xs font-mono rounded-xl shadow-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer hover:scale-[1.01]"
+              >
+                {state.submitting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                    <span>Submitting Application to Formspree...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    <span>Submit &amp; Apply for Private Beta Access</span>
+                  </>
+                )}
+              </button>
+              <p className="text-[10px] font-mono text-center text-white/40 mt-2">
+                Protected by Formspree &bull; Zero spam policy &bull; Instant sandbox pass
+              </p>
+            </div>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Formspree-Powered Request Enterprise Demo Modal Component (Form ID: mrpznygn)
+function DemoFormModal({
+  isOpen,
+  onClose,
+  onLaunchPlatform,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onLaunchPlatform: (e: React.MouseEvent, industry: string, tab?: string) => void;
+}) {
+  const [state, handleSubmit] = useForm("mrpznygn");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div
+        className="border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl font-sans my-8"
+        style={{ background: C.nightRaised, borderColor: C.lineDark, color: C.chalk }}
+      >
+        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full animate-pulse bg-cyan-400" />
+            <h3 className="font-bold text-sm text-white font-mono">Request Enterprise Demo</h3>
+          </div>
+          <button onClick={onClose} className="p-1 rounded-lg text-white/50 hover:text-white hover:bg-white/10 text-lg cursor-pointer">✕</button>
+        </div>
+
+        {state.succeeded ? (
+          <div className="py-6 text-center space-y-3 font-sans">
+            <div className="h-12 w-12 rounded-full border mx-auto flex items-center justify-center bg-emerald-500/20 border-emerald-500 text-emerald-400">
+              <CheckCircle2 className="h-6 w-6" />
+            </div>
+            <h4 className="text-base font-bold text-white">Demo Request Received</h4>
+            <p className="text-xs text-white/70 max-w-xs mx-auto leading-relaxed">
+              Your request has been registered with Formspree. Our Enterprise Architecture team will reach out within 2 hours.
+            </p>
+            <a
+              href="/?launch=1&industry=energy&tab=energy-dashboard"
+              onClick={(e) => {
+                onLaunchPlatform(e, "energy", "energy-dashboard");
+                onClose();
+              }}
+              className="mt-4 px-4 py-2.5 rounded-lg font-bold text-xs font-mono bg-white text-black hover:bg-slate-100 inline-block shadow-md"
+            >
+              Explore Interactive Live Demo Now →
+            </a>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-3.5 font-sans text-xs">
+            <input type="hidden" name="form_type" value="Enterprise Demo Request" />
+            <input type="hidden" name="source" value="Stellar SCIO Enterprise Demo Modal" />
+
+            <div>
+              <label htmlFor="demo-email" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
+                Corporate Work Email
+              </label>
+              <input
+                id="demo-email"
+                type="email"
+                name="email"
+                required
+                placeholder="name@enterprise.com"
+                className="w-full px-3.5 py-2.5 border rounded-lg font-mono focus:outline-none text-white transition-colors focus:border-cyan-400"
+                style={{ background: C.night, borderColor: C.lineDark }}
+              />
+              <ValidationError prefix="Email" field="email" errors={state.errors} className="text-red-400 text-[10px] mt-1 font-mono" />
+            </div>
+
+            <div>
+              <label htmlFor="demo-sector" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
+                Primary Operating Sector
+              </label>
+              <select
+                id="demo-sector"
+                name="sector"
+                className="w-full px-3.5 py-2.5 border rounded-lg font-mono focus:outline-none text-white transition-colors focus:border-cyan-400"
+                style={{ background: C.night, borderColor: C.lineDark }}
+              >
+                <option value="Renewable Energy & Utilities">Renewable Energy &amp; Utilities (12.4 GW)</option>
+                <option value="Maritime Fleet Operations">Maritime Fleet Operations (28 Ships)</option>
+                <option value="Manufacturing 4.0 & OEE">Manufacturing 4.0 &amp; OEE (91.4% OEE)</option>
+                <option value="Cold-Chain & Multimodal Logistics">Cold-Chain &amp; Multimodal Logistics (142 Reefers)</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              disabled={state.submitting}
+              className="w-full mt-2 py-3 font-bold text-xs font-mono rounded-lg shadow-md bg-white text-black hover:bg-slate-100 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {state.submitting ? (
+                <>
+                  <span className="h-3 w-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  <span>Submitting to Formspree...</span>
+                </>
+              ) : (
+                <span>Submit Demo Request</span>
+              )}
+            </button>
+
+            <p className="text-[10px] text-center text-white/40 font-mono">
+              Protected by Formspree &bull; Zero spam policy
+            </p>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onOpenContact }: StellarHomePageProps) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState(0);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
   const [demoSubmitted, setDemoSubmitted] = useState(false);
+  const [betaModalOpen, setBetaModalOpen] = useState(false);
+  const [betaSubmitted, setBetaSubmitted] = useState(false);
   const [oscilloscopePhase, setOscilloscopePhase] = useState(0);
   const [selectedIndustryTab, setSelectedIndustryTab] = useState<"energy" | "maritime" | "manufacturing" | "logistics">("energy");
   
@@ -300,6 +683,11 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
   // Interactive Integration Infographic State
   const [selectedIntegrationSource, setSelectedIntegrationSource] = useState<"erp" | "scada" | "fleet" | "cloud">("erp");
   const [simulatingPacket, setSimulatingPacket] = useState(true);
+
+  // How SCIO Works Interactive Section State
+  const [howItWorksStep, setHowItWorksStep] = useState<number>(0);
+  const [copiedPayload, setCopiedPayload] = useState(false);
+  const [activeConsoleTab, setActiveConsoleTab] = useState<"payload" | "logic" | "architecture">("payload");
 
   const [liveJitter, setLiveJitter] = useState({ mw: 2854.2, hz: 50.02, health: 98.4 });
   const [businessHealth, setBusinessHealth] = useState({
@@ -391,7 +779,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
     maritime: {
       id: "maritime",
       name: "Maritime Fleet & Port Operations",
-      tagline: "Live AIS Vessel Tracking · Bunker Fuel Watch · SOLAS/MARPOL CAPA",
+      tagline: "Live Vessel GPS Tracking · Fuel Logs · Safety Inspections & Parts Delivery",
       icon: Ship,
       accentColor: C.violet,
       heroImg: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80",
@@ -400,11 +788,11 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
         { label: "ECDIS Navigation Bridge Console", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
         { label: "Automated Port Gantry Cranes", img: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=600&q=80" },
       ],
-      problem: "Ocean-going fleets operate with high-latency offline communication gaps, rising bunker fuel costs, and severe Port State Control (PSC) detention risks.",
-      solution: "SCIO's Operations Control Tower monitors vessel availability, tracks 200 MT bunker reserve margins, and closes safety CAPA deficiencies before port arrival.",
+      problem: "Ocean-going fleets operate with high-latency offline communication gaps, rising fuel costs, and unexpected equipment breakdowns at sea.",
+      solution: "SCIO's Operations Control Tower monitors vessel availability, tracks 200 MT fuel reserves, and completes routine safety equipment checklists before docking.",
       kpis: [
         { label: "Fleet Monitored", val: "28 Vessels", tone: C.violet },
-        { label: "PSC Compliance Score", val: "91.8%", tone: C.green },
+        { label: "Safety Readiness Score", val: "98.8%", tone: C.green },
         { label: "Bunker ROB Accuracy", val: "99.2%", tone: C.cyan },
         { label: "Port Clearance Rate", val: "97.5%", tone: C.green }
       ],
@@ -458,6 +846,199 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
 
   const currentInd = INDUSTRY_DATA[selectedIndustryTab];
 
+  // How SCIO Works - Simple Hierarchy: CONNECT → UNDERSTAND → PREDICT → ACT
+  const HOW_SCIO_WORKS_STEPS = [
+    {
+      step: "01",
+      phase: "CONNECT",
+      stepName: "Connect All Data",
+      title: "Universal Telemetry Ingestion",
+      subtitle: "Bring live data from machines, sensors, PLCs, SCADA, ERP, and other systems into SCIO.",
+      accent: C.cyan,
+      accentBg: "rgba(6, 182, 212, 0.12)",
+      icon: Radio,
+      badge: "Zero Rip-and-Replace",
+      description:
+        "Connect all your physical machines, field sensors, PLC controllers, SCADA historians, and enterprise ERP databases directly to SCIO using lightweight, non-invasive connectors with zero downtime.",
+      capabilities: [
+        "Connects 40+ standard protocols: OPC-UA, Modbus TCP, MQTT Sparkplug B, IEC 61850, CANbus, and REST APIs",
+        "Zero-loss edge buffering: Stores and forwards telemetry during network or remote communications blackouts",
+        "Hardware-grade security: Secure read-only data diode architecture with TLS 1.3 encryption & mTLS",
+        "Automatic stream standardization: Unifies timestamps, engineering units, and sampling frequencies"
+      ],
+      metrics: [
+        { label: "Supported Protocols", val: "40+" },
+        { label: "Stream Latency", val: "32ms" },
+        { label: "Throughput", val: "2.4M msg/s" },
+        { label: "Data Integrity", val: "100%" }
+      ],
+      payload: {
+        source_protocol: "OPC-UA / Sparkplug-B",
+        gateway_id: "SCIO-EDGE-GW-084",
+        asset_id: "TURBINE-04 [Gas-Turbine 45MW]",
+        timestamp: "2026-08-26T04:30:12.842Z",
+        sensors: {
+          radial_vibration_mm_s: 4.82,
+          bearing_temp_celsius: 78.4,
+          lube_oil_pressure_bar: 3.12,
+          harmonic_frequency_hz: 120.4,
+          exhaust_gas_temp_c: 542.1
+        },
+        health_packet: "CRC32_VERIFIED_VALID",
+        edge_processing_latency_ms: 1.4
+      },
+      logicSummary:
+        "Edge agent samples registers at 100Hz, verifies packet checksums, filters noise, and securely transmits encrypted batches to SCIO.",
+      architectureNodes: [
+        "Field Sensors / PLCs",
+        "SCIO Edge Gateway Container",
+        "Kafka / Telemetry Stream Broker",
+        "Dynamic Stream Normalizer"
+      ]
+    },
+    {
+      step: "02",
+      phase: "UNDERSTAND",
+      stepName: "Understand Assets & Operations",
+      title: "Digital Twin & Operational Context",
+      subtitle: "Connect assets, machines, sensors, maintenance history, processes, and relationships to understand what is happening across the operation.",
+      accent: C.violet,
+      accentBg: "rgba(124, 58, 237, 0.12)",
+      icon: Layers,
+      badge: "Complete Context",
+      description:
+        "SCIO links sensor telemetry to real-world equipment hierarchies, maintenance records, Bill of Materials (BOM), and operational processes to build a living digital replica of your entire operation.",
+      capabilities: [
+        "Dynamic Asset Graph: Maps every sensor to its exact physical machine, sub-component, and plant",
+        "Unified Business & OT Context: Blends live sensor feeds with SAP maintenance logs and asset records",
+        "Live Operational State: Reconstructs real-time physical stresses, operating limits, and efficiency",
+        "Historical Replay: Replays exact machine behavior and signals leading up to any past event"
+      ],
+      metrics: [
+        { label: "Connected Assets", val: "120K+" },
+        { label: "Twin Refresh", val: "100ms" },
+        { label: "ERP Linkage", val: "100%" },
+        { label: "Model Accuracy", val: "99.9%" }
+      ],
+      payload: {
+        twin_id: "TWIN_TURBINE_04_GE_9E",
+        parent_facility: "Combined Cycle Power Plant Station Alpha",
+        operating_hours: 14820,
+        design_spec: "GE Frame 9E 45MW Base-load",
+        current_state_vector: {
+          thermal_gradient_delta: "+6.2°C over baseline",
+          vibration_harmonic_stress: "Stage 2 Fatigue Risk",
+          operating_efficiency: "87.4% (Nominal 92.0%)",
+          degradation_index: "0.82 (Elevated)"
+        },
+        linked_history: {
+          last_overhaul_date: "14 Feb 2026",
+          active_work_orders: ["WO-98211-MRO"],
+          warranty_sla: "Tier-1 OEM Critical Care"
+        }
+      },
+      logicSummary:
+        "Dynamic graph matches incoming sensor IDs against equipment Bill of Materials (BOM) schemas, evaluating physical operating limits in real time.",
+      architectureNodes: [
+        "Raw Stream Pipeline",
+        "Graph Entity Resolver",
+        "Physics Constraint Engine",
+        "Digital Twin State Store"
+      ]
+    },
+    {
+      step: "03",
+      phase: "PREDICT",
+      stepName: "Predict Problems",
+      title: "Predictive AI & Diagnostics",
+      subtitle: "Use live data, historical data, documents, images, and other information to detect issues, identify root causes, and predict failures.",
+      accent: C.amber,
+      accentBg: "rgba(245, 158, 11, 0.12)",
+      icon: Cpu,
+      badge: "14-Day Early Warning",
+      description:
+        "SCIO's predictive models analyze multi-sensor trends and maintenance manuals to catch subtle anomalies weeks before failure occurs, explaining the exact root cause and recommending fixes in plain language.",
+      capabilities: [
+        "Early Anomaly Detection: Detects microscopic cross-sensor drift long before static alarms trigger",
+        "Failure Date Forecasting: Estimates remaining useful life (RUL) and time to failure with high confidence",
+        "Plain-Language AI Diagnostics: Explains root causes citing equipment manuals and past logs",
+        "Prescriptive Advice: Recommends exact operating adjustments to protect equipment safely"
+      ],
+      metrics: [
+        { label: "Early Warning", val: "14 Days" },
+        { label: "False Alarms Cut", val: "91%" },
+        { label: "Response Speed", val: "120ms" },
+        { label: "AI Accuracy", val: "98.8%" }
+      ],
+      payload: {
+        inference_job_id: "AI-INF-2026-9810",
+        target_subsystem: "Turbine-04 / Bearing #2 Inner Race",
+        alert_classification: "CRITICAL_FATIGUE_EARLY_WARNING",
+        confidence_score: 97.4,
+        failure_mode: "Sub-surface Fatigue Spalling on Bearing 2",
+        estimated_time_to_trip: "11.4 Days (at current 42MW continuous load)",
+        ai_diagnostic_explanation:
+          "Cross-correlation between 120Hz FFT harmonic vibration spike and 6.2°C lube oil thermal rise indicates lubrication breakdown under peak-load cycling.",
+        prescriptive_recommendation:
+          "Reduce turbine load to 35MW immediately and schedule bearing replacement during the 02:00 off-peak maintenance window."
+      },
+      logicSummary:
+        "Multivariate models compute anomaly scores; upon threshold exceedance, AI cross-examines work logs and manuals to form a clear root-cause diagnosis.",
+      architectureNodes: [
+        "Time-Series Feature Store",
+        "Physics-Informed ML Models",
+        "LLM Reasoning Engine",
+        "Prescriptive Dispatcher"
+      ]
+    },
+    {
+      step: "04",
+      phase: "ACT",
+      stepName: "Take Action",
+      title: "Automation & Enterprise Integration",
+      subtitle: "Turn insights into maintenance actions, work orders, alerts, inventory requests, and updates across enterprise systems.",
+      accent: C.green,
+      accentBg: "rgba(16, 185, 129, 0.12)",
+      icon: Workflow,
+      badge: "Closed-Loop Action",
+      description:
+        "Instead of just sending alerts, SCIO triggers real workflows: auto-drafting work orders in SAP or Maximo, checking and reserving warehouse spare parts, dispatching technician checklists, and verifying sensor health post-repair.",
+      capabilities: [
+        "Two-Way Enterprise Sync: Automatically creates and updates work orders in SAP, Oracle, and Maximo",
+        "Spare Parts Staging: Checks warehouse inventory, reserves needed parts, or triggers supplier orders",
+        "Technician Field Copilot: Provides mobile step-by-step repair checklists, torque specs, and safety steps",
+        "Post-Repair Verification: Continuously monitors sensor streams to certify the issue is fully fixed"
+      ],
+      metrics: [
+        { label: "Response Lag Cut", val: "85%" },
+        { label: "Auto-Drafted Orders", val: "100%" },
+        { label: "Parts Stockout Drop", val: "94%" },
+        { label: "Audit Traceability", val: "100%" }
+      ],
+      payload: {
+        work_order_id: "SAP-WO-2026-4402",
+        erp_destination: "SAP S/4HANA Enterprise PM (Connected)",
+        order_status: "DISPATCHED_TO_FIELD_CREW",
+        assigned_team: "Station Alpha Mechanical Reliability Unit (3 Techs)",
+        staged_mro_inventory: [
+          { sku: "SKF-BEARING-7320-B", qty: 2, bin: "Bay-4 Rack-12", status: "RESERVED_STAGED" },
+          { sku: "MOBIL-DTE-732-OIL-20L", qty: 4, bin: "Hazmat-Chem-B", status: "RESERVED_STAGED" }
+        ],
+        scheduled_window: "27 Aug 2026 02:00 - 05:30 UTC (Off-Peak)",
+        projected_cost_avoidance: "$380,000 in unscheduled trip avoidance",
+        verification_loop: "Auto-monitor 48-hr post-install vibration baseline"
+      },
+      logicSummary:
+        "Action Engine invokes enterprise ERP webhooks, reserves warehouse stock, dispatches technicians, and listens to post-repair telemetry to close the loop.",
+      architectureNodes: [
+        "Action Orchestrator",
+        "SAP/ERP Integration Connector",
+        "Mobile Technician Copilot",
+        "Audit & Verification Loop"
+      ]
+    }
+  ];
+
   // Maritime Mock Telemetry for Homepage Control Tower
   const MARITIME_DATA = {
     vesselClasses: [
@@ -474,11 +1055,11 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
       { name: "Cosco Galaxy", score: 58.2, color: "#F0526B", route: "Dubai → Mumbai", status: "Maintenance" },
     ],
     aiPrecision: [
-      { label: "Hull Fouling & Bio-Index", val: 99.2 },
+      { label: "Hull Cleanliness Index", val: 99.2 },
       { label: "Propulsion Vibration FFT", val: 97.8 },
-      { label: "Exhaust CII / MARPOL", val: 95.4 },
+      { label: "Exhaust & Fuel Efficiency", val: 95.4 },
       { label: "AIS Route Drift Detection", val: 98.6 },
-      { label: "Safety Gear CV OCR", val: 96.9 },
+      { label: "Safety Gear Inspection CV", val: 96.9 },
       { label: "Bunker Fuel Viscosity Match", val: 99.4 },
     ],
     inspections: [
@@ -585,34 +1166,34 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
 
       {/* ==================== 1. STICKY TOP NAVIGATION BAR ==================== */}
       <nav
-        className="sticky top-0 z-50 h-16 border-b backdrop-blur-xl px-4 sm:px-6 lg:px-8 flex items-center justify-between shadow-xs transition-colors bg-white/95 border-slate-200"
+        className="sticky top-0 z-50 h-16 border-b backdrop-blur-xl px-3 sm:px-5 lg:px-6 flex items-center justify-between gap-2 shadow-xs transition-colors bg-white/95 border-slate-200"
       >
-        {/* Brand Logo & Tagline (Strict Single-Line No Wrapping) */}
-        <div className="flex items-center space-x-4 lg:space-x-6 shrink-0">
+        {/* Brand Logo & Tagline */}
+        <div className="flex items-center space-x-3 2xl:space-x-5 shrink-0">
           <div
-            className="flex items-center space-x-2.5 cursor-pointer group select-none shrink-0"
+            className="flex items-center space-x-2 cursor-pointer group select-none shrink-0"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
             <div
-              className="h-9 w-9 rounded-xl shadow-xs flex items-center justify-center font-mono font-black text-sm bg-black text-white group-hover:scale-105 transition-transform shrink-0"
+              className="h-8 w-8 rounded-xl shadow-xs flex items-center justify-center font-mono font-black text-xs bg-black text-white group-hover:scale-105 transition-transform shrink-0"
             >
               S
             </div>
             <div className="flex flex-col whitespace-nowrap">
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-sm tracking-tight text-slate-950 group-hover:text-blue-600 transition-colors">
+              <div className="flex items-center gap-1">
+                <span className="font-extrabold text-xs sm:text-sm tracking-tight text-slate-950 group-hover:text-blue-600 transition-colors">
                   STELLAR SCIO
                 </span>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               </div>
-              <span className="text-[9.5px] font-mono tracking-wider font-bold text-slate-500">
+              <span className="text-[8.5px] sm:text-[9px] font-mono tracking-wider font-bold text-slate-500">
                 OPERATIONAL AI PLATFORM
               </span>
             </div>
           </div>
 
-          {/* Clean Modern Navigation Links (Single-Line, No 2-Line Wraps) */}
-          <div className="hidden lg:flex items-center space-x-1 text-[13px] font-medium text-slate-700 font-sans whitespace-nowrap">
+          {/* Clean Modern Navigation Links */}
+          <div className="hidden xl:flex items-center space-x-0.5 text-xs font-semibold text-slate-700 font-sans whitespace-nowrap">
             <a
               href="#industries"
               className="px-2.5 py-1 rounded-full whitespace-nowrap hover:text-black hover:bg-slate-100 transition-all font-semibold"
@@ -620,16 +1201,10 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
               Industries
             </a>
             <a
-              href="#problem"
-              className="px-2.5 py-1 rounded-full whitespace-nowrap hover:text-black hover:bg-slate-100 transition-all"
+              href="#how-it-works"
+              className="px-2.5 py-1 rounded-full whitespace-nowrap hover:text-black hover:bg-slate-100 transition-all font-semibold text-blue-700 hover:text-blue-900"
             >
-              The Problem
-            </a>
-            <a
-              href="#solution"
-              className="px-2.5 py-1 rounded-full whitespace-nowrap hover:text-black hover:bg-slate-100 transition-all"
-            >
-              Solution
+              How SCIO Works
             </a>
             <a
               href="#control-tower"
@@ -637,12 +1212,6 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
             >
               <span className="h-1.5 w-1.5 rounded-full bg-violet-600 shrink-0" />
               <span>Control Tower</span>
-            </a>
-            <a
-              href="#gallery"
-              className="px-2.5 py-1 rounded-full whitespace-nowrap hover:text-black hover:bg-slate-100 transition-all"
-            >
-              Field Telemetry
             </a>
             <a
               href="#integrations"
@@ -657,25 +1226,35 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
               Why SCIO
             </a>
             <button
-              onClick={onOpenResources}
-              className="px-3 py-1 rounded-full whitespace-nowrap hover:bg-indigo-50 transition-all font-semibold text-indigo-700 hover:text-indigo-900 flex items-center gap-1.5 border border-indigo-200 bg-white shadow-2xs"
+              onClick={onOpenContact}
+              className="px-2.5 py-1 rounded-full whitespace-nowrap hover:text-black hover:bg-slate-100 transition-all text-slate-700 font-semibold cursor-pointer"
             >
-              <BookOpen className="h-3.5 w-3.5 shrink-0" />
-              <span>Case Studies &amp; Blogs</span>
+              Contact &amp; Briefings
             </button>
           </div>
         </div>
 
-        {/* Right CTA Actions (Strict Single-Line No Wrapping) */}
-        <div className="flex items-center space-x-2 sm:space-x-2.5 shrink-0 whitespace-nowrap">
-          <div className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-emerald-400/40 bg-emerald-50 font-mono text-[10.5px] font-bold text-emerald-800 whitespace-nowrap shrink-0">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 shrink-0" />
-            <span>50 Nodes Live</span>
-          </div>
+        {/* Right CTA Actions */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0 whitespace-nowrap">
+          <button
+            onClick={onOpenResources}
+            className="hidden lg:inline-flex px-2.5 py-1.5 rounded-full whitespace-nowrap hover:bg-indigo-50 transition-all font-semibold text-indigo-700 hover:text-indigo-900 items-center gap-1.5 border border-indigo-200 bg-white shadow-2xs text-xs shrink-0"
+          >
+            <BookOpen className="h-3.5 w-3.5 shrink-0" />
+            <span>Case Studies</span>
+          </button>
+
+          <button
+            onClick={() => setBetaModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-500/50 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 font-sans text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <span>Join Beta</span>
+          </button>
 
           <button
             onClick={() => setDemoModalOpen(true)}
-            className="hidden sm:inline-flex px-3.5 py-1.5 rounded-full border border-slate-300 bg-white font-sans text-xs font-semibold text-slate-800 transition-all hover:bg-slate-50 hover:border-slate-400 shadow-xs whitespace-nowrap shrink-0"
+            className="hidden sm:inline-flex px-3 py-1.5 rounded-full border border-slate-300 bg-white font-sans text-xs font-semibold text-slate-800 transition-all hover:bg-slate-50 hover:border-slate-400 shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
           >
             Request Demo
           </button>
@@ -683,7 +1262,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
           <a
             href="/?launch=1&industry=energy&tab=energy-dashboard"
             onClick={(e) => handleNavClick(e, "energy", "energy-dashboard")}
-            className="px-4 py-1.5 rounded-full font-sans text-xs font-bold shadow-md flex items-center gap-1.5 transition-all hover:scale-[1.02] bg-[#090D16] text-white hover:bg-slate-900 whitespace-nowrap shrink-0"
+            className="px-3.5 py-1.5 rounded-full font-sans text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all hover:scale-[1.02] bg-[#090D16] text-white hover:bg-slate-900 whitespace-nowrap shrink-0"
           >
             <span>Launch Platform</span>
             <ArrowRight className="h-3.5 w-3.5 opacity-80 shrink-0" />
@@ -750,6 +1329,13 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                 className="inline-flex items-center justify-center rounded-full px-6 py-3.5 font-mono text-xs sm:text-sm font-bold tracking-wide transition-all hover:scale-[1.02] shadow-md bg-black text-white hover:bg-slate-900"
               >
                 Request Enterprise Demo
+              </button>
+              <button
+                onClick={() => setBetaModalOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full px-5 py-3.5 font-mono text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] border-2 border-indigo-600 bg-indigo-50/80 text-indigo-950 shadow-xs hover:bg-indigo-100"
+              >
+                <Sparkles className="h-4 w-4 text-indigo-600" />
+                <span>Join Beta Version</span>
               </button>
               <a
                 href="/?launch=1&industry=energy&tab=energy-dashboard"
@@ -1318,6 +1904,406 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
         </div>
       </section>
 
+      {/* ==================== 5B. HOW SCIO WORKS (END-TO-END ARCHITECTURE & OPERATIONAL LOOP) ==================== */}
+      <section id="how-it-works" className="py-20 sm:py-24 border-t relative overflow-hidden" style={{ background: C.white, borderColor: C.lineLight }}>
+        {/* Subtle Background Geometry */}
+        <div className="absolute inset-0 pointer-events-none opacity-40">
+          <div className="absolute top-0 right-1/4 w-96 h-96 rounded-full bg-blue-100/50 blur-3xl" />
+          <div className="absolute bottom-0 left-1/4 w-96 h-96 rounded-full bg-indigo-100/40 blur-3xl" />
+        </div>
+
+        <div className={`${SHELL} relative space-y-12`}>
+          {/* Section Header */}
+          <SectionIntro
+            eyebrow="04 — HOW SCIO WORKS · CONNECT → UNDERSTAND → PREDICT → ACT"
+            title="How SCIO Works: A Simple 4-Step Intelligence Loop"
+            description="From connecting your machines to predicting problems and executing repairs, SCIO simplifies your entire operational workflow into four clear steps: Connect All Data, Understand Operations, Predict Failures, and Take Action."
+            tone="light"
+            rule
+          />
+
+          {/* Interactive 4-Stage Stepper Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {HOW_SCIO_WORKS_STEPS.map((st, idx) => {
+              const isActive = howItWorksStep === idx;
+              const Icon = st.icon;
+              return (
+                <button
+                  key={st.step}
+                  onClick={() => setHowItWorksStep(idx)}
+                  className={`text-left p-4 sm:p-5 rounded-2xl border transition-all duration-300 relative overflow-hidden group flex flex-col justify-between ${
+                    isActive
+                      ? "bg-slate-950 text-white shadow-xl scale-[1.02] border-slate-900"
+                      : "bg-white text-slate-800 border-slate-200 hover:border-slate-300 hover:bg-slate-50/80 shadow-xs"
+                  }`}
+                >
+                  <div>
+                    {/* Top Status & Number */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span
+                        className={`font-mono text-[11px] font-black px-2.5 py-0.5 rounded-full ${
+                          isActive
+                            ? "bg-white/15 text-white"
+                            : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        STEP {st.step} — {st.phase}
+                      </span>
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          isActive ? "animate-pulse" : "opacity-40"
+                        }`}
+                        style={{ backgroundColor: st.accent }}
+                      />
+                    </div>
+
+                    {/* Icon & Step Name */}
+                    <div className="flex items-center gap-2.5 mb-1.5">
+                      <div
+                        className={`p-1.5 rounded-lg border shrink-0 ${
+                          isActive
+                            ? "bg-white/10 border-white/20 text-white"
+                            : "bg-slate-100 border-slate-200 text-slate-700 group-hover:text-black"
+                        }`}
+                      >
+                        <Icon className="h-4 w-4" style={{ color: isActive ? "#FFFFFF" : st.accent }} />
+                      </div>
+                      <span className="font-extrabold text-sm sm:text-base tracking-tight leading-tight">
+                        {st.stepName}
+                      </span>
+                    </div>
+
+                    {/* Technical Subtitle Tag */}
+                    <div
+                      className={`text-[11px] font-mono font-semibold mb-2 ${
+                        isActive ? "text-cyan-300" : "text-slate-500"
+                      }`}
+                    >
+                      {st.title}
+                    </div>
+
+                    {/* Clear Simple Description */}
+                    <p
+                      className={`text-xs leading-relaxed font-medium ${
+                        isActive ? "text-slate-300" : "text-slate-600"
+                      }`}
+                    >
+                      {st.subtitle}
+                    </p>
+                  </div>
+
+                  {/* Active Indicator Underline */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeHowItWorksUnderline"
+                      className="absolute bottom-0 left-0 right-0 h-1"
+                      style={{ backgroundColor: st.accent }}
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Interactive Split Workbench (Left: Capabilities & Metrics, Right: Live Engine Inspector) */}
+          {(() => {
+            const currentStep = HOW_SCIO_WORKS_STEPS[howItWorksStep];
+            const StepIcon = currentStep.icon;
+
+            return (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                {/* Left Column: Clear Customer-Centric Explanation & Deep Architecture */}
+                <div className="lg:col-span-6 flex flex-col justify-between space-y-6 bg-slate-50/70 border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-sm">
+                  <div className="space-y-4">
+                    {/* Stage Tag Badge & Metric Pill */}
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <span
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-mono text-[11px] font-bold text-white shadow-xs"
+                        style={{ backgroundColor: currentStep.accent }}
+                      >
+                        <StepIcon className="h-3.5 w-3.5" />
+                        <span>STEP {currentStep.step} — {currentStep.phase}</span>
+                      </span>
+                      <span className="px-3 py-1 rounded-full font-mono text-[11px] font-bold bg-white text-slate-800 border border-slate-200 shadow-2xs">
+                        {currentStep.badge}
+                      </span>
+                    </div>
+
+                    {/* Headline & Subtitle */}
+                    <div>
+                      <h3 className="text-xl sm:text-3xl font-black text-slate-950 tracking-tight">
+                        {currentStep.stepName}
+                      </h3>
+                      <p className="text-xs sm:text-sm font-mono font-bold text-blue-600 mt-1 uppercase tracking-wider">
+                        {currentStep.title}
+                      </p>
+                    </div>
+
+                    {/* Simple Customer-Facing Summary */}
+                    <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs">
+                      <p className="text-xs sm:text-sm text-slate-900 font-semibold leading-relaxed">
+                        {currentStep.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Deeper Description */}
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
+                      {currentStep.description}
+                    </p>
+
+                    {/* Key Engineering Capabilities */}
+                    <div className="space-y-2.5 pt-2">
+                      <h4 className="font-mono text-[11px] uppercase tracking-wider font-bold text-slate-500">
+                        How It Works Under the Hood:
+                      </h4>
+                      <div className="space-y-2">
+                        {currentStep.capabilities.map((cap, i) => (
+                          <div
+                            key={i}
+                            className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white border border-slate-200/80 shadow-2xs"
+                          >
+                            <div
+                              className="h-4 w-4 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-white"
+                              style={{ backgroundColor: currentStep.accent }}
+                            >
+                              <Check className="h-2.5 w-2.5 stroke-[3]" />
+                            </div>
+                            <span className="text-xs text-slate-800 font-medium leading-snug">
+                              {cap}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4 Performance Metric Chips */}
+                  <div className="pt-4 border-t border-slate-200/80">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {currentStep.metrics.map((met, i) => (
+                        <div
+                          key={i}
+                          className="p-3 rounded-xl bg-white border border-slate-200 text-center shadow-2xs"
+                        >
+                          <div
+                            className="font-mono text-base sm:text-lg font-black"
+                            style={{ color: currentStep.accent }}
+                          >
+                            {met.val}
+                          </div>
+                          <div className="font-mono text-[9.5px] uppercase font-bold text-slate-500 mt-0.5 tracking-tight">
+                            {met.label}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Column: High-Tech SCIO Live Runtime Inspector Terminal */}
+                <div className="lg:col-span-6 flex flex-col rounded-3xl overflow-hidden border border-slate-800 bg-[#07090E] shadow-2xl">
+                  {/* Console Header Bar */}
+                  <div className="h-12 px-4 bg-[#0D111A] border-b border-white/[0.08] flex items-center justify-between text-xs font-mono">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full bg-rose-500/80" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-amber-500/80" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
+                      </div>
+                      <span className="text-[10.5px] font-bold text-white/80 tracking-wider">
+                        SCIO_RUNTIME // {currentStep.phase}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold border border-emerald-500/20">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
+                        <span>LIVE RUNTIME</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Inspector Tabs (JSON Payload vs Logic Engine vs Nodes) */}
+                  <div className="flex items-center border-b border-white/[0.08] bg-[#0A0D14] px-4 pt-2 gap-2 text-xs font-mono">
+                    <button
+                      onClick={() => setActiveConsoleTab("payload")}
+                      className={`px-3 py-1.5 rounded-t-lg font-bold transition-colors ${
+                        activeConsoleTab === "payload"
+                          ? "bg-[#121722] text-cyan-400 border-t border-x border-cyan-500/40"
+                          : "text-white/40 hover:text-white/70"
+                      }`}
+                    >
+                      Live Telemetry Payload
+                    </button>
+                    <button
+                      onClick={() => setActiveConsoleTab("logic")}
+                      className={`px-3 py-1.5 rounded-t-lg font-bold transition-colors ${
+                        activeConsoleTab === "logic"
+                          ? "bg-[#121722] text-violet-400 border-t border-x border-violet-500/40"
+                          : "text-white/40 hover:text-white/70"
+                      }`}
+                    >
+                      Engine Logic &amp; Rules
+                    </button>
+                    <button
+                      onClick={() => setActiveConsoleTab("architecture")}
+                      className={`px-3 py-1.5 rounded-t-lg font-bold transition-colors ${
+                        activeConsoleTab === "architecture"
+                          ? "bg-[#121722] text-amber-400 border-t border-x border-amber-500/40"
+                          : "text-white/40 hover:text-white/70"
+                      }`}
+                    >
+                      Connected Pipeline Nodes
+                    </button>
+                  </div>
+
+                  {/* Console Body */}
+                  <div className="p-5 flex-1 flex flex-col justify-between font-mono text-xs overflow-auto min-h-[380px]">
+                    {activeConsoleTab === "payload" && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between text-[11px] text-white/50 border-b border-white/[0.06] pb-2">
+                          <span>// LIVE DATA PACKET AT STEP {currentStep.step} ({currentStep.phase})</span>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(JSON.stringify(currentStep.payload, null, 2));
+                              setCopiedPayload(true);
+                              setTimeout(() => setCopiedPayload(false), 2000);
+                            }}
+                            className="flex items-center gap-1 text-[10.5px] px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-white/80 transition-colors border border-white/10"
+                          >
+                            <Copy className="h-3 w-3" />
+                            <span>{copiedPayload ? "Copied!" : "Copy JSON"}</span>
+                          </button>
+                        </div>
+                        <pre className="text-[11.5px] leading-relaxed text-slate-300 overflow-x-auto p-3 rounded-xl bg-black/40 border border-white/[0.05]">
+                          <code>{JSON.stringify(currentStep.payload, null, 2)}</code>
+                        </pre>
+                      </div>
+                    )}
+
+                    {activeConsoleTab === "logic" && (
+                      <div className="space-y-4">
+                        <div className="text-[11px] text-white/50 border-b border-white/[0.06] pb-2">
+                          // INTERNAL EVALUATION LOGIC
+                        </div>
+                        <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] space-y-3">
+                          <div className="flex items-center gap-2 text-violet-400 font-bold text-xs">
+                            <Cpu className="h-4 w-4" />
+                            <span>EXECUTION RULESET SUMMARY</span>
+                          </div>
+                          <p className="text-slate-300 text-xs leading-relaxed font-sans font-medium">
+                            {currentStep.logicSummary}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-[10px] uppercase font-bold tracking-wider text-white/40">
+                            Telemetry Stream Status:
+                          </div>
+                          <div className="flex items-center justify-between p-2.5 rounded-lg bg-black/40 border border-white/[0.06] text-xs">
+                            <span className="text-white/70">Edge Sync Status:</span>
+                            <span className="text-emerald-400 font-bold">100% IN-SYNC (0.8ms jitter)</span>
+                          </div>
+                          <div className="flex items-center justify-between p-2.5 rounded-lg bg-black/40 border border-white/[0.06] text-xs">
+                            <span className="text-white/70">Security Protocol:</span>
+                            <span className="text-cyan-400 font-bold">TLS 1.3 mTLS Unidirectional Diode</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeConsoleTab === "architecture" && (
+                      <div className="space-y-4">
+                        <div className="text-[11px] text-white/50 border-b border-white/[0.06] pb-2">
+                          // DATA PATHWAY &amp; TOPOLOGY MAPPING
+                        </div>
+                        <div className="space-y-3">
+                          {currentStep.architectureNodes.map((node, i) => (
+                            <div
+                              key={i}
+                              className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]"
+                            >
+                              <div className="flex items-center gap-2.5">
+                                <span className="h-5 w-5 rounded-full bg-white/10 flex items-center justify-center font-mono text-[10px] font-bold text-white">
+                                  {i + 1}
+                                </span>
+                                <span className="text-xs text-white font-bold">{node}</span>
+                              </div>
+                              <span className="text-[10.5px] text-emerald-400 font-bold flex items-center gap-1">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                                ACTIVE
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Terminal Footer Info Bar */}
+                    <div className="pt-4 mt-4 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-[10.5px] text-white/40">
+                      <span>CONNECTOR: SCIO_STREAM_ENGINE</span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-cyan-400 font-bold">CONNECT → UNDERSTAND → PREDICT → ACT</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Bottom 4-Card Architecture Overview Grid (Simple Customer-Facing Cards) */}
+          <div className="pt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {HOW_SCIO_WORKS_STEPS.map((card, idx) => {
+                const Icon = card.icon;
+                return (
+                  <div
+                    key={card.step}
+                    onClick={() => setHowItWorksStep(idx)}
+                    className="p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 hover:shadow-md transition-all duration-300 cursor-pointer flex flex-col justify-between space-y-3 group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div
+                        className="p-2 rounded-xl border text-slate-800 transition-colors group-hover:text-white"
+                        style={{
+                          backgroundColor: "rgba(0,0,0,0.03)",
+                          borderColor: "rgba(0,0,0,0.08)"
+                        }}
+                      >
+                        <Icon className="h-4 w-4" style={{ color: card.accent }} />
+                      </div>
+                      <span className="font-mono text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                        {card.phase}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="font-mono text-[11px] font-black text-slate-400">
+                        STEP {card.step}
+                      </span>
+                      <h4 className="font-extrabold text-slate-900 text-sm mt-0.5 group-hover:text-blue-600 transition-colors">
+                        {card.stepName}
+                      </h4>
+                      <div className="font-mono text-[11px] text-slate-500 font-semibold mt-0.5">
+                        {card.title}
+                      </div>
+                      <p className="text-xs text-slate-600 leading-relaxed mt-1.5 font-medium">
+                        {card.subtitle}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 flex items-center text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
+                      <span>Explore {card.phase} Details</span>
+                      <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ==================== 6. OPERATIONS CONTROL TOWER (FULL INTERACTIVE MARITIME/MULTI-SECTOR DASHBOARD) ==================== */}
       <section id="control-tower" className="py-20" style={{ background: C.night, color: C.chalk }}>
         <div className={`${SHELL} space-y-10`}>
@@ -1327,14 +2313,14 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#8B5CF6] font-bold">
                 <Anchor className="h-3.5 w-3.5" />
-                04 — CONTROL TOWER · REAL-TIME MISSION CONTROL SUITE
+                05 — CONTROL TOWER · REAL-TIME MISSION CONTROL SUITE
               </div>
               <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
                 One Operations Control Tower for Global Industrial Fleets
               </h2>
               <p className="max-w-3xl text-sm leading-relaxed text-white/60 sm:text-[14.5px] font-medium">
-                Live AIS maritime fleet tracking, Port State Control (PSC) deficiency remediation, bunker fuel reserves,
-                and SOLAS/MARPOL compliance — with sub-second node telemetry behind every number.
+                Live AIS maritime fleet tracking, routine safety equipment walkthroughs, fuel reserves,
+                and port inspection readiness — with sub-second node telemetry behind every number.
               </p>
             </div>
 
@@ -1354,7 +2340,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                 className="inline-flex items-center gap-2 rounded-xl border border-[#F0526B]/30 bg-[#F0526B]/10 px-4 py-2.5 font-mono text-xs font-bold text-[#F0526B] transition-all hover:border-[#F0526B]/60 hover:bg-[#F0526B]/20"
               >
                 <CircleAlert className="h-4 w-4" />
-                <span>1 Active SOLAS Deficiency</span>
+                <span>1 Safety Inspection Pending</span>
               </a>
             </div>
           </div>
@@ -1427,10 +2413,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                     className="space-y-4 sm:space-y-6"
                   >
                     {/* Top 4 KPI Metric Cards */}
-                    <motion.div
-                      variants={fadeUp}
-                      className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-                    >
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                       {/* KPI 1: Fleet Seaworthiness */}
                       <div className="rounded-xl border border-white/[0.08] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
                         <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/50 font-bold sm:text-[11.5px]">
@@ -1444,9 +2427,8 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                           <motion.span
                             className="block h-full rounded-full bg-[#2FBF71]"
                             initial={{ width: 0 }}
-                            whileInView={{ width: "94.8%" }}
-                            viewport={{ once: true, amount: 0.6 }}
-                            transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.1 }}
+                            animate={{ width: "94.8%" }}
+                            transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.1 }}
                           />
                         </span>
                       </div>
@@ -1464,9 +2446,8 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                           <motion.span
                             className="block h-full rounded-full bg-[#3FC8D8]"
                             initial={{ width: 0 }}
-                            whileInView={{ width: "97.5%" }}
-                            viewport={{ once: true, amount: 0.6 }}
-                            transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.2 }}
+                            animate={{ width: "97.5%" }}
+                            transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.2 }}
                           />
                         </span>
                       </div>
@@ -1484,9 +2465,8 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                           <motion.span
                             className="block h-full rounded-full bg-[#8B5CF6]"
                             initial={{ width: 0 }}
-                            whileInView={{ width: "91.8%" }}
-                            viewport={{ once: true, amount: 0.6 }}
-                            transition={{ duration: 1.2, ease: ENTRANCE, delay: 0.3 }}
+                            animate={{ width: "91.8%" }}
+                            transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.3 }}
                           />
                         </span>
                       </div>
@@ -1504,13 +2484,10 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                           Starboard Lifeboat Release · Cosco Galaxy
                         </p>
                       </div>
-                    </motion.div>
+                    </div>
 
                     {/* Middle Row 1: Fleet Distribution Radial Chart + Monthly Volume */}
-                    <motion.div
-                      variants={fadeUp}
-                      className="grid gap-4 lg:grid-cols-[1fr_1.35fr]"
-                    >
+                    <div className="grid gap-4 lg:grid-cols-[1fr_1.35fr]">
                       {/* Vessel Class Breakdown */}
                       <DashboardCard
                         title="Maritime Fleet Class Distribution"
@@ -1543,15 +2520,15 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                                     fill="transparent"
                                     stroke={item.color}
                                     strokeWidth="4.2"
+                                    pathLength={1}
                                     strokeDasharray={`${fraction} ${1 - fraction}`}
                                     strokeDashoffset={-offset}
                                     initial={{ strokeDasharray: "0 1" }}
-                                    whileInView={{ strokeDasharray: `${fraction} ${1 - fraction}` }}
-                                    viewport={{ once: true, amount: 0.6 }}
+                                    animate={{ strokeDasharray: `${fraction} ${1 - fraction}` }}
                                     transition={{
-                                      duration: 0.9,
+                                      duration: 0.8,
                                       ease: ENTRANCE,
-                                      delay: 0.15 + index * 0.1,
+                                      delay: 0.1 + index * 0.05,
                                     }}
                                   />
                                 );
@@ -1610,26 +2587,22 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                             <div key={month as string} className="flex flex-1 flex-col items-center gap-2 h-full justify-end">
                               <span className="text-[10px] font-mono text-white/60 font-bold">{val}</span>
                               <div className="w-full max-w-[28px] bg-white/[0.05] rounded-t-sm h-full flex flex-col justify-end overflow-hidden">
-                                <motion.div
-                                  className="w-full rounded-t-sm bg-gradient-to-t from-[#8B5CF6] to-[#3FC8D8]"
-                                  initial={{ height: 0 }}
-                                  whileInView={{ height: `${val}%` }}
-                                  viewport={{ once: true, amount: 0.6 }}
-                                  transition={{ duration: 0.8, delay: i * 0.08, ease: ENTRANCE }}
-                                />
+                              <motion.div
+                                className="w-full rounded-t-sm bg-gradient-to-t from-[#8B5CF6] to-[#3FC8D8]"
+                                initial={{ height: 0 }}
+                                animate={{ height: `${val}%` }}
+                                transition={{ duration: 0.6, delay: i * 0.05, ease: ENTRANCE }}
+                              />
                               </div>
                               <span className="text-[10px] font-mono text-white/50 font-bold">{month}</span>
                             </div>
                           ))}
                         </div>
                       </DashboardCard>
-                    </motion.div>
+                    </div>
 
                     {/* Middle Row 2: Vessel Readiness & AI Marine Precision */}
-                    <motion.div
-                      variants={fadeUp}
-                      className="grid gap-4 lg:grid-cols-2"
-                    >
+                    <div className="grid gap-4 lg:grid-cols-2">
                       <DashboardCard
                         title="Vessel Seaworthiness & Active Voyage Routes"
                         accentColor="#2FBF71"
@@ -1675,13 +2648,10 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                           ))}
                         </div>
                       </DashboardCard>
-                    </motion.div>
+                    </div>
 
                     {/* Bottom Operational Telemetry Footer Cards */}
-                    <motion.div
-                      variants={fadeUp}
-                      className="grid gap-3 sm:grid-cols-3"
-                    >
+                    <div className="grid gap-3 sm:grid-cols-3">
                       <div className="rounded-xl border border-white/[0.08] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
                         <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/50 font-bold sm:text-[11.5px]">
                           Bunker &amp; Supply Bottlenecks
@@ -1720,7 +2690,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                           Propulsion bearing vibration anomalies reduced following condition-based lubrication.
                         </p>
                       </div>
-                    </motion.div>
+                    </div>
                   </motion.div>
                 )}
 
@@ -1788,8 +2758,8 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                   </motion.div>
                 )}
 
-                {/* ==================== TAB 3: INSPECTIONS & PSC ==================== */}
-                {dashboardTab === "Inspections & PSC" && (
+                {/* ==================== TAB 3: INSPECTIONS & SAFETY ==================== */}
+                {dashboardTab === "Inspections & Safety" && (
                   <motion.div
                     key="inspections-tab"
                     initial={{ opacity: 0, y: 10 }}
@@ -1882,10 +2852,10 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                   </motion.div>
                 )}
 
-                {/* ==================== TAB 5: SOLAS COMPLIANCE ==================== */}
-                {dashboardTab === "SOLAS Compliance" && (
+                {/* ==================== TAB 5: SAFETY EQUIPMENT ==================== */}
+                {dashboardTab === "Safety Equipment" && (
                   <motion.div
-                    key="solas-tab"
+                    key="safety-tab"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -1894,23 +2864,23 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
                   >
                     <div className="rounded-xl border border-white/[0.08] bg-[#FFFDFA]/[0.02] p-4">
                       <ShieldCheck className="h-6 w-6 text-[#2FBF71] mb-2" />
-                      <h4 className="font-bold text-white text-sm">SOLAS Safety Equipment</h4>
-                      <p className="text-xs text-white/50 mt-1">Life rafts, EPIRBs, and immersion suits inspected and certified.</p>
-                      <span className="mt-3 inline-block font-mono text-[10px] text-[#2FBF71] font-bold">100% COMPLIANT</span>
+                      <h4 className="font-bold text-white text-sm">Lifeboats & Survival Gear</h4>
+                      <p className="text-xs text-white/50 mt-1">Life rafts, emergency beacons, and immersion suits inspected and certified.</p>
+                      <span className="mt-3 inline-block font-mono text-[10px] text-[#2FBF71] font-bold">100% INSPECTED</span>
                     </div>
 
                     <div className="rounded-xl border border-white/[0.08] bg-[#FFFDFA]/[0.02] p-4">
                       <Radio className="h-6 w-6 text-[#3FC8D8] mb-2" />
-                      <h4 className="font-bold text-white text-sm">MARPOL Annex VI (CII)</h4>
-                      <p className="text-xs text-white/50 mt-1">Carbon Intensity Indicator telemetry verified against IMO 2026 trajectories.</p>
-                      <span className="mt-3 inline-block font-mono text-[10px] text-[#3FC8D8] font-bold">GRADE A RATING</span>
+                      <h4 className="font-bold text-white text-sm">Fuel & Emissions Log</h4>
+                      <p className="text-xs text-white/50 mt-1">Fuel consumption and clean exhaust readings verified across all active routes.</p>
+                      <span className="mt-3 inline-block font-mono text-[10px] text-[#3FC8D8] font-bold">OPTIMAL STATUS</span>
                     </div>
 
                     <div className="rounded-xl border border-white/[0.08] bg-[#FFFDFA]/[0.02] p-4">
                       <Anchor className="h-6 w-6 text-[#8B5CF6] mb-2" />
-                      <h4 className="font-bold text-white text-sm">ISM Code SMS Audits</h4>
-                      <p className="text-xs text-white/50 mt-1">Safety Management System internal audits synchronized for all 28 vessels.</p>
-                      <span className="mt-3 inline-block font-mono text-[10px] text-[#8B5CF6] font-bold">ANNUAL AUDIT PASSED</span>
+                      <h4 className="font-bold text-white text-sm">Routine Ship Walkthroughs</h4>
+                      <p className="text-xs text-white/50 mt-1">Deck, hull, and engine room safety checklists completed on all 28 vessels.</p>
+                      <span className="mt-3 inline-block font-mono text-[10px] text-[#8B5CF6] font-bold">ALL SHIPS PASSED</span>
                     </div>
                   </motion.div>
                 )}
@@ -2043,11 +3013,203 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
         </div>
       </section>
 
+      {/* ==================== 8. CORE OPERATIONAL INTELLIGENCE PILLARS ==================== */}
+      <section id="capabilities" className="py-24 border-t bg-slate-900 text-white relative overflow-hidden" style={{ borderColor: C.lineDark }}>
+        <div className="absolute top-0 left-1/3 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/3 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className={`${SHELL} space-y-12 relative z-10`}>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold shadow-xs">
+                <Cpu className="h-4 w-4" />
+                <span>07 — 4 CORE PILLARS · INDUSTRIAL INTELLIGENCE</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white font-display">
+                Automated Root Cause, Document OCR &amp; Inspections
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
+                Stellar SCIO goes beyond simple telemetry dashboards by providing deep-domain diagnosis, technical manual intelligence, mobile checklists, and automated ERP actions.
+              </p>
+            </div>
+
+            <button
+              onClick={() => setDemoModalOpen(true)}
+              className="px-6 py-3 rounded-full font-mono text-xs font-bold bg-white hover:bg-slate-100 text-black transition-all flex items-center gap-2 shadow-lg cursor-pointer hover:scale-105 shrink-0"
+            >
+              <span>Explore All 4 Modules</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+
+          {/* 4 Pillars Interactive Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            {/* PILLAR 1: ROOT CAUSE ANALYSIS */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-950/80 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-cyan-500/50 hover:shadow-cyan-500/10 group">
+              <div className="space-y-4">
+                <div className="h-12 w-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform">
+                  <Search className="h-6 w-6" />
+                </div>
+
+                <div>
+                  <span className="font-mono text-[10px] font-bold text-cyan-400 uppercase tracking-wider">PILLAR 01 · DIAGNOSTICS</span>
+                  <h3 className="font-extrabold text-lg text-white group-hover:text-cyan-300 transition-colors mt-0.5">
+                    Automated Root Cause Analysis (RCA)
+                  </h3>
+                  <p className="text-xs text-slate-300 font-sans leading-relaxed mt-2">
+                    Correlates multi-axis vibration spectra, temperature transients, and hydraulic pressure curves to isolate true mechanical root causes.
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-mono">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">False Alarm Cut:</span>
+                    <span className="text-cyan-400 font-bold">91% Drop</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Harmonic FFT:</span>
+                    <span className="text-emerald-400 font-bold">Sub-Second</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Failure Prediction:</span>
+                    <span className="text-white font-bold">14 Days Early</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-cyan-400">
+                <span>Multi-Variable AI</span>
+                <span className="font-bold">Active ●</span>
+              </div>
+            </div>
+
+            {/* PILLAR 2: DOCUMENT INTELLIGENCE SCANNING */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-950/80 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-indigo-500/50 hover:shadow-indigo-500/10 group">
+              <div className="space-y-4">
+                <div className="h-12 w-12 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform">
+                  <FileText className="h-6 w-6" />
+                </div>
+
+                <div>
+                  <span className="font-mono text-[10px] font-bold text-indigo-400 uppercase tracking-wider">PILLAR 02 · OCR &amp; VISION</span>
+                  <h3 className="font-extrabold text-lg text-white group-hover:text-indigo-300 transition-colors mt-0.5">
+                    Document Intelligence &amp; Manual OCR
+                  </h3>
+                  <p className="text-xs text-slate-300 font-sans leading-relaxed mt-2">
+                    Scans 800+ page OEM manuals, P&amp;ID schematics, and equipment nameplates to link live sensor alerts directly to exact repair steps.
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-mono">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Manual Ingestion:</span>
+                    <span className="text-indigo-400 font-bold">PDF, CAD &amp; P&amp;ID</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Torque Spec Lookup:</span>
+                    <span className="text-emerald-400 font-bold">Instant Vector</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">MTTR Acceleration:</span>
+                    <span className="text-white font-bold">82% Faster</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-indigo-400">
+                <span>Semantic Twin OCR</span>
+                <span className="font-bold">Active ●</span>
+              </div>
+            </div>
+
+            {/* PILLAR 3: GUIDED SAFETY INSPECTIONS */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-950/80 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-emerald-500/50 hover:shadow-emerald-500/10 group">
+              <div className="space-y-4">
+                <div className="h-12 w-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform">
+                  <CheckCircle2 className="h-6 w-6" />
+                </div>
+
+                <div>
+                  <span className="font-mono text-[10px] font-bold text-emerald-400 uppercase tracking-wider">PILLAR 03 · FIELD OPS</span>
+                  <h3 className="font-extrabold text-lg text-white group-hover:text-emerald-300 transition-colors mt-0.5">
+                    Safety Equipment &amp; Inspections
+                  </h3>
+                  <p className="text-xs text-slate-300 font-sans leading-relaxed mt-2">
+                    Digital mobile walkthroughs for ship crews and field technicians with QR asset scanning, photo defect logs, and offline audit sync.
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-mono">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Inspection Pass Rate:</span>
+                    <span className="text-emerald-400 font-bold">100% First-Pass</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">QR / Barcode Sync:</span>
+                    <span className="text-cyan-400 font-bold">Offline Ready</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Audit Trail:</span>
+                    <span className="text-white font-bold">Tamper-Proof</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-emerald-400">
+                <span>Mobile &amp; Port Ready</span>
+                <span className="font-bold">Active ●</span>
+              </div>
+            </div>
+
+            {/* PILLAR 4: CLOSED-LOOP AUTONOMOUS ACTIONS */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-950/80 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-amber-500/50 hover:shadow-amber-500/10 group">
+              <div className="space-y-4">
+                <div className="h-12 w-12 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center font-bold shadow-inner group-hover:scale-110 transition-transform">
+                  <Workflow className="h-6 w-6" />
+                </div>
+
+                <div>
+                  <span className="font-mono text-[10px] font-bold text-amber-400 uppercase tracking-wider">PILLAR 04 · ERP ACTIONS</span>
+                  <h3 className="font-extrabold text-lg text-white group-hover:text-amber-300 transition-colors mt-0.5">
+                    Closed-Loop Actions &amp; MRO Sync
+                  </h3>
+                  <p className="text-xs text-slate-300 font-sans leading-relaxed mt-2">
+                    Auto-drafts SAP S/4HANA PM and IBM Maximo work orders, reserves spare parts in warehouse bins, and schedules technician dispatch.
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-mono">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">SAP / Maximo Sync:</span>
+                    <span className="text-amber-400 font-bold">Automated Draft</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Spare Parts Staging:</span>
+                    <span className="text-emerald-400 font-bold">Auto-Reserved</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-slate-400">Turnaround Speed:</span>
+                    <span className="text-white font-bold">4.2x Faster</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-amber-400">
+                <span>Direct ERP Execution</span>
+                <span className="font-bold">Active ●</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ==================== 9. ENTERPRISE INTEGRATION INFOGRAPHIC PIPELINE ==================== */}
       <section id="integrations" className="py-20 border-t" style={{ background: C.whiteSurface, borderColor: C.lineLight }}>
         <div className={`${SHELL} space-y-12`}>
           <SectionIntro
-            eyebrow="07 — INTEGRATION PIPELINE · ZERO RIP-AND-REPLACE"
+            eyebrow="08 — INTEGRATION PIPELINE · ZERO RIP-AND-REPLACE"
             title="How SCIO Bridges Your Existing ERP & Telemetry to Autonomous Outcomes"
             description="SCIO sits non-invasively on top of your current enterprise systems. Click any data source below to trace how raw telemetry flows through SCIO's neural engine into automated actions."
             tone="light"
@@ -2369,7 +3531,187 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
         </div>
       </section>
 
-      {/* ==================== 10. CLOSING CTA (DEEP OBSIDIAN BLACK) ==================== */}
+      {/* ==================== 10. ACTIVE PRIVATE BETA COHORT (UNDER STRICT NDA) ==================== */}
+      <section id="beta-cohort" className="py-24 border-t bg-slate-950 text-white relative overflow-hidden" style={{ borderColor: C.lineDark }}>
+        {/* Subtle Ambient Background Gradient */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className={`${SHELL} space-y-12 relative z-10`}>
+          {/* Header Row */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-xs font-bold shadow-xs">
+                <ShieldCheck className="h-4 w-4" />
+                <span>CONFIDENTIAL PILOT PROGRAM · ACTIVE BETA COHORT</span>
+              </div>
+              <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white font-display">
+                Trusted by 4 Global Market Leaders
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
+                Stellar SCIO is currently deployed in live production pilots across 4 of the world&apos;s largest industrial operators under strict non-disclosure agreements.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => setBetaModalOpen(true)}
+                className="px-6 py-3 rounded-full font-mono text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-black transition-all flex items-center gap-2 shadow-lg cursor-pointer hover:scale-105"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>Apply for Beta Cohort</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 4 NDA Beta Giant Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            {/* GIANT 1: Clean Energy & Utility Operator */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/90 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-emerald-500/50 hover:shadow-emerald-500/10 group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded font-mono text-[9.5px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                    <Lock className="h-3 w-3" />
+                    <span>CONFIDENTIAL · TOP 3 GLOBAL UTILITY</span>
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-extrabold text-base text-white group-hover:text-emerald-300 transition-colors">
+                    Fortune 50 Clean Energy &amp; Power Grid Operator
+                  </h3>
+                  <p className="text-xs font-mono text-emerald-400 mt-1">12.4 GW Managed · 42 Grid Substations</p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-sans">
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-400 font-bold">›</span>
+                    <span><strong>Live Pilot:</strong> Substation transformer DGA gas analysis &amp; 50.02 Hz frequency telemetry.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-400 font-bold">›</span>
+                    <span><strong>Verified Impact:</strong> 14-day early warning on transformer dielectric insulation degradation.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Status: Production Pilot</span>
+                <span className="text-emerald-400 font-bold">● Active 24/7</span>
+              </div>
+            </div>
+
+            {/* GIANT 2: Maritime Shipping Fleet */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/90 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-blue-500/50 hover:shadow-blue-500/10 group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded font-mono text-[9.5px] font-bold uppercase tracking-wider bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center gap-1">
+                    <Lock className="h-3 w-3" />
+                    <span>CONFIDENTIAL · TOP 5 GLOBAL SHIPPING LINE</span>
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-extrabold text-base text-white group-hover:text-blue-300 transition-colors">
+                    Global Ocean Cargo &amp; Container Shipping Giant
+                  </h3>
+                  <p className="text-xs font-mono text-blue-400 mt-1">240+ Ocean Vessels · Global Sea Lanes</p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-sans">
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-400 font-bold">›</span>
+                    <span><strong>Live Pilot:</strong> Propulsion engine vibration, daily fuel burn rate logs &amp; safety inspection checklists.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-400 font-bold">›</span>
+                    <span><strong>Verified Impact:</strong> 100% first-pass port safety inspection readiness; 240 MT fuel burn protected.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Status: Ocean Pilot</span>
+                <span className="text-blue-400 font-bold">● Active 24/7</span>
+              </div>
+            </div>
+
+            {/* GIANT 3: Advanced Automotive & Aerospace OEM */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/90 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-amber-500/50 hover:shadow-amber-500/10 group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded font-mono text-[9.5px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                    <Lock className="h-3 w-3" />
+                    <span>CONFIDENTIAL · TIER-1 GLOBAL OEM</span>
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-extrabold text-base text-white group-hover:text-amber-300 transition-colors">
+                    Tier-1 Global Aerospace &amp; Precision OEM
+                  </h3>
+                  <p className="text-xs font-mono text-amber-400 mt-1">38 Smart Plants · 1,200+ CNC Machining Cells</p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-sans">
+                  <div className="flex items-start gap-2">
+                    <span className="text-amber-400 font-bold">›</span>
+                    <span><strong>Live Pilot:</strong> 5-axis CNC spindle FFT vibration, micro-stoppage detection &amp; automated SAP PM work orders.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-amber-400 font-bold">›</span>
+                    <span><strong>Verified Impact:</strong> 4.2% overall OEE boost; eliminated tool-chatter defects causing $1.8M scrap.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Status: Plant Pilot</span>
+                <span className="text-amber-400 font-bold">● Active 24/7</span>
+              </div>
+            </div>
+
+            {/* GIANT 4: Cold-Chain & Food Logistics Enterprise */}
+            <div className="p-6 rounded-2xl border border-white/10 bg-slate-900/90 backdrop-blur-xl shadow-xl flex flex-col justify-between space-y-5 transition-all hover:border-cyan-500/50 hover:shadow-cyan-500/10 group">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded font-mono text-[9.5px] font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 flex items-center gap-1">
+                    <Lock className="h-3 w-3" />
+                    <span>CONFIDENTIAL · GLOBAL SUPPLY CHAIN GIANT</span>
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-extrabold text-base text-white group-hover:text-cyan-300 transition-colors">
+                    Multinational Cold-Chain &amp; Freight Network
+                  </h3>
+                  <p className="text-xs font-mono text-cyan-400 mt-1">18,000+ Refrigerated Reefers · Intermodal Rail</p>
+                </div>
+
+                <div className="pt-3 border-t border-white/10 space-y-2 text-xs text-slate-300 font-sans">
+                  <div className="flex items-start gap-2">
+                    <span className="text-cyan-400 font-bold">›</span>
+                    <span><strong>Live Pilot:</strong> Continuous IoT temperature telemetry (-25°C to +4°C) &amp; 6-9 day delay prediction.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-cyan-400 font-bold">›</span>
+                    <span><strong>Verified Impact:</strong> 99.98% cold-chain temperature compliance; 0 perishable shipments spoiled.</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span>Status: Multimodal Pilot</span>
+                <span className="text-cyan-400 font-bold">● Active 24/7</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ==================== 11. CLOSING CTA (DEEP OBSIDIAN BLACK) ==================== */}
       <section className="py-20" style={{ background: C.night, color: C.chalk }}>
         <div className={`${SHELL}`}>
           <div
@@ -2451,87 +3793,38 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources }: S
               <a href="#solution" className="hover:text-white transition-colors">Our Solution</a>
               <a href="#industries" className="hover:text-white transition-colors">4 Industries</a>
               <button onClick={onOpenResources} className="text-left hover:text-white transition-colors text-emerald-400 font-bold">Case Studies &amp; Blogs</button>
-              <button onClick={() => setDemoModalOpen(true)} className="text-left hover:text-white transition-colors">Contact Sales</button>
+              <button onClick={onOpenContact} className="text-left hover:text-white transition-colors text-amber-400 font-bold">Contact &amp; Book Briefing</button>
+              <button onClick={() => setBetaModalOpen(true)} className="text-left hover:text-white transition-colors text-cyan-400 font-bold flex items-center gap-1.5">
+                <Sparkles className="h-3 w-3 text-cyan-400" />
+                <span>Join Private Beta</span>
+              </button>
+              <button onClick={() => setDemoModalOpen(true)} className="text-left hover:text-white transition-colors">Request Enterprise Demo</button>
             </div>
           </div>
         </div>
       </footer>
 
-      {/* ==================== DEMO REQUEST MODAL ==================== */}
-      {demoModalOpen && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div
-            className="border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl font-mono"
-            style={{ background: C.nightRaised, borderColor: C.lineDark, color: C.chalk }}
-          >
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full animate-pulse" style={{ background: C.cyan }} />
-                <h3 className="font-bold text-sm text-white">Request Enterprise Demo</h3>
-              </div>
-              <button onClick={() => setDemoModalOpen(false)} className="opacity-50 hover:opacity-100 text-lg text-white">✕</button>
-            </div>
+      {/* ==================== DEMO REQUEST MODAL (FORMSPREE: mrpznygn) ==================== */}
+      <DemoFormModal
+        isOpen={demoModalOpen}
+        onClose={() => setDemoModalOpen(false)}
+        onLaunchPlatform={handleNavClick}
+      />
 
-            {demoSubmitted ? (
-              <div className="py-6 text-center space-y-3 font-sans">
-                <div className="h-12 w-12 rounded-full border mx-auto flex items-center justify-center" style={{ background: "rgba(16,185,129,0.2)", borderColor: C.green, color: C.green }}>
-                  <CheckCircle2 className="h-6 w-6" />
-                </div>
-                <h4 className="text-base font-bold text-white">Demo Request Received</h4>
-                <p className="text-xs text-white/70">Our Enterprise Architecture team will reach out within 2 hours.</p>
-                <a
-                  href="/?launch=1&industry=energy&tab=energy-dashboard"
-                  onClick={(e) => {
-                    handleNavClick(e, "energy", "energy-dashboard");
-                    setDemoModalOpen(false);
-                    setDemoSubmitted(false);
-                  }}
-                  className="mt-4 px-4 py-2 rounded-lg font-bold text-xs font-mono bg-white text-black hover:bg-slate-100 inline-block"
-                >
-                  Explore Interactive Live Demo Now →
-                </a>
-              </div>
-            ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setDemoSubmitted(true);
-                }}
-                className="space-y-3 font-sans text-xs"
-              >
-                <div>
-                  <label className="block mb-1 font-mono text-[10px] uppercase text-white/60">Corporate Work Email</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="name@enterprise.com"
-                    className="w-full px-3 py-2 border rounded-lg font-mono focus:outline-none text-white"
-                    style={{ background: C.night, borderColor: C.lineDark }}
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 font-mono text-[10px] uppercase text-white/60">Primary Operating Sector</label>
-                  <select
-                    className="w-full px-3 py-2 border rounded-lg font-mono focus:outline-none text-white"
-                    style={{ background: C.night, borderColor: C.lineDark }}
-                  >
-                    <option value="energy">Renewable Energy & Utilities</option>
-                    <option value="maritime">Maritime Fleet Operations</option>
-                    <option value="manufacturing">Manufacturing 4.0 & OEE</option>
-                    <option value="logistics">Multimodal Supply Chain</option>
-                  </select>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full mt-2 py-3 font-bold text-xs font-mono rounded-lg shadow-md bg-white text-black hover:bg-slate-100"
-                >
-                  Submit Demo Request
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      {/* ==================== JOIN BETA VERSION MODAL (FORMSPREE: mrpznygn) ==================== */}
+      <BetaFormModal
+        isOpen={betaModalOpen}
+        onClose={() => setBetaModalOpen(false)}
+        onLaunchPlatform={handleNavClick}
+      />
+
+      {/* ==================== 24/7 SCIO SENTINEL AI ORB COMPANION ==================== */}
+      <ScioSentinelOrb
+        onOpenBetaModal={() => setBetaModalOpen(true)}
+        onOpenDemoModal={() => setDemoModalOpen(true)}
+        onLaunchPlatform={(ind, tab) => onLaunchPlatform(ind, tab)}
+        currentIndustry="home"
+      />
 
     </div>
   );

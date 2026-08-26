@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import {
   Building2, Ship, Zap, Truck, Shield, AlertTriangle, Plus,
   X, User, MessageSquare, Anchor, ClipboardList, Activity, Navigation, ShoppingCart, UserCheck, Terminal, Download, FileText, Gauge,
-  Search, Filter, CheckCircle2, Clock, ArrowRight, Package, DollarSign, Calendar, Cpu, Boxes, ThermometerSnowflake, Globe
+  Search, Filter, CheckCircle2, Clock, ArrowRight, ArrowLeft, ChevronDown, Check, Sparkles, Package, DollarSign, Calendar, Cpu, Boxes, ThermometerSnowflake, Globe
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -47,10 +47,12 @@ import {
 import StellarHomePage from "../components/landing/StellarHomePage";
 import ResourcesHub from "../components/resources/ResourcesHub";
 import GenerativeVisualCopilot from "../components/ai/GenerativeVisualCopilot";
+import ScioSentinelOrb from "../components/ai/ScioSentinelOrb";
+import ContactHub from "../components/contact/ContactHub";
 import { mockDb } from "../config/energyMockDb";
 
 export default function App() {
-  const [viewMode, setViewMode] = useState<"landing" | "platform" | "resources">("landing");
+  const [viewMode, setViewMode] = useState<"landing" | "platform" | "resources" | "contact">("landing");
   const [currentIndustry, setCurrentIndustry] = useState<string>("energy");
   const [activeTab, setActiveTab] = useState<string>("energy-dashboard");
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
@@ -80,6 +82,8 @@ export default function App() {
       window.history.replaceState(null, "", window.location.pathname);
     } else if (urlParams.get("view") === "resources" || urlParams.get("tab") === "resources") {
       setViewMode("resources");
+    } else if (urlParams.get("view") === "contact" || urlParams.get("tab") === "contact") {
+      setViewMode("contact");
     }
   }, []);
 
@@ -508,15 +512,6 @@ export default function App() {
     });
   };
 
-  const getIndustryIcon = (ind: string) => {
-    switch (ind) {
-      case "maritime": return <Ship className="h-5 w-5" />;
-      case "energy": return <Zap className="h-5 w-5" />;
-      case "logistics": return <Truck className="h-5 w-5" />;
-      default: return <Building2 className="h-5 w-5" />;
-    }
-  };
-
   const getPriorityColor = (prio: string) => {
     switch (prio) {
       case "Critical": return "text-critical border-critical/30 bg-critical/10";
@@ -577,6 +572,7 @@ export default function App() {
       <StellarHomePage
         onLaunchPlatform={handleLaunchPlatform}
         onOpenResources={() => setViewMode("resources")}
+        onOpenContact={() => setViewMode("contact")}
       />
     );
   }
@@ -586,6 +582,16 @@ export default function App() {
       <ResourcesHub
         onBackToHome={() => setViewMode("landing")}
         onLaunchPlatform={handleLaunchPlatform}
+      />
+    );
+  }
+
+  if (viewMode === "contact") {
+    return (
+      <ContactHub
+        onBackToHome={() => setViewMode("landing")}
+        onLaunchPlatform={handleLaunchPlatform}
+        onOpenResources={() => setViewMode("resources")}
       />
     );
   }
@@ -643,19 +649,19 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
-                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
-                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all group cursor-pointer ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-white dark:text-black"
+                      : "text-slate-700 hover:text-black hover:bg-slate-100 font-medium dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/[0.07]"
                     }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-cyan-400 dark:text-blue-600" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-400 dark:group-hover:text-slate-200"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
                   </div>
                   {sidebarOpen && tab.badge && (
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 font-bold">
+                    <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded-md border border-slate-200 bg-slate-100 text-slate-700 dark:border-white/15 dark:bg-white/10 dark:text-slate-200 font-bold">
                       {tab.badge}
                     </span>
                   )}
@@ -680,21 +686,21 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
-                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
-                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all group cursor-pointer ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-white dark:text-black"
+                      : "text-slate-700 hover:text-black hover:bg-slate-100 font-medium dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/[0.07]"
                     }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-emerald-400 dark:text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-emerald-400 dark:text-emerald-600" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-400 dark:group-hover:text-slate-200"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
                   </div>
                   {sidebarOpen && tab.badge && (
-                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${isActive
-                        ? "bg-slate-800 text-white border-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600"
-                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:border-slate-800"
+                    <span className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded-md border uppercase tracking-wider font-bold ${isActive
+                        ? "bg-slate-800 text-white border-slate-700 dark:bg-black/20 dark:text-black dark:border-black/20"
+                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-white/10 dark:text-slate-300 dark:border-white/15"
                       }`}>
                       {tab.badge}
                     </span>
@@ -717,21 +723,21 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
-                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
-                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all group cursor-pointer ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-white dark:text-black"
+                      : "text-slate-700 hover:text-black hover:bg-slate-100 font-medium dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/[0.07]"
                     }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-amber-400 dark:text-amber-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-amber-400 dark:text-amber-600" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-400 dark:group-hover:text-slate-200"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
                   </div>
                   {sidebarOpen && tab.badge && (
-                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${isActive
-                        ? "bg-slate-800 text-white border-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 font-bold"
-                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 font-bold"
+                    <span className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded-md border uppercase tracking-wider font-bold ${isActive
+                        ? "bg-slate-800 text-white border-slate-700 dark:bg-black/20 dark:text-black dark:border-black/20"
+                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-white/10 dark:text-slate-300 dark:border-white/15"
                       }`}>
                       {tab.badge}
                     </span>
@@ -755,21 +761,21 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
-                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
-                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all group cursor-pointer ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-white dark:text-black"
+                      : "text-slate-700 hover:text-black hover:bg-slate-100 font-medium dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/[0.07]"
                     }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-cyan-400 dark:text-cyan-600" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-400 dark:group-hover:text-slate-200"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
                   </div>
                   {sidebarOpen && tab.badge && (
-                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase tracking-wider ${isActive
-                        ? "bg-slate-800 text-white border-slate-700 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 font-bold"
-                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800 font-bold"
+                    <span className={`text-[9.5px] font-mono px-1.5 py-0.5 rounded-md border uppercase tracking-wider font-bold ${isActive
+                        ? "bg-slate-800 text-white border-slate-700 dark:bg-black/20 dark:text-black dark:border-black/20"
+                        : "bg-slate-100 text-slate-700 border-slate-200 dark:bg-white/10 dark:text-slate-300 dark:border-white/15"
                       }`}>
                       {tab.badge}
                     </span>
@@ -791,13 +797,13 @@ export default function App() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-mono transition-all group ${isActive
-                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-900/60 dark:border-l-2 dark:border-slate-200 dark:text-white"
-                      : "text-slate-800 hover:text-black hover:bg-slate-100/80 font-medium dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-slate-900/60"
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition-all group cursor-pointer ${isActive
+                      ? "bg-slate-900 text-white shadow-xs font-bold dark:bg-white dark:text-black"
+                      : "text-slate-700 hover:text-black hover:bg-slate-100 font-medium dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/[0.07]"
                     }`}
                 >
                   <div className="flex items-center space-x-3 truncate">
-                    <span className={isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-500 dark:group-hover:text-slate-300"}>
+                    <span className={isActive ? "text-cyan-400 dark:text-cyan-600" : "text-slate-500 group-hover:text-slate-900 dark:text-slate-400 dark:group-hover:text-slate-200"}>
                       {tab.icon}
                     </span>
                     {sidebarOpen && <span className="truncate">{tab.label}</span>}
@@ -822,33 +828,39 @@ export default function App() {
       {/* MAIN VIEWPORT */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#F1F5F9]/60 dark:bg-[#08090d] transition-colors">
 
-        {/* EXECUTIVE TOP HEADER */}
-        <header className="h-16 border-b border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0d1017] px-6 flex items-center justify-between relative z-50 shadow-xs dark:shadow-md transition-colors">
-          <div className="flex items-center space-x-4">
+        {/* EXECUTIVE TOP HEADER (ALIGNED WITH HOMEPAGE DESIGN SYSTEM) */}
+        <header className="h-16 border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#090D14]/90 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between relative z-50 shadow-xs transition-colors">
+          <div className="flex items-center space-x-3 sm:space-x-4">
 
             {/* Back to Homepage Gateway */}
             <button
               onClick={() => setViewMode("landing")}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg text-xs font-mono text-slate-700 hover:text-slate-900 dark:bg-slate-900/90 dark:hover:bg-slate-800 dark:border-slate-700/60 dark:text-slate-300 dark:hover:text-white transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/12 border border-slate-200 dark:border-white/10 rounded-lg text-xs font-medium text-slate-800 dark:text-slate-200 transition-all shadow-2xs cursor-pointer group"
               title="Return to Stellar SCIO Product Homepage"
             >
-              <span>← Product Overview</span>
+              <ArrowLeft className="h-3.5 w-3.5 text-slate-500 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Home</span>
             </button>
 
             {/* Industry Selector Dropdown */}
             <div className="relative z-50">
               <button
                 onClick={() => setIndustryDropdownOpen(!industryDropdownOpen)}
-                className="flex items-center space-x-2.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-200 dark:bg-gradient-to-b dark:from-[#1c2230] dark:to-[#121620] dark:border-slate-700/60 hover:border-slate-400 dark:hover:border-slate-500 rounded-lg text-xs font-mono font-bold text-slate-800 dark:text-slate-100 transition-all shadow-xs"
+                className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.08] dark:hover:bg-white/15 border border-slate-200 dark:border-white/12 rounded-lg text-xs font-semibold text-slate-900 dark:text-white transition-all shadow-2xs cursor-pointer"
               >
-                <span className="text-cyan-600 dark:text-cyan-400">{getIndustryIcon(currentIndustry)}</span>
-                <span className="uppercase tracking-wider">
-                  {currentIndustry === "energy" ? "Utilities & Energy" :
+                <span className="p-1 rounded-md bg-white dark:bg-black/40 shadow-2xs">
+                  {currentIndustry === "energy" && <Zap className="h-3.5 w-3.5 text-emerald-500" />}
+                  {currentIndustry === "manufacturing" && <Building2 className="h-3.5 w-3.5 text-amber-500" />}
+                  {currentIndustry === "maritime" && <Ship className="h-3.5 w-3.5 text-blue-500" />}
+                  {currentIndustry === "logistics" && <Truck className="h-3.5 w-3.5 text-cyan-500" />}
+                </span>
+                <span className="tracking-tight">
+                  {currentIndustry === "energy" ? "Renewable Energy & Grid" :
                     currentIndustry === "manufacturing" ? "Manufacturing 4.0" :
                       currentIndustry === "maritime" ? "Maritime Fleet" :
-                        currentIndustry === "logistics" ? "Logistics & Supply" : "Operations"}
+                        currentIndustry === "logistics" ? "Cold-Chain & Logistics" : "Operations"}
                 </span>
-                <span className="text-slate-400 dark:text-slate-500 text-[10px]">▼</span>
+                <ChevronDown className={`h-3.5 w-3.5 text-slate-400 dark:text-slate-400 transition-transform duration-200 ${industryDropdownOpen ? "rotate-180" : ""}`} />
               </button>
 
               {industryDropdownOpen && (
@@ -857,12 +869,18 @@ export default function App() {
                     className="fixed inset-0 z-40 bg-transparent"
                     onClick={() => setIndustryDropdownOpen(false)}
                   />
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-[#11151f] border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl z-50 p-1.5 backdrop-blur-xl">
+                  <div className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/15 rounded-2xl shadow-2xl z-50 p-2 backdrop-blur-2xl animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-2 py-1.5 border-b border-slate-100 dark:border-white/10 mb-1 flex items-center justify-between">
+                      <span className="text-[10.5px] font-mono uppercase font-bold text-slate-400 dark:text-slate-400 tracking-wider">
+                        Switch Sector Workspace
+                      </span>
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    </div>
                     {[
-                      { id: "energy", name: "Utilities & Energy", desc: "SCADA & Power Grid OCC", icon: <Zap className="h-4 w-4 text-emerald-600 dark:text-cyan-400" /> },
-                      { id: "manufacturing", name: "Manufacturing 4.0", desc: "OEE Engine & Vision QA", icon: <Building2 className="h-4 w-4 text-amber-600 dark:text-amber-400" /> },
-                      { id: "maritime", name: "Maritime Fleet", desc: "AIS Navigation & Bunkering", icon: <Ship className="h-4 w-4 text-violet-600 dark:text-purple-400" /> },
-                      { id: "logistics", name: "Logistics & Supply Chain", desc: "Multimodal Cargo & Cold Chain", icon: <Truck className="h-4 w-4 text-cyan-600 dark:text-emerald-400" /> }
+                      { id: "energy", name: "Renewable Energy & Grid", desc: "12.4 GW Live • SCADA & Wind/Solar OCC", icon: <Zap className="h-4 w-4 text-emerald-500" /> },
+                      { id: "manufacturing", name: "Manufacturing 4.0", desc: "91.4% OEE • Spindles & Robotic Cells", icon: <Building2 className="h-4 w-4 text-amber-500" /> },
+                      { id: "maritime", name: "Maritime Fleet", desc: "12 Vessels • AIS & Bunker Operations", icon: <Ship className="h-4 w-4 text-blue-500" /> },
+                      { id: "logistics", name: "Cold-Chain & Logistics", desc: "142 Reefers • Cargo IoT & Disruption AI", icon: <Truck className="h-4 w-4 text-cyan-500" /> }
                     ].map((ind) => (
                       <button
                         key={ind.id}
@@ -871,16 +889,23 @@ export default function App() {
                           setIndustryDropdownOpen(false);
                           setActiveTab(ind.id === "energy" ? "energy-dashboard" : "dashboard");
                         }}
-                        className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-xs font-mono text-left transition-all relative z-50 ${currentIndustry === ind.id
-                            ? "bg-slate-100 text-slate-900 font-bold border-l-2 border-emerald-600 dark:bg-slate-800 dark:text-white dark:border-cyan-400"
-                            : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/60 dark:hover:text-white"
+                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs text-left transition-all relative z-50 cursor-pointer ${currentIndustry === ind.id
+                            ? "bg-slate-900 text-white dark:bg-white dark:text-black font-semibold shadow-xs"
+                            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/[0.07] dark:hover:text-white"
                           }`}
                       >
-                        <div className="flex-shrink-0">{ind.icon}</div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="font-bold text-slate-900 dark:text-white truncate">{ind.name}</span>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{ind.desc}</span>
+                        <div className={`p-1.5 rounded-lg shrink-0 ${currentIndustry === ind.id ? "bg-white/20 dark:bg-black/10" : "bg-slate-100 dark:bg-white/10"}`}>
+                          {ind.icon}
                         </div>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className="font-bold truncate">{ind.name}</span>
+                          <span className={`text-[10px] truncate ${currentIndustry === ind.id ? "text-slate-300 dark:text-slate-600" : "text-slate-400 dark:text-slate-400"}`}>
+                            {ind.desc}
+                          </span>
+                        </div>
+                        {currentIndustry === ind.id && (
+                          <Check className="h-4 w-4 shrink-0 opacity-90" />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -888,48 +913,68 @@ export default function App() {
               )}
             </div>
 
-            {/* Platform Uplink Live Beacon */}
-            <div className="hidden lg:flex items-center space-x-3 px-3 py-1 bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-lg text-[10px] font-mono text-slate-600 dark:text-slate-400">
+            {/* Dynamic Multi-Industry Live Telemetry Beacon */}
+            <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-sans text-slate-700 dark:text-slate-300">
               <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                UPLINK ACTIVE
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                LIVE
               </span>
-              <span className="text-slate-300 dark:text-slate-600">|</span>
-              <span className="text-cyan-700 dark:text-cyan-300 font-mono">14ms LATENCY</span>
-              <span className="text-slate-300 dark:text-slate-600">|</span>
-              <span className="text-slate-700 dark:text-slate-300 font-bold">NERC-CIP / ISO-27001 SECURED</span>
+              <span className="text-slate-300 dark:text-white/20">/</span>
+              {currentIndustry === "energy" && (
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  <strong className="text-slate-900 dark:text-white">12.4 GW</strong> Grid Load • <strong className="text-slate-900 dark:text-white">50.02 Hz</strong> • 8 Substations
+                </span>
+              )}
+              {currentIndustry === "maritime" && (
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  <strong className="text-slate-900 dark:text-white">12 Vessels</strong> Active • AIS Satellite Sync • 0 Port Detentions
+                </span>
+              )}
+              {currentIndustry === "manufacturing" && (
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  <strong className="text-slate-900 dark:text-white">91.4% OEE</strong> • 24 Robotic Cells • 0 Batch Defects
+                </span>
+              )}
+              {currentIndustry === "logistics" && (
+                <span className="font-medium text-slate-700 dark:text-slate-200">
+                  <strong className="text-slate-900 dark:text-white">142 Reefers</strong> • -21.4°C Avg • 0 Temp Excursions
+                </span>
+              )}
+              <span className="text-slate-300 dark:text-white/20">/</span>
+              <span className="font-mono text-[10px] text-slate-400 dark:text-slate-400">14ms latency</span>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          {/* Right Action Suite */}
+          <div className="flex items-center space-x-2.5">
             <button
               onClick={() => setShowCockpitHUD(!showCockpitHUD)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all border ${showCockpitHUD
-                  ? "bg-cyan-50 text-cyan-700 border-cyan-300 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/40 shadow-xs"
-                  : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-700/60 dark:hover:border-slate-500"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer ${showCockpitHUD
+                  ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/40 shadow-xs"
+                  : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 dark:bg-white/[0.06] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/12"
                 }`}
             >
-              <Gauge className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" />
-              <span>{showCockpitHUD ? "⚡ HUD: ACTIVE" : "⚡ Telemetry HUD"}</span>
+              <Gauge className="h-3.5 w-3.5 text-blue-500" />
+              <span>{showCockpitHUD ? "HUD Active" : "Telemetry HUD"}</span>
             </button>
 
             <button
               onClick={() => setCopilotOpen(true)}
-              className="flex items-center space-x-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-gradient-to-r dark:from-indigo-950 dark:via-slate-900 dark:to-purple-950 dark:hover:from-indigo-900 dark:hover:to-purple-900 dark:text-indigo-200 dark:border dark:border-indigo-500/30 rounded-lg text-xs font-mono font-bold transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-black dark:hover:bg-slate-100 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer group"
             >
-              <MessageSquare className="h-3.5 w-3.5 text-white dark:text-indigo-400 animate-pulse" />
+              <Sparkles className="h-3.5 w-3.5 text-cyan-400 dark:text-blue-600 group-hover:scale-110 transition-transform" />
               <span>Ask AI Copilot</span>
             </button>
 
             <button
               onClick={() => setCreateWoModalOpen(true)}
-              className="flex items-center space-x-1.5 px-3 py-1.5 bg-black hover:bg-slate-800 text-white dark:bg-gradient-to-b dark:from-slate-700 dark:to-slate-800 dark:hover:from-slate-600 dark:hover:to-slate-700 border border-transparent dark:border-slate-500/40 dark:text-slate-100 rounded-lg text-xs font-mono font-semibold transition-all shadow-xs"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
-              <Plus className="h-3.5 w-3.5 text-white dark:text-slate-200" />
+              <Plus className="h-3.5 w-3.5 text-white" />
               <span>New Work Order</span>
             </button>
 
-            <div className="h-8 w-8 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 flex items-center justify-center">
+            <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-white/[0.08] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-white/15 transition-colors">
               <User className="h-4 w-4" />
             </div>
           </div>
@@ -2460,7 +2505,7 @@ export default function App() {
             <div className="flex justify-between items-center border-b border-borderMuted/30 pb-3">
               <span className="text-xs font-mono text-cyan-400 flex items-center space-x-1.5">
                 <Shield className="h-4 w-4" />
-                <span>SOLAS Seaworthiness Certificate</span>
+                <span>Marine Safety Equipment Inspection Certificate</span>
               </span>
               <button onClick={() => setSelectedCertEquipment(null)} className="text-textMuted hover:text-textBright print:hidden">✕</button>
             </div>
@@ -2469,7 +2514,7 @@ export default function App() {
               <div className="border border-cyan-500/20 bg-cyan-950/10 p-5 rounded-lg text-center space-y-2 relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/5 rounded-full blur-xl" />
                 <Anchor className="h-10 w-10 text-cyan-500 mx-auto opacity-75" />
-                <h4 className="text-base font-bold text-textBright tracking-wide uppercase">SOLAS Compliance Certification</h4>
+                <h4 className="text-base font-bold text-textBright tracking-wide uppercase">Marine Safety Equipment Certification</h4>
                 <div className="text-xs text-textMuted font-mono">Reg ID: CERT-{selectedCertEquipment.equipmentId.toUpperCase()}</div>
               </div>
 
@@ -2598,6 +2643,15 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* ==================== 24/7 SCIO SENTINEL AI ORB COMPANION ==================== */}
+      <ScioSentinelOrb
+        onLaunchPlatform={handleLaunchPlatform}
+        currentIndustry={currentIndustry}
+        activeTab={activeTab}
+        isCopilotOpenTrigger={copilotOpen}
+        onCloseCopilot={() => setCopilotOpen(false)}
+      />
 
     </div>
   );

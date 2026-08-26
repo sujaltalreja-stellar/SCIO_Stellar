@@ -261,8 +261,8 @@ export const INDUSTRY_SEEDS: Record<string, {
       { id: "mar-wo-2", assetId: "IMO-9602447", title: "Corrective Fuel Line Seepage Fix", priority: "High", status: "In Progress", assignedTeam: "Vessel Engine Crew", assignedPerson: "Chief Kenji Sato", createdDate: "2026-08-21", dueDate: "2026-08-24", estimatedDuration: "3 Hours", requiredParts: [{ partId: "MRO-SPINDLE", quantity: 1 }], notes: "Seepage detected during rounds on Carrier 02." }
     ],
     compliance: [
-      { id: "mar-cmp-1", title: "IMO Class Certificate of Seaworthiness", authority: "DNV", expiryDate: "2026-09-01", status: "Expiring" },
-      { id: "mar-cmp-2", title: "MARPOL Annex VI Air Pollution Cert", authority: "IMO", expiryDate: "2027-02-12", status: "Valid" }
+      { id: "mar-cmp-1", title: "Marine Safety & Seaworthiness Certificate", authority: "DNV", expiryDate: "2026-09-01", status: "Expiring" },
+      { id: "mar-cmp-2", title: "Fleet Clean Air & Fuel Emission Certificate", authority: "Port Authority", expiryDate: "2027-02-12", status: "Valid" }
     ],
     insights: [
       { id: "mar-ins-1", type: "operational", title: "High Cylinder Temperature Anomaly", severity: "High", targetEntity: "IMO-9602447", detail: "Cylinder exhaust temperature reached 520°C. Head gasket replacement is suggested.", recommendation: "Perform engine power test and inspect head gasket at next port call." }
