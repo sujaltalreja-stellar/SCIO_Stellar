@@ -16,6 +16,24 @@ async function persistChatToConvex(
     const client = new ConvexHttpClient(convexUrl);
     const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
+    let formattedAction: { type: string; label: string; payload?: Record<string, string> } | undefined = undefined;
+    if (suggestedAction) {
+      let normPayload: Record<string, string> | undefined = undefined;
+      if (typeof suggestedAction.payload === "string") {
+        normPayload = { target: suggestedAction.payload };
+      } else if (typeof suggestedAction.payload === "object" && suggestedAction.payload !== null) {
+        normPayload = {};
+        for (const [k, v] of Object.entries(suggestedAction.payload)) {
+          normPayload[k] = String(v);
+        }
+      }
+      formattedAction = {
+        type: String(suggestedAction.type || ""),
+        label: String(suggestedAction.label || ""),
+        payload: normPayload,
+      };
+    }
+
     // 1. Save User Message
     await client.mutation(api.mutations.saveChatMessage, {
       industry: sector,
@@ -31,7 +49,7 @@ async function persistChatToConvex(
       text: botText,
       timestamp: timeStr,
       provider,
-      suggestedAction,
+      suggestedAction: formattedAction,
     });
   } catch (err) {
     console.warn("Convex chat history persistence warning:", err);

@@ -100,7 +100,7 @@ export const saveChatMessage = mutation({
       v.object({
         type: v.string(),
         label: v.string(),
-        payload: v.optional(v.any()),
+        payload: v.optional(v.record(v.string(), v.string())),
       })
     ),
   },
