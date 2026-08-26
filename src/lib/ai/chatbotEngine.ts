@@ -246,11 +246,25 @@ export function truncateResponse(text: string): string {
 }
 
 // ============================================================================
+// SECTOR NORMALIZATION HELPER
+// ============================================================================
+export function normalizeSectorKey(rawSector: string): "home" | "general" | "energy" | "maritime" | "manufacturing" | "logistics" {
+  const s = (rawSector || "").toLowerCase().trim();
+  if (s.includes("manufactur") || s.includes("factory") || s.includes("oee") || s.includes("plant")) return "manufacturing";
+  if (s.includes("maritime") || s.includes("ship") || s.includes("fleet") || s.includes("vessel")) return "maritime";
+  if (s.includes("logistics") || s.includes("cold") || s.includes("supply") || s.includes("reefer")) return "logistics";
+  if (s.includes("energy") || s.includes("power") || s.includes("grid") || s.includes("renewable")) return "energy";
+  if (s === "general") return "general";
+  return "home";
+}
+
+// ============================================================================
 // SYSTEM PROMPT BUILDER (Strict Company Chatbot Boundaries)
 // ============================================================================
-export function buildSystemPrompt(sector: string, query: string): string {
+export function buildSystemPrompt(rawSector: string, query: string): string {
+  const sector = normalizeSectorKey(rawSector);
   const intentMeta = classifyIntent(query);
-  const sectorData = PRODUCT_KNOWLEDGE_BASE.sectors[sector as keyof typeof PRODUCT_KNOWLEDGE_BASE.sectors] || PRODUCT_KNOWLEDGE_BASE.sectors.home;
+  const sectorData = PRODUCT_KNOWLEDGE_BASE.sectors[sector] || PRODUCT_KNOWLEDGE_BASE.sectors.home;
 
   return `You are the official Company AI Assistant for ${PRODUCT_KNOWLEDGE_BASE.platformName}.
 
@@ -279,7 +293,8 @@ STRICT COMPANY BOUNDARY GUARDRAILS:
 // ============================================================================
 // INTELLIGENT FALLBACK (Plain English, Helpful Answers)
 // ============================================================================
-export function generateIntelligentFallback(sector: string, query: string): { text: string; provider: string; suggestedAction?: any } {
+export function generateIntelligentFallback(rawSector: string, query: string): { text: string; provider: string; suggestedAction?: any } {
+  const sector = normalizeSectorKey(rawSector);
   const lower = query.toLowerCase().trim();
   const intent = classifyIntent(query);
 
@@ -300,7 +315,7 @@ export function generateIntelligentFallback(sector: string, query: string): { te
   const isGreeting = /^(\s*(hi+|hello+|hey+|hola|greetings|good\s+(morning|afternoon|evening)|who\s+are\s+you|help)\s*[\!\?.]*)$/i.test(lower) || lower === "hi" || lower === "hello" || lower === "hey";
 
   if (isGreeting) {
-    if (sector === "home" || sector === "homepage" || sector === "general") {
+    if (sector === "home" || sector === "general") {
       return {
         text: `**Hello! Welcome to Stellar SCIO** 👋\n\n` +
           `I am your platform assistant. I can help you with:\n\n` +
@@ -326,7 +341,7 @@ export function generateIntelligentFallback(sector: string, query: string): { te
   }
 
   // 1. GENERAL PLATFORM OVERVIEW (What is SCIO, tell me about SCIO)
-  if (sector === "home" || sector === "homepage" || sector === "general" || lower.includes("what is scio") || lower.includes("what is stellar scio") || lower.includes("tell me about scio") || lower.includes("project overview") || lower.includes("what does this do")) {
+  if (sector === "home" || sector === "general" || lower.includes("what is scio") || lower.includes("what is stellar scio") || lower.includes("tell me about scio") || lower.includes("project overview") || lower.includes("what does this do")) {
     return {
       text: `**Stellar SCIO Platform Overview**:\n\n` +
         `• **What It Does**: Connects industrial equipment, sensor streams, maintenance records, and supply chains into one live dashboard.\n` +
@@ -430,7 +445,8 @@ export function generateIntelligentFallback(sector: string, query: string): { te
 // ============================================================================
 // MAIN GENERATE RESPONSE PIPELINE
 // ============================================================================
-export async function generateResponse(sector: string, rawQuery: string) {
+export async function generateResponse(rawSector: string, rawQuery: string) {
+  const sector = normalizeSectorKey(rawSector);
   const query = sanitizeInput(rawQuery);
 
   if (!query) {
@@ -464,7 +480,7 @@ export async function generateResponse(sector: string, rawQuery: string) {
     mistralKey = process.env.MISTRAL_API_KEY_MANUFACTURING || process.env.MANUFACTURING_MISTRAL_API_KEY || mistralKey;
   } else if (sector === "logistics") {
     mistralKey = process.env.MISTRAL_API_KEY_LOGISTICS || process.env.LOGISTICS_MISTRAL_API_KEY || mistralKey;
-  } else if (sector === "homepage" || sector === "home" || sector === "general") {
+  } else if (sector === "home" || sector === "general") {
     mistralKey = process.env.MISTRAL_API_KEY_HOMEPAGE || mistralKey;
   }
 
@@ -577,7 +593,7 @@ export async function generateResponse(sector: string, rawQuery: string) {
 
   // Auto-assign default suggested action if none
   if (!suggestedAction) {
-    if (sector === "homepage" || sector === "home" || sector === "general") {
+    if (sector === "home" || sector === "general") {
       suggestedAction = { type: "open_beta", label: "Apply for Private Beta Access" };
     } else {
       suggestedAction = {

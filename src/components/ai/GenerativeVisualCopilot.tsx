@@ -108,51 +108,113 @@ export default function GenerativeVisualCopilot({
       let visual: Message["visual"] | undefined;
 
       const lowerQ = query.toLowerCase();
+      const ind = (currentIndustry || "energy").toLowerCase();
+      const isMfg = ind.includes("manufactur") || ind.includes("factory");
+      const isMar = ind.includes("maritime") || ind.includes("ship");
+      const isLog = ind.includes("logistics") || ind.includes("cold");
 
       if (lowerQ.includes("temp") || lowerQ.includes("thermal") || lowerQ.includes("curve") || lowerQ.includes("trend")) {
         if (!responseText) {
-          responseText = "Retrieved 24-hour thermal telemetry from Inverter Array 04 and Transformer TX-01. Note the thermal hotspot peaking at 88.4°C during peak noon irradiation.";
+          if (isMfg) {
+            responseText = "Retrieved 24-hour thermal telemetry for CNC Spindle Bearing #2 and Robot Arm Joint 3. Peak temperature reached 82.1°C during Shift 2 high-speed milling.";
+          } else if (isMar) {
+            responseText = "Retrieved 24-hour exhaust gas thermal telemetry from Vessel SCIO Leader Main Cylinder #4. Peak exhaust temperature recorded at 398°C.";
+          } else if (isLog) {
+            responseText = "Retrieved 24-hour temperature telemetry across Reefer Container #RC-804. Core cargo temperature maintained between -21.4°C and -18.2°C.";
+          } else {
+            responseText = "Retrieved 24-hour thermal telemetry from Inverter Array 04 and Transformer TX-01. Thermal hotspot peaked at 88.4°C during peak noon solar output.";
+          }
         }
         visual = {
           type: "trend",
-          title: "24-Hour Thermal Telemetry (°C)",
+          title: isMfg ? "CNC Spindle Temp Telemetry (°C)" : isMar ? "Main Engine Exhaust Temp (°C)" : isLog ? "Cold-Chain Reefer Temp (°C)" : "24-Hour Thermal Telemetry (°C)",
           data: [
             { time: "00:00", temp: 42, threshold: 75 },
             { time: "04:00", temp: 39, threshold: 75 },
             { time: "08:00", temp: 58, threshold: 75 },
-            { time: "12:00", temp: 88.4, threshold: 75 },
-            { time: "16:00", temp: 79.2, threshold: 75 },
-            { time: "20:00", temp: 55, threshold: 75 },
-            { time: "23:00", temp: 46, threshold: 75 }
+            { time: "12:00", temp: isLog ? -18.4 : 88.4, threshold: 75 },
+            { time: "16:00", temp: isLog ? -19.1 : 79.2, threshold: 75 },
+            { time: "20:00", temp: isLog ? -20.2 : 55, threshold: 75 },
+            { time: "23:00", temp: isLog ? -21.0 : 46, threshold: 75 }
           ]
         };
       } else if (lowerQ.includes("downtime") || lowerQ.includes("loss") || lowerQ.includes("pareto") || lowerQ.includes("oee")) {
         if (!responseText) {
-          responseText = "Calculated OEE downtime root-cause breakdown. Hydraulic line pressure drops account for 58.2% ($48,200 USD) of total recorded downtime.";
+          if (isMfg) {
+            responseText = "Calculated OEE downtime root-cause breakdown. Tooling wear changeovers and feeder jams account for 61.4% ($42,100 USD) of total shopfloor downtime.";
+          } else if (isMar) {
+            responseText = "Calculated vessel delay root-cause breakdown. Fuel injector fouling and port congestion account for 54.8% ($36,000 USD) of total fleet delays.";
+          } else if (isLog) {
+            responseText = "Calculated supply chain delay root-cause breakdown. Cold-chain reefer defrost cycles account for 48.2% ($29,800 USD) of transit variance.";
+          } else {
+            responseText = "Calculated OEE downtime root-cause breakdown. Hydraulic line pressure drops account for 58.2% ($48,200 USD) of total recorded downtime.";
+          }
         }
         visual = {
           type: "pareto",
           title: "Downtime Financial Loss Pareto ($ USD)",
-          data: [
-            { cause: "Hydraulic Seal Leak", loss: 48200 },
-            { cause: "Bearing Vibration", loss: 24500 },
-            { cause: "Grid Curtailment", loss: 16800 },
-            { cause: "Sensor Drift", loss: 8900 }
-          ]
+          data: isMfg
+            ? [
+                { cause: "Tooling Wear & Jam", loss: 42100 },
+                { cause: "CNC Spindle Vibration", loss: 28400 },
+                { cause: "Conveyor Stoppage", loss: 14200 },
+                { cause: "Sensor Misalignment", loss: 6800 }
+              ]
+            : isMar
+            ? [
+                { cause: "Fuel Injector Clog", loss: 36000 },
+                { cause: "Sea Water Pump Leak", loss: 22100 },
+                { cause: "Turbocharger Surging", loss: 11500 },
+                { cause: "Valve Clearance Drift", loss: 5400 }
+              ]
+            : isLog
+            ? [
+                { cause: "Reefer Compressor Defrost", loss: 29800 },
+                { cause: "Door Seal Excursion", loss: 18200 },
+                { cause: "Route Port Delay", loss: 9400 },
+                { cause: "Battery Telematics Drop", loss: 4100 }
+              ]
+            : [
+                { cause: "Hydraulic Seal Leak", loss: 48200 },
+                { cause: "Bearing Vibration", loss: 24500 },
+                { cause: "Grid Curtailment", loss: 16800 },
+                { cause: "Sensor Drift", loss: 8900 }
+              ]
         };
       } else if (lowerQ.includes("risk") || lowerQ.includes("high-risk") || lowerQ.includes("asset")) {
         if (!responseText) {
-          responseText = "Identified 4 critical assets exceeding normal operational risk boundaries due to elevated vibration spectral peaks and thermal degradation.";
+          responseText = `Identified critical ${isMfg ? "robotic and CNC" : isMar ? "vessel engine" : isLog ? "cold-chain reefer" : "power grid"} assets exceeding normal operational risk boundaries.`;
         }
         visual = {
           type: "risk_matrix",
           title: "Top Monitored Risk Assets",
-          data: [
-            { name: "Turbine Feed Valve B", score: 88, status: "Critical", metric: "3.8 mm/s RMS" },
-            { name: "Inverter Array 04", score: 79, status: "High Risk", metric: "88.4°C Hotspot" },
-            { name: "BESS Inverter Rack 2", score: 65, status: "Warning", metric: "Coolant Flow -14%" },
-            { name: "Step-Up Transformer", score: 42, status: "Moderate", metric: "Oil DGA Normal" }
-          ]
+          data: isMfg
+            ? [
+                { name: "Robotic Arm Joint 3", score: 88, status: "Critical", metric: "4.2 mm/s RMS" },
+                { name: "CNC Spindle Bearing #2", score: 79, status: "High Risk", metric: "82.1°C Hotspot" },
+                { name: "Conveyor Motor B4", score: 65, status: "Warning", metric: "Current +18%" },
+                { name: "Hydraulic Press Line 1", score: 42, status: "Moderate", metric: "Oil Viscosity Normal" }
+              ]
+            : isMar
+            ? [
+                { name: "Vessel SCIO Main Engine", score: 88, status: "Critical", metric: "Cyl #4 Temp 398°C" },
+                { name: "Purifier Unit 2", score: 79, status: "High Risk", metric: "Vibration 3.6 mm/s" },
+                { name: "Aux Generator 3", score: 65, status: "Warning", metric: "Oil Pressure Low" },
+                { name: "Bunker Transfer Pump", score: 42, status: "Moderate", metric: "Flow Rate Nominal" }
+              ]
+            : isLog
+            ? [
+                { name: "Reefer Unit #RC-804", score: 88, status: "Critical", metric: "Temp Delta +3.4°C" },
+                { name: "Cold Room Compressor 2", score: 79, status: "High Risk", metric: "Freon Pressure High" },
+                { name: "Loading Dock Chiller", score: 65, status: "Warning", metric: "Door Open Alert" },
+                { name: "Fleet Telematics #12", score: 42, status: "Moderate", metric: "Battery 92%" }
+              ]
+            : [
+                { name: "Turbine Feed Valve B", score: 88, status: "Critical", metric: "3.8 mm/s RMS" },
+                { name: "Inverter Array 04", score: 79, status: "High Risk", metric: "88.4°C Hotspot" },
+                { name: "BESS Inverter Rack 2", score: 65, status: "Warning", metric: "Coolant Flow -14%" },
+                { name: "Step-Up Transformer", score: 42, status: "Moderate", metric: "Oil DGA Normal" }
+              ]
         };
       } else if (lowerQ.includes("work order") || lowerQ.includes("draft") || lowerQ.includes("fix") || lowerQ.includes("dispatch")) {
         if (!responseText) {
@@ -163,10 +225,10 @@ export default function GenerativeVisualCopilot({
           title: "Generated Corrective Work Order",
           actionPayload: {
             woNumber: `WO-${Math.floor(1000 + Math.random() * 9000)}`,
-            assetName: "High-Pressure Hydraulic Valve Seal (Unit 4)",
+            assetName: isMfg ? "CNC Spindle Bearing #2" : isMar ? "Main Engine Fuel Injector #4" : isLog ? "Reefer Compressor Unit RC-804" : "High-Pressure Hydraulic Valve Seal (Unit 4)",
             priority: "CRITICAL",
-            estimatedCost: "$3,450 USD",
-            assignedTeam: "Rapid Mechanical Response Alpha"
+            estimatedCost: isMfg ? "$2,850 USD" : isMar ? "$4,200 USD" : isLog ? "$1,950 USD" : "$3,450 USD",
+            assignedTeam: isMfg ? "Plant Maintenance Crew Beta" : isMar ? "Shipboard Technical Engineers" : isLog ? "Cold-Chain Logistics Response" : "Rapid Mechanical Response Alpha"
           }
         };
       } else {
