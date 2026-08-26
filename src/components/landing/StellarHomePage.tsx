@@ -863,6 +863,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
       capabilities: [
         "Connects 40+ standard protocols: OPC-UA, Modbus TCP, MQTT Sparkplug B, IEC 61850, CANbus, and REST APIs",
         "Zero-loss edge buffering: Stores and forwards telemetry during network or remote communications blackouts",
+        "100% Data Sovereignty: Deployed on your own secure servers & private cloud — your operational telemetry never leaves your infrastructure",
         "Hardware-grade security: Secure read-only data diode architecture with TLS 1.3 encryption & mTLS",
         "Automatic stream standardization: Unifies timestamps, engineering units, and sampling frequencies"
       ],
@@ -1275,20 +1276,24 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
         <div className={`${SHELL} flex flex-col items-start gap-[24px]`}>
           
           {/* Eyebrow */}
+          {/* Top Category Eyebrow & Highlighted Tagline Badge */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: EASE }}
-            className="flex w-full items-center gap-2.5"
+            className="flex flex-wrap items-center gap-3"
           >
-            <span
-              className="h-2 w-2 rounded-full shrink-0 bg-blue-600"
-            />
-            <span
-              className="uppercase font-mono font-bold text-[12px] sm:text-[13px] tracking-[2px] text-blue-600"
-            >
-              SCIO PLATFORM — ENTERPRISE OPERATIONS OS
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full shrink-0 bg-blue-600 animate-pulse" />
+              <span className="uppercase font-mono font-bold text-[12px] sm:text-[13px] tracking-[2px] text-blue-600">
+                SCIO PLATFORM — ENTERPRISE OPERATIONS OS
+              </span>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full font-mono text-[11px] sm:text-xs font-bold bg-slate-900 text-white dark:bg-emerald-950/80 dark:text-emerald-200 border border-emerald-500/50 shadow-md">
+              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>100% Data Sovereignty: Deployed On Your Own On-Premise &amp; Private Cloud Servers</span>
+            </div>
           </motion.div>
 
           {/* Main Display Headline */}
@@ -1306,6 +1311,22 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
           >
             Unify Supply Chain Intelligence &amp; Multi-Sector Field Operations in One Platform
           </motion.h1>
+
+          {/* Special Highlighted Tagline Callout Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: EASE, delay: 0.15 }}
+            className="max-w-[1020px] p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-blue-950 text-white border border-emerald-500/40 shadow-xl flex items-center gap-3.5"
+          >
+            <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 text-emerald-400">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="font-mono text-xs sm:text-sm font-bold tracking-wide leading-relaxed text-emerald-300">
+              <span className="text-white font-extrabold uppercase mr-2 px-2 py-0.5 rounded bg-emerald-500/30 text-[10px] border border-emerald-400/40">Data Sovereignty Guarantee</span>
+              100% On-Premise &amp; Private Cloud Deployment — Your operational telemetry &amp; business data stay strictly on your own secure servers.
+            </div>
+          </motion.div>
 
           {/* Lead & CTAs Row */}
           <div className="flex w-full flex-col items-start justify-between gap-8 pt-[8px] lg:flex-row lg:items-end lg:gap-[120px]">
@@ -1348,6 +1369,24 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
               </a>
             </motion.div>
           </div>
+
+          {/* Data Sovereignty & Security Trust Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE, delay: 0.3 }}
+            className="w-full pt-2"
+          >
+            <div className="inline-flex flex-wrap items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-emerald-500/50 bg-slate-900 text-white dark:bg-slate-950 dark:text-white font-mono text-xs font-bold shadow-lg">
+              <span className="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold uppercase text-[10px] tracking-wide">
+                Data Sovereignty
+              </span>
+              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span className="text-slate-100">
+                Deployed 100% on Your Own On-Premise &amp; Private Cloud Infrastructure — Your Operational Telemetry Never Leaves Your Own Servers.
+              </span>
+            </div>
+          </motion.div>
 
           {/* 4 Industries Quick-Jump Cards (Enlarged, High-Contrast Typography, No Emojis) */}
           <div className="w-full pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

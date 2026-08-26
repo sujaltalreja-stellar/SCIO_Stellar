@@ -114,6 +114,7 @@ export const PRODUCT_KNOWLEDGE_BASE = {
       highlights: [
         "Unifies operations across Renewable Energy, Maritime, Manufacturing, and Logistics",
         "Connects machines to digital twins to predict failures 14 days early",
+        "Data Sovereignty: 100% On-Premise & Private Cloud Deployment — your data stays on your own servers",
         "Automatically creates maintenance work orders in SAP PM and IBM Maximo",
         "Reduces false alarms by 91% and saves $1.4M to $2.8M annually per site",
       ],
@@ -126,6 +127,7 @@ export const PRODUCT_KNOWLEDGE_BASE = {
       highlights: [
         "Unifies operations across Renewable Energy, Maritime, Manufacturing, and Logistics",
         "Connects machines to digital twins to predict failures 14 days early",
+        "Data Sovereignty: 100% On-Premise & Private Cloud Deployment — your data stays on your own servers",
         "Automatically creates maintenance work orders in SAP PM and IBM Maximo",
         "Reduces false alarms by 91% and saves $1.4M to $2.8M annually per site",
       ],
@@ -321,6 +323,7 @@ export function generateIntelligentFallback(rawSector: string, query: string): {
           `I am your platform assistant. I can help you with:\n\n` +
           `• **How SCIO Works**: Learn our 4-step loop (Connect ➔ Understand ➔ Predict ➔ Act).\n` +
           `• **Supported Industries**: Explore features for Renewable Energy, Maritime Fleets, Manufacturing, and Logistics.\n` +
+          `• **Data Sovereignty**: 100% On-Premise & Private Cloud Deployment — your operational data never leaves your own infrastructure.\n` +
           `• **Business Benefits**: See how SCIO reduces downtime and saves **$1.4M–$2.8M per site** annually.\n` +
           `• **Private Beta**: Learn how to join our beta program.\n\n` +
           `What would you like to know today?`,
@@ -346,9 +349,10 @@ export function generateIntelligentFallback(rawSector: string, query: string): {
       text: `**Stellar SCIO Platform Overview**:\n\n` +
         `• **What It Does**: Connects industrial equipment, sensor streams, maintenance records, and supply chains into one live dashboard.\n` +
         `• **4 Industries Supported**: Renewable Energy (12.4 GW), Maritime Fleets (48 Ships), Manufacturing 4.0 (Robotic Lines), and Cold-Chain Logistics (Refrigerated Reefers).\n` +
+        `• **Data Sovereignty**: 100% On-Premise & Private Cloud — operational data stays 100% on your own secure servers.\n` +
         `• **4-Step Process**: Connects machines ➔ Builds digital twins ➔ Predicts failures 14 days early ➔ Creates work orders in SAP or Maximo.\n` +
         `• **Key Benefits**: Saves **$1.4M to $2.8M per site** annually, reduces false alarms by 91%, and maintains 99.98% uptime.\n` +
-        `• **No Hardware Changes Needed**: Connects directly to existing SCADA, OPC-UA, and PLCs.`,
+        `• **No Hardware Rip-and-Replace**: Connects directly to existing SCADA, OPC-UA, and PLCs.`,
       provider: "Stellar SCIO AI Assistant",
       suggestedAction: { type: "open_beta", label: "Apply for Private Beta Access" }
     };
