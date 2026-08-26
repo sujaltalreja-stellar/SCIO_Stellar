@@ -260,6 +260,16 @@ class SectorChatbotIndexCache {
    */
   private seedDefaultKnowledge() {
     // HOMEPAGE KNOWLEDGE SEEDS
+    this.store("homepage", "What is Stellar SCIO and what problem does it solve for enterprise operations?", {
+      text: `**Stellar SCIO Platform Overview**:\n\n` +
+        `• **What It Is**: An enterprise AI operations software that unifies industrial machines, sensors, repair logs, and supply chains into a central dashboard.\n` +
+        `• **4 Supported Sectors**: Built natively for **Renewable Energy & Power Grid**, **Maritime Fleet Operations**, **Manufacturing 4.0 Smart Factories**, and **Cold-Chain Logistics**.\n` +
+        `• **Key Problems Solved**: Prevents catastrophic machine breakdowns by predicting failures **14 to 21 days in advance**, eliminates 91% of false alarms, and automates work orders in SAP PM & IBM Maximo.\n` +
+        `• **Proven Business Impact**: Reduces unplanned downtime, increases asset lifespan, and saves **$1.4M to $2.8M annually per site**.`,
+      provider: "Stellar SCIO Platform AI",
+      suggestedAction: { type: "open_beta", label: "Apply for Private Beta Access" }
+    });
+
     this.store("homepage", "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act.", {
       text: `**Stellar SCIO 4-Step Process**:\n\n` +
         `• **1. CONNECT**: Connects live sensor data from PLCs, SCADA, and IoT systems without requiring any hardware replacement.\n` +

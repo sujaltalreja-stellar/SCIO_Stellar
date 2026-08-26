@@ -21,7 +21,9 @@ import {
   FileText,
   Compass,
   Radio,
-  Eye
+  Eye,
+  Check,
+  Copy
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -995,8 +997,20 @@ export default function ScioSentinelOrb({
     }
   };
 
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyText = (id: string, text: string) => {
+    try {
+      navigator.clipboard.writeText(text);
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (e) {
+      console.warn("Failed to copy text", e);
+    }
+  };
+
   return (
-    <div className="fixed bottom-6 right-6 z-[999999] select-none pointer-events-auto flex items-end justify-end">
+    <div className="fixed bottom-6 right-6 z-[999999] pointer-events-auto flex items-end justify-end select-text">
       {/* ==================== EXPANDED CHATBOT WINDOW ==================== */}
       <AnimatePresence>
         {isOpen && (
@@ -1103,12 +1117,33 @@ export default function ScioSentinelOrb({
                     className={`flex flex-col ${isBot ? "items-start" : "items-end"}`}
                   >
                     <div
-                      className={`max-w-[88%] p-3.5 rounded-2xl leading-relaxed ${
+                      className={`max-w-[88%] p-3.5 rounded-2xl leading-relaxed relative select-text cursor-text ${
                         isBot
                           ? "bg-slate-900 border border-white/10 text-slate-100 shadow-sm rounded-tl-sm"
                           : "bg-blue-600 text-white font-medium shadow-md rounded-tr-sm"
                       }`}
                     >
+                      {/* Copy Action Button */}
+                      {isBot && (
+                        <button
+                          onClick={() => handleCopyText(msg.id, msg.text)}
+                          title="Copy Message Text"
+                          className="absolute top-2 right-2 p-1 rounded-md bg-white/5 hover:bg-white/15 text-white/50 hover:text-white transition-all text-[10px] font-mono flex items-center gap-1 cursor-pointer"
+                        >
+                          {copiedId === msg.id ? (
+                            <>
+                              <Check className="h-3 w-3 text-emerald-400" />
+                              <span className="text-emerald-400 text-[9px]">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              <span className="text-[9px]">Copy</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+
                       <ChatMessageFormatted text={msg.text} isBot={isBot} isLatest={idx === messages.length - 1} />
 
                       {/* Visual Component Render if requested */}
@@ -1147,18 +1182,39 @@ export default function ScioSentinelOrb({
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 mt-1 px-1 text-[9.5px] font-mono text-white/40">
-                      <span>{msg.timestamp}</span>
-                      {isBot && msg.provider && (
-                        <span className="flex items-center gap-1">
-                          &bull; <span>{msg.provider}</span>
-                          {(msg.provider.includes("Cached") || msg.provider.includes("Indexed")) && (
-                            <span className="ml-1 px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 text-[8.5px] inline-flex items-center gap-0.5">
-                              <Zap className="h-2.5 w-2.5 text-cyan-400" />
-                              Indexed Cache Hit
-                            </span>
+                    <div className="flex items-center justify-between w-full mt-1 px-1 text-[9.5px] font-mono text-white/40">
+                      <div className="flex items-center gap-1.5">
+                        <span>{msg.timestamp}</span>
+                        {isBot && msg.provider && (
+                          <span className="flex items-center gap-1">
+                            &bull; <span>{msg.provider}</span>
+                            {(msg.provider.includes("Cached") || msg.provider.includes("Indexed")) && (
+                              <span className="ml-1 px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 text-[8.5px] inline-flex items-center gap-0.5">
+                                <Zap className="h-2.5 w-2.5 text-cyan-400" />
+                                Indexed Cache Hit
+                              </span>
+                            )}
+                          </span>
+                        )}
+                      </div>
+                      {isBot && (
+                        <button
+                          onClick={() => handleCopyText(msg.id, msg.text)}
+                          title="Copy message text"
+                          className="p-1 rounded text-white/40 hover:text-white hover:bg-white/10 transition-colors inline-flex items-center gap-1 text-[10px] font-mono cursor-pointer"
+                        >
+                          {copiedId === msg.id ? (
+                            <>
+                              <Check className="h-3 w-3 text-emerald-400" />
+                              <span className="text-emerald-400 font-bold">Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-3 w-3" />
+                              <span>Copy</span>
+                            </>
                           )}
-                        </span>
+                        </button>
                       )}
                     </div>
                   </motion.div>
