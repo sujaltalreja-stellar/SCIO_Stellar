@@ -747,16 +747,27 @@ export default function ScioSentinelOrb({
   useEffect(() => {
     let isCancelled = false;
 
+    const indConfig = INDUSTRY_SENTINEL_CONFIG[currentIndustry] || INDUSTRY_SENTINEL_CONFIG.home || INDUSTRY_SENTINEL_CONFIG.general;
+    const defaultWelcome: ChatMessage = {
+      id: `welcome-${currentIndustry}`,
+      sender: "bot",
+      text: indConfig.welcomeMessage,
+      timestamp: "Live",
+      provider: `${indConfig.name} Assistant`
+    };
+
+    // Reset messages immediately when industry changes to show the correct welcome message
+    setMessages([defaultWelcome]);
+
     async function loadHistory() {
+      let loaded: ChatMessage[] = [];
+
       try {
         const res = await fetch(`/api/chatbot/history?industry=${currentIndustry}`);
         if (res.ok) {
           const data = await res.json();
           if (data.success && Array.isArray(data.messages) && data.messages.length > 0) {
-            if (!isCancelled) {
-              setMessages(data.messages);
-              return;
-            }
+            loaded = data.messages;
           }
         }
       } catch (err) {
@@ -764,32 +775,38 @@ export default function ScioSentinelOrb({
       }
 
       // LocalStorage fallback if offline or no Convex records
-      try {
-        const storageKey = `scio_chat_history_${currentIndustry}`;
-        const saved = localStorage.getItem(storageKey);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            if (!isCancelled) {
-              setMessages(parsed);
-              return;
+      if (loaded.length === 0) {
+        try {
+          const storageKey = `scio_chat_history_${currentIndustry}`;
+          const saved = localStorage.getItem(storageKey);
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              loaded = parsed;
             }
           }
+        } catch (e) {
+          console.warn("Failed to load local chat history", e);
         }
-      } catch (e) {
-        console.warn("Failed to load local chat history", e);
       }
 
       if (!isCancelled) {
-        setMessages([
-          {
-            id: `welcome-${Date.now()}`,
-            sender: "bot",
-            text: currentIndConfig.welcomeMessage,
-            timestamp: "Live",
-            provider: `${currentIndConfig.name} Assistant`
-          }
-        ]);
+        if (loaded.length > 0) {
+          // Normalize first welcome message to always match current industry's config
+          const normalized = loaded.map((msg, idx) => {
+            if (idx === 0 && (msg.id.startsWith("welcome") || msg.sender === "bot")) {
+              return {
+                ...msg,
+                text: indConfig.welcomeMessage,
+                provider: `${indConfig.name} Assistant`
+              };
+            }
+            return msg;
+          });
+          setMessages(normalized);
+        } else {
+          setMessages([defaultWelcome]);
+        }
       }
     }
 
@@ -800,9 +817,15 @@ export default function ScioSentinelOrb({
     };
   }, [currentIndustry]);
 
-  // Save messages to LocalStorage
+  // Save messages to LocalStorage safely (only when messages match currentIndustry)
   useEffect(() => {
     if (messages.length > 0) {
+      const indConfig = INDUSTRY_SENTINEL_CONFIG[currentIndustry] || INDUSTRY_SENTINEL_CONFIG.home || INDUSTRY_SENTINEL_CONFIG.general;
+      const firstMsg = messages[0];
+      // Prevent saving if first message is a welcome message from another industry
+      if (firstMsg && firstMsg.id.startsWith("welcome") && firstMsg.text !== indConfig.welcomeMessage) {
+        return;
+      }
       try {
         const storageKey = `scio_chat_history_${currentIndustry}`;
         localStorage.setItem(storageKey, JSON.stringify(messages));
