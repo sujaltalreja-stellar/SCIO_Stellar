@@ -2647,7 +2647,7 @@ export default function App() {
       {/* ==================== 24/7 SCIO SENTINEL AI ORB COMPANION ==================== */}
       <ScioSentinelOrb
         onLaunchPlatform={handleLaunchPlatform}
-        currentIndustry={currentIndustry}
+        currentIndustry={(viewMode as string) === "landing" ? "home" : currentIndustry}
         activeTab={activeTab}
         isCopilotOpenTrigger={copilotOpen}
         onCloseCopilot={() => setCopilotOpen(false)}

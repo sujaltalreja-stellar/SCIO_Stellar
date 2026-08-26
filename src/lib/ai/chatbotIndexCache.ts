@@ -261,62 +261,62 @@ class SectorChatbotIndexCache {
   private seedDefaultKnowledge() {
     // HOMEPAGE KNOWLEDGE SEEDS
     this.store("homepage", "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act.", {
-      text: `**Stellar SCIO 4-Step Closed-Loop Operating Model**:\n\n` +
-        `• **STEP 01 — CONNECT**: Ingests live telemetry from PLCs, SCADA, and IoT sensors using native OPC-UA, Modbus TCP, and MQTT Sparkplug B drivers with zero hardware replacements.\n` +
-        `• **STEP 02 — UNDERSTAND**: Synthesizes a unified semantic Digital Twin connecting real-time sensor streams with technical schematics, asset BOMs, and historic repair records.\n` +
-        `• **STEP 03 — PREDICT**: 24-Band FFT vibration and neural temperature modeling detects mechanical bearing wear and electrical anomalies 14 to 21 days before catastrophic failure.\n` +
-        `• **STEP 04 — ACT**: Automatically drafts repair work orders and purchase requisitions in SAP S/4HANA PM and IBM Maximo with matched spare part numbers.`,
-      provider: "SCIO Executive Knowledge Index",
+      text: `**Stellar SCIO 4-Step Process**:\n\n` +
+        `• **1. CONNECT**: Connects live sensor data from PLCs, SCADA, and IoT systems without requiring any hardware replacement.\n` +
+        `• **2. UNDERSTAND**: Combines machine telemetry with equipment manuals, parts lists, and repair history into a live digital twin.\n` +
+        `• **3. PREDICT**: Analyzes machine vibration and temperature trends to catch equipment wear 14 to 21 days before failure.\n` +
+        `• **4. ACT**: Automatically creates maintenance work orders and orders required spare parts in SAP S/4HANA PM and IBM Maximo.`,
+      provider: "Stellar SCIO Platform AI",
       suggestedAction: { type: "scroll", label: "View How SCIO Works (4 Steps)", payload: "#how-it-works" }
     });
 
     this.store("homepage", "Which 4 industries does SCIO support and what are the main features?", {
-      text: `**Stellar SCIO 4 Dedicated Industry Verticals**:\n\n` +
-        `• **Renewable Energy & Power Grid**: 12.4 GW monitored across solar PV, wind turbine pitch harmonics, substation transformers, and BESS storage.\n` +
-        `• **Maritime Fleet Operations**: Real-time AIS satellite GPS tracking for 12 vessels, engine room telemetry, routine safety inspections, and port bunker logs.\n` +
-        `• **Manufacturing 4.0 & OEE**: Real-time 91.4% OEE tracking across 24 robotic cells, sub-minute micro-stoppage root causes, and CNC spindle vibration.\n` +
-        `• **Cold-Chain Logistics**: Continuous IoT monitoring across 142 refrigerated reefers (-25°C to +4°C), predictive delay forecasting, and automated MRO spare parts staging.`,
-      provider: "SCIO Executive Knowledge Index",
+      text: `**Stellar SCIO Supported Industries**:\n\n` +
+        `• **Renewable Energy & Power Grid**: Power generation monitoring, wind/solar panel health, and battery storage.\n` +
+        `• **Maritime Fleet Operations**: Live ship GPS tracking, engine status, fuel consumption logs, and safety inspection checklists.\n` +
+        `• **Manufacturing 4.0 & OEE**: Factory OEE tracking across robotic cells, downtime cause analysis, and machine tool wear.\n` +
+        `• **Cold-Chain Logistics**: Temperature tracking for refrigerated containers, shipment delay predictions, and warehouse spare parts stock.`,
+      provider: "Stellar SCIO Platform AI",
       suggestedAction: { type: "scroll", label: "Explore 4 Sector Hubs", payload: "#industries" }
     });
 
     // ENERGY KNOWLEDGE SEEDS
-    this.store("energy", "Analyze wind turbine gearbox vibration and pitch bearing harmonics", {
-      text: `**Wind Turbine Mechanical & Bearing Diagnostics**:\n\n` +
-        `• **Vibration FFT Analysis**: Continuously sampling 24-band high-frequency spectra (96 kS/s) on main planetary stage and generator bearings to isolate inner/outer race spalling.\n` +
-        `• **Pitch Bearing Grease Health**: Tracks hydraulic pitch drive torque spikes and temperature variations to detect lubrication breakdown before blade pitch jamming.\n` +
-        `• **Dynamic Load Redistribution**: During sudden wind gusts, the SCIO PowerOps engine orchestrates micro-pitch adjustments to minimize blade fatigue while sustaining rated generation output.`,
-      provider: "SCIO Energy Operations Index",
+    this.store("energy", "Check wind turbine gearbox health and vibration monitoring", {
+      text: `**Wind Turbine Health & Diagnostics**:\n\n` +
+        `• **Vibration Analysis**: Monitors generator bearings and gearbox vibration patterns to catch wear weeks before breakdown.\n` +
+        `• **Blade Pitch Drive**: Tracks hydraulic torque spikes and temperature variations to prevent blade pitch jamming.\n` +
+        `• **Generation Output**: Helps sustain optimal power output while protecting mechanical components during heavy wind gusts.`,
+      provider: "Renewable Energy AI Assistant",
       suggestedAction: { type: "launch_occ", label: "View Renewable Energy Control Tower", payload: { industry: "energy", tab: "energy-dashboard" } }
     });
 
     // MARITIME KNOWLEDGE SEEDS
-    this.store("maritime", "How does SCIO track ship fuel levels and bunker consumption?", {
-      text: `**Maritime Vessel Fuel & Bunker Management**:\n\n` +
-        `• **Live Tank Telemetry**: Continuous radar and hydrostatic sensor readings monitor heavy fuel oil (HFO) and marine gas oil (MGO) tank volumes in metric tons.\n` +
-        `• **Daily Fuel Burn Rate**: Evaluates main propulsion burn against speed through water (STW) and prevailing sea currents to calculate optimal cruising RPM.\n` +
-        `• **Port Bunkering Scheduling**: Flags refueling requirements 5 days before safety reserves drop below port approach margins, drafting bunker supply orders for next berth.`,
-      provider: "SCIO Maritime Fleet Index",
+    this.store("maritime", "How does SCIO track ship fuel levels and consumption?", {
+      text: `**Maritime Fleet Fuel & Bunker Monitoring**:\n\n` +
+        `• **Tank Levels**: Continuous sensor monitoring of fuel tank levels (HFO and MGO) in metric tons.\n` +
+        `• **Daily Fuel Burn Rate**: Compares fuel consumption against vessel speed to recommend fuel-efficient sailing speeds.\n` +
+        `• **Port Bunkering**: Flags refueling needs days before arrival so bunker fuel delivery can be scheduled at the next port berth.`,
+      provider: "Maritime Fleet AI Assistant",
       suggestedAction: { type: "launch_occ", label: "Launch Maritime Fleet Control Center", payload: { industry: "maritime", tab: "dashboard" } }
     });
 
     // MANUFACTURING KNOWLEDGE SEEDS
     this.store("manufacturing", "Explain how SCIO calculates real-time OEE across Availability, Performance, and Quality", {
-      text: `**Real-Time Dual-Axis OEE Intelligence (91.4%)**:\n\n` +
-        `• **Availability (96.2%)**: Measured via direct PLC cycle registers, isolating scheduled tool changes from unplanned electrical and mechanical downtime.\n` +
-        `• **Performance (97.1%)**: Compares instantaneous machine takt rate against rated ideal cycle times, detecting sub-second micro-stoppages caused by conveyor friction or robotic joint lag.\n` +
-        `• **Quality (97.8%)**: High-speed optical inspection cameras cross-check produced parts, isolating defect clusters and auto-quarantining defective batches before packaging.`,
-      provider: "SCIO Manufacturing 4.0 Index",
+      text: `**Factory OEE Breakdown (91.4%)**:\n\n` +
+        `• **Availability**: Tracks machine uptime vs planned downtime for tool changes or maintenance.\n` +
+        `• **Performance**: Compares actual machine cycle speeds against rated speeds, flagging short conveyor jams and micro-stoppages.\n` +
+        `• **Quality**: Camera vision AI inspects 100% of manufactured parts to isolate defect clusters and stop defective batches.`,
+      provider: "Manufacturing AI Assistant",
       suggestedAction: { type: "launch_occ", label: "Launch Manufacturing 4.0 Control Center", payload: { industry: "manufacturing", tab: "dashboard" } }
     });
 
     // LOGISTICS KNOWLEDGE SEEDS
-    this.store("logistics", "Check live temperature telemetry across all 142 refrigerated reefers for excursion breaches", {
-      text: `**Cold-Chain Temperature & Reefer Telematics**:\n\n` +
-        `• **Continuous IoT Monitoring**: Cellular and satellite IoT beacons transmit core temperature and relative humidity every 15 seconds across all 142 refrigerated containers.\n` +
-        `• **Threshold Gating (-18.4°C)**: Multi-stage neural alerts trigger when compressor discharge temperatures drift by more than 0.8°C over 2 consecutive reporting intervals.\n` +
-        `• **Predictive Intermodal Triage**: If an intermodal rail or customs delay threatens container dwell limits, SCIO automatically alerts destination depot technicians to stage backup gen-sets.`,
-      provider: "SCIO Cold-Chain Logistics Index",
+    this.store("logistics", "Check live temperature telemetry across all refrigerated reefers for excursion breaches", {
+      text: `**Cold-Chain Container Temperature Control**:\n\n` +
+        `• **Live Temperature Tracking**: IoT sensors transmit core container temperature every 15 seconds across refrigerated reefers.\n` +
+        `• **Temperature Alerts**: Instant alerts trigger when container temperatures drift outside the safe range (-25°C to +4°C).\n` +
+        `• **Shipment Delay Warnings**: Predicts port delays so depot crews can prepare backup generators and protect cargo.`,
+      provider: "Supply Chain AI Assistant",
       suggestedAction: { type: "launch_occ", label: "Launch Supply Chain Control Center", payload: { industry: "logistics", tab: "dashboard" } }
     });
   }

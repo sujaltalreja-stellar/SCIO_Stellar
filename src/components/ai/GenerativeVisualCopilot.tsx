@@ -64,7 +64,7 @@ export default function GenerativeVisualCopilot({
     {
       id: "msg-1",
       sender: "copilot",
-      text: "Stellar SCIO Operations Copilot online. I am continuously monitoring your SCADA telemetry, asset vibration logs, and supply risk streams. Select a prompt below or ask any operational question.",
+      text: "Stellar SCIO AI Copilot online. I can help answer questions about your operations, equipment health, and supply chain. Ask any question or pick a prompt below.",
       timestamp: "Just now"
     }
   ]);

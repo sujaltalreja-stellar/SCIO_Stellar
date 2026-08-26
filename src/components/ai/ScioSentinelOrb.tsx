@@ -373,13 +373,44 @@ const DASHBOARD_TAB_INTELLIGENCE: Record<string, SectionIntel> = {
   }
 };
 
-function ChatMessageFormatted({ text, isBot }: { text: string; isBot: boolean }) {
+function ChatMessageFormatted({ text, isBot, isLatest }: { text: string; isBot: boolean; isLatest?: boolean }) {
+  const [displayedText, setDisplayedText] = useState(isBot && isLatest ? "" : text);
+  const [isTyping, setIsTyping] = useState(isBot && isLatest);
+
+  useEffect(() => {
+    if (!isBot || !isLatest) {
+      setDisplayedText(text);
+      setIsTyping(false);
+      return;
+    }
+
+    let i = 0;
+    const speed = Math.max(6, Math.min(20, Math.floor(1000 / (text.length || 1))));
+    setDisplayedText("");
+    setIsTyping(true);
+
+    const timer = setInterval(() => {
+      i += 3;
+      if (i >= text.length) {
+        setDisplayedText(text);
+        setIsTyping(false);
+        clearInterval(timer);
+      } else {
+        setDisplayedText(text.slice(0, i));
+      }
+    }, speed);
+
+    return () => clearInterval(timer);
+  }, [text, isBot, isLatest]);
+
+  const textToRender = displayedText;
+
   if (!isBot) {
-    return <span className="whitespace-pre-wrap">{text}</span>;
+    return <span className="whitespace-pre-wrap">{textToRender}</span>;
   }
 
   // Clean out artificial meta headers or '---' lines if present
-  const cleaned = text
+  const cleaned = textToRender
     .replace(/\*\*SCIO Sentinel 24\/7 Response[^\n]*\*\*/gi, "")
     .replace(/^---+$/gm, "")
     .trim();
@@ -458,6 +489,9 @@ function ChatMessageFormatted({ text, isBot }: { text: string; isBot: boolean })
           </p>
         );
       })}
+      {isTyping && (
+        <span className="inline-block w-1.5 h-3 bg-cyan-400 ml-1 animate-pulse" />
+      )}
     </div>
   );
 }
@@ -472,33 +506,63 @@ interface IndustrySentinelInfo {
 }
 
 const INDUSTRY_SENTINEL_CONFIG: Record<string, IndustrySentinelInfo> = {
+  home: {
+    name: "Stellar SCIO AI Assistant",
+    badge: "ENTERPRISE OS",
+    color: "#3B82F6",
+    watchingText: "Guiding enterprise executives & engineers across all 4 industrial sectors 24/7.",
+    welcomeMessage: "Welcome to **Stellar SCIO Enterprise Operations Platform**. I am your platform guide across all 4 industrial sectors (Renewable Energy, Maritime Fleets, Manufacturing 4.0, and Supply Chain Logistics).\n\nAsk me about platform features, our 4-step intelligence loop, industry use cases, or private beta access.",
+    quickPrompts: [
+      { label: "🚀 What is Stellar SCIO?", query: "What is Stellar SCIO and what problem does it solve for enterprise operations?" },
+      { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." },
+      { label: "🏭 Supported Industries", query: "Which 4 industries does SCIO support and what are the main features of each?" },
+      { label: "📈 ROI & Savings", query: "What is the ROI and annual downtime savings achieved with Stellar SCIO?" },
+      { label: "🔌 Systems & ERP Integration", query: "How does SCIO integrate with existing OPC-UA, SCADA, SAP PM, and IBM Maximo?" },
+      { label: "🔒 Security & Data Safety", query: "What security, NERC-CIP compliance, and data encryption standards does SCIO use?" }
+    ]
+  },
+  general: {
+    name: "Stellar SCIO AI Assistant",
+    badge: "ENTERPRISE OS",
+    color: "#3B82F6",
+    watchingText: "Guiding enterprise executives & engineers across all 4 industrial sectors 24/7.",
+    welcomeMessage: "Welcome to **Stellar SCIO Enterprise Operations Platform**. I am your platform guide across all 4 industrial sectors (Renewable Energy, Maritime Fleets, Manufacturing 4.0, and Supply Chain Logistics).\n\nAsk me about platform features, our 4-step intelligence loop, industry use cases, or private beta access.",
+    quickPrompts: [
+      { label: "🚀 What is Stellar SCIO?", query: "What is Stellar SCIO and what problem does it solve for enterprise operations?" },
+      { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." },
+      { label: "🏭 Supported Industries", query: "Which 4 industries does SCIO support and what are the main features of each?" },
+      { label: "📈 ROI & Savings", query: "What is the ROI and annual downtime savings achieved with Stellar SCIO?" },
+      { label: "🔌 Systems & ERP Integration", query: "How does SCIO integrate with existing OPC-UA, SCADA, SAP PM, and IBM Maximo?" },
+      { label: "🔒 Security & Data Safety", query: "What security, NERC-CIP compliance, and data encryption standards does SCIO use?" }
+    ]
+  },
   energy: {
     name: "Renewable Energy & Power Grid",
     badge: "12.4 GW LIVE",
     color: "#10B981",
-    watchingText: "Monitoring 12.4 GW Grid Load, 50.02 Hz frequency, and 8 substation transformers 24/7.",
-    welcomeMessage: "Welcome to the **Renewable Energy & Grid OCC**. I am monitoring 12.4 GW of active solar PV, wind turbine telemetry, and BESS storage across 8 grid nodes.\n\nAsk me about transformer DGA, pitch bearing harmonics, or frequency stability.",
+    watchingText: "Monitoring power generation, wind/solar health, and grid performance 24/7.",
+    welcomeMessage: "Welcome to **Renewable Energy & Grid Operations**. I monitor live power generation, wind/solar performance, and battery storage across grid nodes.\n\nWhat would you like to check on your energy operations today?",
     quickPrompts: [
-      { label: "⚡ Grid Frequency (50.02 Hz)", query: "Analyze current grid load and frequency stability across all 8 substations." },
-      { label: "🌀 Wind Pitch Bearing Vibration", query: "Show vibration FFT harmonics on Wind Turbine 04 pitch bearing." },
-      { label: "☀️ Solar Inverter PR & Hotspots", query: "What is the Performance Ratio (PR) and hotspot risk on Solar Array 02?" },
-      { label: "🔋 BESS Cell Voltage & Thermal Runaway", query: "Check Battery Energy Storage BESS cell voltage balance and thermal safety." },
+      { label: "⚡ Power Generation & Load", query: "Analyze current grid load and power output across substations." },
+      { label: "🌀 Wind Turbine Health", query: "Check wind turbine gearbox health and vibration monitoring." },
+      { label: "☀️ Solar Farm Output", query: "What is the performance ratio and panel temperature on our solar farms?" },
+      { label: "🔋 Battery Storage Status", query: "Check Battery Energy Storage (BESS) cell voltage balance and health." },
       { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." },
-      { label: "🔌 SCADA & SAP PM Integration", query: "How does SCIO integrate with existing OPC-UA, SCADA, and SAP PM?" }
+      { label: "🔌 Systems & ERP Integration", query: "How does SCIO integrate with existing OPC-UA, SCADA, and SAP PM?" }
     ]
   },
   maritime: {
     name: "Maritime Fleet & Ship Operations",
     badge: "12 SHIPS ACTIVE",
     color: "#3B82F6",
-    watchingText: "Watching 12 ships at sea, engine temperatures, fuel levels, and safety inspections 24/7.",
+    watchingText: "Monitoring vessel locations, engine health, fuel levels, and safety checklists 24/7.",
     welcomeMessage: "Welcome to **Maritime Fleet Operations**. I help you manage your ships at sea — from tracking vessel routes and engine health to fuel logs, safety inspections, and port spare parts delivery.\n\nWhat would you like to check on the fleet today?",
     quickPrompts: [
-      { label: "🚢 Ship Locations & Arrival Times", query: "Where are our 12 ships right now and what are their estimated arrival times (ETA) at port?" },
-      { label: "🦺 Safety Equipment & Routine Inspections", query: "What routine safety inspections are due for lifeboats, fire systems, and emergency equipment?" },
-      { label: "⚙️ Ship Engine Health & Alarms", query: "Check engine temperatures, oil pressure, and vibration for ships currently sailing." },
-      { label: "⛽ Fuel Levels & Daily Consumption", query: "How much fuel do our ships have left and what is our daily fuel burn rate?" },
-      { label: "📦 Port Spare Parts & Repairs", query: "What spare parts need to be ordered and delivered to the next port for repairs?" },
+      { label: "🚢 Ship Locations & Port ETAs", query: "Where are our 12 ships right now and what are their estimated arrival times at port?" },
+      { label: "🦺 Safety Inspection Checklist", query: "What routine safety inspections are due for lifeboats, fire systems, and emergency equipment?" },
+      { label: "⚙️ Ship Engine Status", query: "Check engine temperatures, oil pressure, and vibration for active vessels." },
+      { label: "⛽ Fuel Levels & Consumption", query: "How much fuel do our ships have left and what is our daily fuel burn rate?" },
+      { label: "📦 Spare Parts & Port Delivery", query: "What spare parts need to be ordered and delivered to the next port for repairs?" },
       { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." }
     ]
   },
@@ -506,30 +570,30 @@ const INDUSTRY_SENTINEL_CONFIG: Record<string, IndustrySentinelInfo> = {
     name: "Manufacturing 4.0 & Industrial OEE",
     badge: "91.4% OEE",
     color: "#F59E0B",
-    watchingText: "Observing 24 robotic cells, 91.4% OEE, CNC spindle vibration, and micro-stoppages 24/7.",
-    welcomeMessage: "Welcome to the **Manufacturing 4.0 OCC**. I am analyzing real-time OEE across 24 robotic cells and CNC machining centers with sub-minute micro-stoppage detection.\n\nAsk me about spindle bearing wear, Pareto downtime causes, or automated batch quarantine.",
+    watchingText: "Monitoring 24 robotic cells, factory OEE, machine health, and product quality 24/7.",
+    welcomeMessage: "Welcome to **Manufacturing 4.0 & Factory OEE**. I track real-time OEE across robotic cells and CNC machining centers, detecting downtime causes and equipment wear.\n\nHow can I assist with your factory operations today?",
     quickPrompts: [
-      { label: "📊 Real-Time OEE Breakdown", query: "Explain how SCIO calculates real-time OEE across Availability, Performance, and Quality." },
-      { label: "📉 Micro-Stoppage Pareto Analysis", query: "Show top root causes of downtime and micro-stoppages across the robotic cells." },
-      { label: "🔧 CNC Spindle Bearing Wear", query: "Analyze 5-axis CNC spindle vibration spectra to detect bearing inner-race spalling." },
-      { label: "📦 Automated SAP Tool Changeover", query: "How does SCIO trigger automated tool-wear changeover work orders in SAP PM?" },
+      { label: "📊 Factory OEE & Line Uptime", query: "Explain how SCIO calculates real-time OEE across Availability, Performance, and Quality." },
+      { label: "📉 Downtime Root Causes", query: "Show top root causes of downtime and micro-stoppages across the robotic cells." },
+      { label: "🔧 Machine Health & Tool Wear", query: "Analyze machine spindle vibration and tool wear to prevent breakdown." },
+      { label: "📦 Work Orders in SAP", query: "How does SCIO trigger automated tool-wear changeover work orders in SAP PM?" },
       { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." },
-      { label: "🔌 PLC / OPC-UA Sensor Integration", query: "How does SCIO connect to Siemens S7 and Rockwell PLCs without hardware swap?" }
+      { label: "🔌 Sensor & PLC Connection", query: "How does SCIO connect to Siemens S7 and Rockwell PLCs without hardware swap?" }
     ]
   },
   logistics: {
     name: "Cold-Chain & Multimodal Logistics",
     badge: "142 REEFERS",
     color: "#06B6D4",
-    watchingText: "Monitoring 142 refrigerated containers (-21.4°C), cargo IoT, and disruption risks 24/7.",
-    welcomeMessage: "Welcome to the **Cold-Chain & Supply Chain OCC**. I am continuously monitoring 142 refrigerated reefers with IoT temperature telemetry and AI lead-time delay forecasting.\n\nAsk me about temperature excursion alerts, warehouse ASRS inventory, or vendor risk.",
+    watchingText: "Monitoring refrigerated container temperatures, shipping routes, and warehouse stock 24/7.",
+    welcomeMessage: "Welcome to **Cold-Chain & Supply Chain Logistics**. I monitor refrigerated container temperatures, shipping delays, and warehouse spare parts inventory.\n\nHow can I assist your logistics operations today?",
     quickPrompts: [
-      { label: "❄️ Cold-Chain Temp Excursions (-25°C to +4°C)", query: "Check live temperature telemetry across all 142 refrigerated reefers for excursion breaches." },
-      { label: "🚢 Supply Disruption & Lead-Time AI", query: "Forecast vendor shipping delays and port bottlenecks for upcoming freight." },
-      { label: "📦 MRO Spare Parts Bin Staging", query: "How does SCIO synchronize warehouse MRO spare parts stock with field work order demand?" },
-      { label: "📋 Automated Purchase Order Release", query: "Explain automated purchase requisition workflows when safety stock drops below threshold." },
+      { label: "❄️ Container Temperature Control", query: "Check live temperature telemetry across all refrigerated reefers for excursion breaches." },
+      { label: "🚢 Shipment Delay Forecasts", query: "Forecast vendor shipping delays and port bottlenecks for upcoming freight." },
+      { label: "📦 Warehouse Spare Parts Stock", query: "How does SCIO synchronize warehouse spare parts stock with field repair work orders?" },
+      { label: "📋 Automated Purchase Orders", query: "Explain automated purchase requisition workflows when safety stock drops below threshold." },
       { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." },
-      { label: "🔌 Telematics & ERP Integration", query: "How does SCIO integrate with fleet GPS telematics and SAP/Oracle supply chain?" }
+      { label: "🔌 Tracking & ERP Integration", query: "How does SCIO integrate with fleet GPS telematics and SAP/Oracle supply chain?" }
     ]
   }
 };
@@ -622,7 +686,7 @@ export default function ScioSentinelOrb({
   onOpenBetaModal,
   onOpenDemoModal,
   onLaunchPlatform,
-  currentIndustry = "general",
+  currentIndustry = "home",
   activeTab,
   isCopilotOpenTrigger,
   onCloseCopilot
@@ -641,7 +705,7 @@ export default function ScioSentinelOrb({
   }, []);
   
   // Sector Face Theme: Home/General (White), Maritime (White), Energy (Green), Manufacturing (Yellow), Logistics (Light Blue)
-  const faceTheme = SECTOR_FACE_THEMES[currentIndustry] || SECTOR_FACE_THEMES.general;
+  const faceTheme = SECTOR_FACE_THEMES[currentIndustry] || SECTOR_FACE_THEMES.home || SECTOR_FACE_THEMES.general;
   
   // Section Guide States
   const [activeSectionKey, setActiveSectionKey] = useState<string>("hero");
@@ -658,7 +722,7 @@ export default function ScioSentinelOrb({
   const activeIntel = (activeTab && DASHBOARD_TAB_INTELLIGENCE[activeTab])
     ? DASHBOARD_TAB_INTELLIGENCE[activeTab]
     : (SECTION_INTELLIGENCE[activeSectionKey] || SECTION_INTELLIGENCE.hero);
-  const currentIndConfig = INDUSTRY_SENTINEL_CONFIG[currentIndustry] || INDUSTRY_SENTINEL_CONFIG.energy;
+  const currentIndConfig = INDUSTRY_SENTINEL_CONFIG[currentIndustry] || INDUSTRY_SENTINEL_CONFIG.home || INDUSTRY_SENTINEL_CONFIG.general;
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -677,18 +741,61 @@ export default function ScioSentinelOrb({
     }
   }, [isCopilotOpenTrigger]);
 
-  // Update welcome message when industry changes
+  // Load saved messages from LocalStorage per industry on mount / industry change
   useEffect(() => {
+    try {
+      const storageKey = `scio_chat_history_${currentIndustry}`;
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load chat history", e);
+    }
+
     setMessages([
       {
         id: `welcome-${Date.now()}`,
         sender: "bot",
         text: currentIndConfig.welcomeMessage,
         timestamp: "Live",
-        provider: `${currentIndConfig.name} Sentinel`
+        provider: `${currentIndConfig.name} Assistant`
       }
     ]);
   }, [currentIndustry]);
+
+  // Save messages to LocalStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      try {
+        const storageKey = `scio_chat_history_${currentIndustry}`;
+        localStorage.setItem(storageKey, JSON.stringify(messages));
+      } catch (e) {
+        console.warn("Failed to save chat history", e);
+      }
+    }
+  }, [messages, currentIndustry]);
+
+  // Clear chat function
+  const handleClearChat = () => {
+    try {
+      const storageKey = `scio_chat_history_${currentIndustry}`;
+      localStorage.removeItem(storageKey);
+    } catch (e) {}
+    setMessages([
+      {
+        id: `welcome-${Date.now()}`,
+        sender: "bot",
+        text: currentIndConfig.welcomeMessage,
+        timestamp: "Live",
+        provider: `${currentIndConfig.name} Assistant`
+      }
+    ]);
+  };
 
   // 1. Real-Time Mouse Gaze Physics
   useEffect(() => {
@@ -951,18 +1058,8 @@ export default function ScioSentinelOrb({
 
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() =>
-                    setMessages([
-                      {
-                        id: `welcome-${Date.now()}`,
-                        sender: "bot",
-                        text: currentIndConfig.welcomeMessage,
-                        timestamp: "Just now",
-                        provider: `${currentIndConfig.name} Sentinel`
-                      }
-                    ])
-                  }
-                  title="Reset Chat"
+                  onClick={handleClearChat}
+                  title="Clear Chat History"
                   className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors text-xs cursor-pointer"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
@@ -996,7 +1093,7 @@ export default function ScioSentinelOrb({
 
             {/* Messages Thread */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">
-              {messages.map((msg) => {
+              {messages.map((msg, idx) => {
                 const isBot = msg.sender === "bot";
                 return (
                   <motion.div
@@ -1012,7 +1109,7 @@ export default function ScioSentinelOrb({
                           : "bg-blue-600 text-white font-medium shadow-md rounded-tr-sm"
                       }`}
                     >
-                      <ChatMessageFormatted text={msg.text} isBot={isBot} />
+                      <ChatMessageFormatted text={msg.text} isBot={isBot} isLatest={idx === messages.length - 1} />
 
                       {/* Visual Component Render if requested */}
                       {isBot && msg.visualType === "trend" && (
