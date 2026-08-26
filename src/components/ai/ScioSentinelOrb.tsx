@@ -743,31 +743,61 @@ export default function ScioSentinelOrb({
     }
   }, [isCopilotOpenTrigger]);
 
-  // Load saved messages from LocalStorage per industry on mount / industry change
+  // Load recorded chat history from Convex Database (with LocalStorage fallback)
   useEffect(() => {
-    try {
-      const storageKey = `scio_chat_history_${currentIndustry}`;
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed);
-          return;
+    let isCancelled = false;
+
+    async function loadHistory() {
+      try {
+        const res = await fetch(`/api/chatbot/history?industry=${currentIndustry}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && Array.isArray(data.messages) && data.messages.length > 0) {
+            if (!isCancelled) {
+              setMessages(data.messages);
+              return;
+            }
+          }
         }
+      } catch (err) {
+        console.warn("Failed to fetch Convex chat history", err);
       }
-    } catch (e) {
-      console.warn("Failed to load chat history", e);
+
+      // LocalStorage fallback if offline or no Convex records
+      try {
+        const storageKey = `scio_chat_history_${currentIndustry}`;
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            if (!isCancelled) {
+              setMessages(parsed);
+              return;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to load local chat history", e);
+      }
+
+      if (!isCancelled) {
+        setMessages([
+          {
+            id: `welcome-${Date.now()}`,
+            sender: "bot",
+            text: currentIndConfig.welcomeMessage,
+            timestamp: "Live",
+            provider: `${currentIndConfig.name} Assistant`
+          }
+        ]);
+      }
     }
 
-    setMessages([
-      {
-        id: `welcome-${Date.now()}`,
-        sender: "bot",
-        text: currentIndConfig.welcomeMessage,
-        timestamp: "Live",
-        provider: `${currentIndConfig.name} Assistant`
-      }
-    ]);
+    loadHistory();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [currentIndustry]);
 
   // Save messages to LocalStorage
@@ -783,11 +813,14 @@ export default function ScioSentinelOrb({
   }, [messages, currentIndustry]);
 
   // Clear chat function
-  const handleClearChat = () => {
+  const handleClearChat = async () => {
     try {
       const storageKey = `scio_chat_history_${currentIndustry}`;
       localStorage.removeItem(storageKey);
-    } catch (e) {}
+      await fetch(`/api/chatbot/history?industry=${currentIndustry}`, { method: "DELETE" });
+    } catch (e) {
+      console.warn("Failed to clear Convex history", e);
+    }
     setMessages([
       {
         id: `welcome-${Date.now()}`,

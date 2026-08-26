@@ -1,4 +1,42 @@
 import { chatbotIndexCache } from "./chatbotIndexCache";
+import { ConvexHttpClient } from "convex/browser";
+import { api } from "../../../convex/_generated/api";
+
+// Helper to save chat history directly to Convex Database
+async function persistChatToConvex(
+  sector: string,
+  userText: string,
+  botText: string,
+  provider: string,
+  suggestedAction?: any
+) {
+  try {
+    const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+    if (!convexUrl) return;
+    const client = new ConvexHttpClient(convexUrl);
+    const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+    // 1. Save User Message
+    await client.mutation(api.mutations.saveChatMessage, {
+      industry: sector,
+      sender: "user",
+      text: userText,
+      timestamp: timeStr,
+    });
+
+    // 2. Save Bot Message
+    await client.mutation(api.mutations.saveChatMessage, {
+      industry: sector,
+      sender: "bot",
+      text: botText,
+      timestamp: timeStr,
+      provider,
+      suggestedAction,
+    });
+  } catch (err) {
+    console.warn("Convex chat history persistence warning:", err);
+  }
+}
 
 // ============================================================================
 // STELLAR SCIO CHATBOT ENGINE
@@ -384,6 +422,13 @@ export async function generateResponse(sector: string, rawQuery: string) {
   // 1. Check Semantic Inverted Index & Multi-Tier Cache first
   const cachedResult = chatbotIndexCache.lookup(sector, query);
   if (cachedResult.hit && cachedResult.data) {
+    persistChatToConvex(
+      sector,
+      query,
+      cachedResult.data.text,
+      cachedResult.data.provider,
+      cachedResult.data.suggestedAction
+    );
     return cachedResult.data;
   }
 
