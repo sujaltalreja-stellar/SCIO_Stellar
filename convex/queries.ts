@@ -94,6 +94,13 @@ export const getAlarms = query({
 });
 
 // Maritime Fleet & Safety
+export const getMaritimeVessels = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("maritimeVessels").collect();
+  },
+});
+
 export const getMaritimeSafety = query({
   args: {},
   handler: async (ctx) => {
@@ -109,13 +116,6 @@ export const getChatHistory = query({
       .query("chatHistory")
       .withIndex("by_industry", (q) => q.eq("industry", args.industry))
       .collect();
-  },
-});
-
-export const getMaritimeSafety = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("maritimeSafety").collect();
   },
 });
 
