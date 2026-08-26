@@ -190,14 +190,16 @@ export function truncateResponse(text: string): string {
 }
 
 // ============================================================================
-// SYSTEM PROMPT BUILDER (Plain English, Clear, No Buzzwords)
+// SYSTEM PROMPT BUILDER (Strict Company Chatbot Boundaries)
 // ============================================================================
 export function buildSystemPrompt(sector: string, query: string): string {
   const intentMeta = classifyIntent(query);
   const sectorData = PRODUCT_KNOWLEDGE_BASE.sectors[sector as keyof typeof PRODUCT_KNOWLEDGE_BASE.sectors] || PRODUCT_KNOWLEDGE_BASE.sectors.home;
 
-  return `You are the AI Assistant for the ${PRODUCT_KNOWLEDGE_BASE.platformName}.
-You assist executives, operations managers, and engineers.
+  return `You are the official Company AI Assistant for ${PRODUCT_KNOWLEDGE_BASE.platformName}.
+
+YOUR SOLE PURPOSE:
+Represent Stellar SCIO. Answer questions exclusively about Stellar SCIO, its features, capabilities, 4 supported industries (Renewable Energy, Maritime, Manufacturing, Logistics), ROI, security, and integration.
 
 WHAT STELLAR SCIO DOES:
 ${PRODUCT_KNOWLEDGE_BASE.overview}
@@ -209,12 +211,13 @@ ${sectorData.highlights.map(h => `• ${h}`).join("\n")}
 SUPPORTED INTEGRATIONS:
 ${PRODUCT_KNOWLEDGE_BASE.integrations.join(", ")}
 
-RULES:
-1. Use clear, simple, plain English. Avoid obscure jargon, buzzwords, or fake metrics.
-2. Structure your response with 3 to 4 clear bullet points using bold headers.
-3. Keep your answer brief and direct (under 200 words).
-4. If asked "what is SCIO" or "how does it work", explain the 4 steps: 1. Connect, 2. Understand, 3. Predict, 4. Act.
-5. If the user greets you (hi, hello), welcome them warmly and briefly explain how you can help.`;
+STRICT COMPANY BOUNDARY GUARDRAILS:
+1. You are a COMPANY CHATBOT representing Stellar SCIO. You are NOT a general AI coding assistant, language tutor, or trivia bot.
+2. DO NOT write general programming code (Python, Flask, C++, SQL, etc.), code tutorials, or custom backend scripts.
+3. DO NOT answer off-topic requests (e.g. language lessons, Sindhi/English translation, recipes, homework, general trivia).
+4. If the user asks off-topic questions or requests general coding/tutoring, politely decline:
+   "I am the official Stellar SCIO Platform Assistant. I am specialized in answering questions about Stellar SCIO's platform, features, industrial operations, and integration. How can I assist you with Stellar SCIO today?"
+5. Keep all responses brief, direct, professional, and formatted in 3-4 bullet points using simple English.`;
 }
 
 // ============================================================================
@@ -223,6 +226,19 @@ RULES:
 export function generateIntelligentFallback(sector: string, query: string): { text: string; provider: string; suggestedAction?: any } {
   const lower = query.toLowerCase().trim();
   const intent = classifyIntent(query);
+
+  // OFF-TOPIC OR GENERIC CODE/TUTORING GUARDRAIL
+  const isOffTopic = lower.includes("sindhi") || lower.includes("teach me") || lower.includes("write code") || lower.includes("write backend") || lower.includes("python code") || lower.includes("flask") || lower.includes("write script") || lower.includes("homework") || lower.includes("recipe") || lower.includes("translate");
+
+  if (isOffTopic) {
+    return {
+      text: `I am the official **Stellar SCIO Platform Assistant**.\n\n` +
+        `My purpose is to assist you with the **Stellar SCIO Platform** — answering questions about our features, enterprise ROI, and industrial operations across Renewable Energy, Maritime, Manufacturing, and Logistics.\n\n` +
+        `How can I help you explore Stellar SCIO today?`,
+      provider: "Stellar SCIO AI Assistant",
+      suggestedAction: { type: "open_beta", label: "Apply for Private Beta Access" }
+    };
+  }
 
   // 0. GREETINGS & INTRODUCTIONS (hi, hello, hey, help, who are you)
   const isGreeting = /^(\s*(hi+|hello+|hey+|hola|greetings|good\s+(morning|afternoon|evening)|who\s+are\s+you|help)\s*[\!\?.]*)$/i.test(lower) || lower === "hi" || lower === "hello" || lower === "hey";
