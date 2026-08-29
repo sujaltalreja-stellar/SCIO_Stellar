@@ -4257,10 +4257,18 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
               <span className="font-bold text-xs uppercase tracking-widest text-white">STELLAR SCIO</span>
             </div>
             <p className="text-[11px] leading-relaxed font-sans max-w-sm opacity-80">
-              AI-Powered Operational Intelligence & Mission Control layer for Fortune 500 enterprise operations.
+              AI-Powered Operational Intelligence &amp; Mission Control layer for enterprise operations.
             </p>
-            <p className="text-[10px] opacity-60">
-              © 2026 StellarMind.ai. All rights reserved.
+            <div className="space-y-1.5 font-sans text-xs pt-1 border-t border-white/10 text-slate-300">
+              <div className="font-bold text-white flex items-center gap-2">
+                <span className="text-cyan-400 font-mono">CEO:</span> Ronak Barot
+              </div>
+              <div><span className="text-slate-400 font-mono">Sales:</span> <a href="mailto:sales@stellarmind.ai" className="text-cyan-300 hover:underline font-mono">sales@stellarmind.ai</a></div>
+              <div><span className="text-slate-400 font-mono">Info:</span> <a href="mailto:info@stellarmind.ai" className="text-emerald-300 hover:underline font-mono">info@stellarmind.ai</a></div>
+              <div><span className="text-slate-400 font-mono">Phone:</span> <a href="tel:+919723099765" className="text-white hover:underline font-mono">+91 97230 99765</a></div>
+            </div>
+            <p className="text-[10px] opacity-60 pt-1 font-mono">
+              © 2026 Stellarmind.ai. All rights reserved.
             </p>
           </div>
 
