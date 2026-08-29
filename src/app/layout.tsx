@@ -19,18 +19,20 @@ export const metadata: Metadata = {
     url: siteUrl,
     images: [
       {
-        url: "/thumbnail.png",
+        url: "https://www.stellarscio.app/thumbnail.png",
+        secureUrl: "https://www.stellarscio.app/thumbnail.png",
         width: 1200,
         height: 630,
         alt: "Stellar SCIO Autonomous Enterprise Intelligence Platform",
         type: "image/png",
       },
       {
-        url: "/og-image.png",
+        url: "https://www.stellarscio.app/og-image.jpg",
+        secureUrl: "https://www.stellarscio.app/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Stellar SCIO Platform",
-        type: "image/png",
+        type: "image/jpeg",
       },
     ],
     type: "website",
@@ -39,7 +41,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Stellar SCIO | Autonomous Enterprise Intelligence Platform",
     description: "Next-generation enterprise operations control center for real-time supply chain, maritime, energy, and manufacturing intelligence.",
-    images: ["/thumbnail.png"],
+    images: ["https://www.stellarscio.app/thumbnail.png"],
   },
 };
 
