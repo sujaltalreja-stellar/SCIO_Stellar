@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import {
   Building2, Ship, Zap, Truck, Shield, AlertTriangle, Plus,
   X, User, MessageSquare, Anchor, ClipboardList, Activity, Navigation, ShoppingCart, UserCheck, Terminal, Download, FileText, Gauge,
-  Search, Filter, CheckCircle2, Clock, ArrowRight, ArrowLeft, ChevronDown, Check, Sparkles, Package, DollarSign, Calendar, Cpu, Boxes, ThermometerSnowflake, Globe
+  Search, Filter, CheckCircle2, Clock, ArrowRight, ArrowLeft, ChevronDown, Check, Sparkles, Package, DollarSign, Calendar, Cpu, Boxes, ThermometerSnowflake, Globe, Database
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -678,7 +678,8 @@ export default function App() {
               { id: "energy-reliability", label: "Asset Reliability", icon: <Shield className="h-4 w-4" /> },
               { id: "energy-inventory", label: "Inventory & MRO", icon: <ShoppingCart className="h-4 w-4" /> },
               { id: "energy-supply", label: "Supply Chain", icon: <Navigation className="h-4 w-4" /> },
-              { id: "energy-compliance", label: "Safety & Compliance", icon: <Shield className="h-4 w-4" />, badge: "CIP" }
+              { id: "energy-compliance", label: "Safety & Compliance", icon: <Shield className="h-4 w-4" />, badge: "CIP" },
+              { id: "energy-erp", label: "ERP Operations & Sync", icon: <Database className="h-4 w-4" />, badge: "ERP" }
             ].map(tab => {
               const isActive = activeTab === tab.id;
               return (
@@ -1272,15 +1273,17 @@ export default function App() {
             <FinanceModule />
           )}
 
-          {/* ==================== COMPLIANCE & ERP SYSTEMS ==================== */}
+          {/* ==================== SAFETY & COMPLIANCE (AUDIT TRAIL LOG LEDGER) ==================== */}
           {activeTab === "energy-compliance" && (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <div>
-                <AuditTrail />
-              </div>
-              <div>
-                <ERPSyncHub />
-              </div>
+            <div className="space-y-6">
+              <AuditTrail />
+            </div>
+          )}
+
+          {/* ==================== DEDICATED ERP OPERATIONS CONTROL HUB ==================== */}
+          {activeTab === "energy-erp" && (
+            <div className="space-y-6">
+              <ERPSyncHub />
             </div>
           )}
 

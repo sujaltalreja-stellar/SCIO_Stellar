@@ -1326,7 +1326,7 @@ export default function ScioSentinelOrb({
               initial={{ opacity: 0, x: 25, scale: 0.95 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 25, scale: 0.95 }}
-              className="absolute right-20 bottom-0 w-[300px] sm:w-[330px] rounded-2xl bg-slate-950/95 backdrop-blur-xl text-white border border-white/20 shadow-[0_16px_50px_rgba(0,0,0,0.55)] font-sans select-none overflow-hidden"
+              className="hidden sm:block absolute right-20 bottom-0 w-[320px] rounded-2xl bg-slate-950/95 backdrop-blur-xl text-white border border-white/20 shadow-[0_16px_50px_rgba(0,0,0,0.55)] font-sans select-none overflow-hidden"
             >
               {/* Header Bar with Step #, Section Tag, Collapse Toggle & X Close Button */}
               <div className="px-3.5 py-2.5 border-b border-white/10 bg-white/[0.04] flex items-center justify-between">

@@ -34,26 +34,26 @@ export default function AuditTrail() {
       </div>
 
       {/* Filters Strip */}
-      <div className="flex flex-col md:flex-row items-center gap-4 bg-white dark:bg-zinc-950/40 border border-slate-200 dark:border-zinc-900 p-4 rounded-xl shadow-sm">
+      <div className="flex flex-col md:flex-row items-center gap-4 bg-[#0f1219] border border-[#252b3b] p-4 rounded-xl shadow-lg">
         {/* Search */}
         <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-zinc-500" />
+          <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
           <input
             type="text"
             placeholder="Search by action, details, site or engineer..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:border-emerald-500 focus:outline-none rounded-lg text-xs text-slate-800 dark:text-zinc-200 placeholder:text-slate-400 font-sans"
+            className="w-full pl-9 pr-4 py-2 bg-[#161a24] border border-[#252b3b] focus:border-emerald-500 focus:outline-none rounded-lg text-xs text-white placeholder:text-slate-500 font-sans"
           />
         </div>
 
         {/* Action filter */}
         <div className="flex items-center space-x-2 w-full md:w-auto">
-          <span className="text-[10px] text-slate-500 dark:text-zinc-500 font-mono uppercase font-semibold">Filter Code:</span>
+          <span className="text-[10px] text-slate-400 font-mono uppercase font-semibold">Filter Code:</span>
           <select
             value={actionFilter}
             onChange={(e) => setActionFilter(e.target.value)}
-            className="bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-300 px-3 py-2 rounded-lg text-xs focus:outline-none font-sans"
+            className="bg-[#161a24] border border-[#252b3b] text-white px-3 py-2 rounded-lg text-xs focus:outline-none font-sans"
           >
             <option value="all">All Action Types</option>
             <option value="ALARM_TRIGGER">ALARM_TRIGGER</option>
@@ -64,18 +64,18 @@ export default function AuditTrail() {
           </select>
         </div>
 
-        <div className="ml-auto text-[10px] font-mono text-slate-500 dark:text-zinc-500">
+        <div className="ml-auto text-[10px] font-mono text-emerald-400 font-bold">
           {filteredLogs.length} TRANSACTION ENTRIES LISTED
         </div>
       </div>
 
       {/* Ledger Log Panel */}
-      <div className="glass-panel rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-900 bg-white shadow-sm">
-        <div className="border-b border-slate-200 dark:border-zinc-900 bg-slate-50 dark:bg-zinc-950/60 p-4 flex items-center justify-between">
-          <h3 className="text-xs font-semibold tracking-wide font-mono flex items-center gap-2 text-slate-800 dark:text-zinc-200">
-            <History className="h-4.5 w-4.5 text-emerald-500" /> Immutable Event Journal
+      <div className="rounded-xl overflow-hidden border border-[#252b3b] bg-[#0f1219] shadow-xl">
+        <div className="border-b border-[#252b3b] bg-[#161a24] p-4 flex items-center justify-between">
+          <h3 className="text-xs font-semibold tracking-wide font-mono flex items-center gap-2 text-white">
+            <History className="h-4.5 w-4.5 text-emerald-400" /> Immutable Event Journal
           </h3>
-          <span className="text-[9px] font-mono text-slate-500 dark:text-zinc-500 uppercase">
+          <span className="text-[9.5px] font-mono text-cyan-400 uppercase tracking-widest font-bold">
             SCADA SEED LEVEL 2 LOGS
           </span>
         </div>
@@ -83,52 +83,52 @@ export default function AuditTrail() {
         <div className="max-h-[500px] overflow-y-auto">
           <table className="w-full text-left border-collapse text-xs font-mono">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-zinc-900 bg-slate-50/80 dark:bg-zinc-950/20 text-slate-500 dark:text-zinc-500 sticky top-0 backdrop-blur z-10">
-                <th className="font-semibold p-4">TIMESTAMP</th>
-                <th className="font-semibold p-4">OPERATOR</th>
-                <th className="font-semibold p-4">SITE</th>
-                <th className="font-semibold p-4">ACTION CODE</th>
-                <th className="font-semibold p-4">LOG TRANSACTION SUMMARY</th>
+              <tr className="border-b border-[#252b3b] bg-[#161a24]/90 text-slate-300 sticky top-0 backdrop-blur z-10">
+                <th className="font-bold p-4">TIMESTAMP</th>
+                <th className="font-bold p-4">OPERATOR</th>
+                <th className="font-bold p-4">SITE</th>
+                <th className="font-bold p-4">ACTION CODE</th>
+                <th className="font-bold p-4">LOG TRANSACTION SUMMARY</th>
               </tr>
             </thead>
             <tbody>
               {filteredLogs.map((l: any) => {
-                let badgeStyle = "bg-slate-100 dark:bg-zinc-800/10 text-slate-700 dark:text-zinc-400 border border-slate-200 dark:border-zinc-800";
+                let badgeStyle = "bg-slate-800 text-slate-300 border border-slate-700";
                 if (l.action === "ALARM_TRIGGER") {
-                  badgeStyle = "bg-rose-50 dark:bg-red-500/10 text-rose-700 dark:text-red-500 border border-rose-200 dark:border-red-500/20";
+                  badgeStyle = "bg-red-950/80 text-red-400 border border-red-500/40 font-bold";
                 } else if (l.action === "ALARM_ACKNOWLEDGE") {
-                  badgeStyle = "bg-amber-50 dark:bg-yellow-500/10 text-amber-700 dark:text-yellow-500 border border-amber-200 dark:border-yellow-500/20";
+                  badgeStyle = "bg-amber-950/80 text-amber-300 border border-amber-500/40 font-bold";
                 } else if (l.action === "ALARM_RESOLVE") {
-                  badgeStyle = "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20";
+                  badgeStyle = "bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-bold";
                 } else if (l.action === "MAINTENANCE_SCHEDULE") {
-                  badgeStyle = "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-500 border border-blue-200 dark:border-blue-500/20";
+                  badgeStyle = "bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 font-bold";
                 } else if (l.action === "MAINTENANCE_COMPLETE") {
-                  badgeStyle = "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20";
+                  badgeStyle = "bg-indigo-950/80 text-indigo-300 border border-indigo-500/40 font-bold";
                 }
 
                 return (
                   <tr
                     key={l._id}
-                    className="hover:bg-slate-50 dark:hover:bg-zinc-900/20 border-b border-slate-100 dark:border-zinc-900/40"
+                    className="hover:bg-cyan-500/5 border-b border-white/5 transition-colors"
                   >
-                    <td className="p-4 text-slate-500 dark:text-zinc-500 text-[10px] w-48">
+                    <td className="p-4 text-slate-400 text-[11px] w-48 font-mono">
                       {new Date(l.timestamp).toLocaleString()}
                     </td>
-                    <td className="p-4 text-slate-800 dark:text-zinc-300 font-semibold w-36 truncate">{l.operator}</td>
-                    <td className="p-4 text-slate-600 dark:text-zinc-400 w-44 truncate">{l.plantName}</td>
+                    <td className="p-4 text-white font-bold w-36 truncate">{l.operator}</td>
+                    <td className="p-4 text-cyan-300 w-44 truncate">{l.plantName}</td>
                     <td className="p-4 w-48">
-                      <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${badgeStyle}`}>
+                      <span className={`px-2.5 py-1 rounded text-[9.5px] font-mono ${badgeStyle}`}>
                         {l.action}
                       </span>
                     </td>
-                    <td className="p-4 text-slate-800 dark:text-zinc-300 leading-snug">{l.details}</td>
+                    <td className="p-4 text-slate-200 leading-snug font-sans">{l.details}</td>
                   </tr>
                 );
               })}
 
               {filteredLogs.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-16 text-zinc-500">
+                  <td colSpan={5} className="text-center py-16 text-slate-500 font-mono text-xs">
                     No transactions matched the active query filter tags.
                   </td>
                 </tr>

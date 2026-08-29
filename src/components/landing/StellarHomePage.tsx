@@ -50,7 +50,9 @@ import {
   PackageSearch,
   Filter,
   BookOpen,
-  Copy
+  Copy,
+  HelpCircle,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useForm, ValidationError } from "@formspree/react";
@@ -666,6 +668,234 @@ function DemoFormModal({
   );
 }
 
+// ==================== ENTERPRISE QUESTIONS (FAQ) DATA & RENDERER ====================
+export interface EnterpriseQuestion {
+  id: number;
+  question: string;
+  category: "platform" | "deployment" | "ai" | "roi";
+  categoryName: string;
+  answerText: string;
+  badges?: string[];
+}
+
+export const ENTERPRISE_QUESTIONS_DATA: EnterpriseQuestion[] = [
+  {
+    id: 1,
+    question: "What is SCIO?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "SCIO is an Enterprise Operational Intelligence platform that connects assets, people, enterprise systems, workflows, operational data and AI into a shared operational context.\n\nIt helps organizations move from fragmented signals to evidence-backed decisions, governed actions and continuous operational learning.",
+    badges: ["Operational Intelligence", "Shared Context", "Governed Action"],
+  },
+  {
+    id: 2,
+    question: "Does SCIO replace our existing ERP?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "No.\n\nSCIO can operate alongside existing ERP/EAM platforms such as SAP, Oracle or IBM Maximo. Existing systems can remain the system of record while SCIO adds operational intelligence, cross-system context, AI-powered decision support and workflow orchestration.",
+    badges: ["ERP Side-by-Side", "System of Record Preserved", "Orchestration Layer"],
+  },
+  {
+    id: 3,
+    question: "Can SCIO integrate with SAP, Oracle and IBM Maximo?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "Yes, SCIO is designed to integrate with existing enterprise systems through governed integration boundaries.\n\nDepending on the implementation, SCIO can connect enterprise systems with operational sources such as SCADA, IoT, GIS, inspections, documents and mobile/offline systems.\n\nSpecific connector availability is confirmed during implementation.",
+    badges: ["SAP & Oracle Connectors", "IBM Maximo", "SCADA / IoT / GIS"],
+  },
+  {
+    id: 4,
+    question: "Can SCIO work without replacing our existing software?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "Yes.\n\nThis is one of SCIO's core architectural principles. SCIO can sit as an intelligence and orchestration layer around the systems an organization already uses.",
+    badges: ["Zero Rip-and-Replace", "Wrapper Layer", "Rapid Value"],
+  },
+  {
+    id: 5,
+    question: "Can SCIO be deployed on our own infrastructure?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "Yes, SCIO supports an on-premises deployment model.\n\nSCIO can be deployed within a customer's controlled infrastructure, allowing deployment architecture and data residency to align with the organization's security, compliance and jurisdictional requirements.",
+    badges: ["On-Premises", "Data Residency", "Full Sovereignty"],
+  },
+  {
+    id: 6,
+    question: "Does SCIO support private cloud or hybrid deployment?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "Yes.\n\nSCIO can be architected for:\n• On-premises\n• Private cloud\n• Hybrid environments\n\nThe appropriate model depends on the customer's infrastructure, security policies, operational requirements and data-residency needs.",
+    badges: ["Private Cloud", "Hybrid Environment", "Multi-Region"],
+  },
+  {
+    id: 7,
+    question: "Can SCIO operate in an offline or air-gapped environment?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "SCIO's architecture supports local operation and an offline/air-gapped licensing approach.\n\nProduction offline capabilities should be validated as part of the specific deployment architecture before being committed as a contractual requirement.",
+    badges: ["Air-Gapped Support", "Offline Licensing", "Local Edge Mode"],
+  },
+  {
+    id: 8,
+    question: "What makes SCIO different from another AI platform?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "SCIO is not positioned as simply an AI chatbot or analytics tool.\n\nIt connects:\nAssets + People + Data + ERP + IoT + Documents + Workflows + AI\n\nand preserves relationships between operational events, assets, maintenance, inspections, inventory, suppliers, decisions, approvals and outcomes.\n\nThe goal is to turn isolated information into shared operational context.",
+    badges: ["Full Context Mesh", "Connected Graph", "Beyond Chatbots"],
+  },
+  {
+    id: 9,
+    question: "What can SCIO's AI actually do?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "SCIO can assist with operational intelligence such as:\n• Root-cause analysis\n• Predictive maintenance\n• Document intelligence\n• Inspection intelligence\n• Equipment health analysis\n• Material availability\n• Operational recommendations\n• Workflow assistance\n• Evidence-based decision support\n\nAI recommendations are connected to available operational context and supporting evidence.",
+    badges: ["Root-Cause Analysis", "Predictive Maintenance", "Document & Inspection AI"],
+  },
+  {
+    id: 10,
+    question: "Can SCIO automatically make operational decisions?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "SCIO is designed around governed decision-making rather than unrestricted autonomous action.\n\nDepending on the workflow, recommendations can be reviewed through role-based controls such as:\nApprove → Edit → Escalate → Reject\n\nSensitive operational, financial or safety-related actions can require human approval.",
+    badges: ["Human-in-the-Loop", "Governed Decisions", "Role-Based Approvals"],
+  },
+  {
+    id: 11,
+    question: "Can SCIO automatically control critical machinery?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "SCIO should not be positioned as an autonomous safety-critical control system.\n\nIts core approach is to provide evidence-backed recommendations, governed permissions and controlled human action rather than independently controlling critical machinery.",
+    badges: ["Safety First", "Evidence-Backed", "Human Oversight"],
+  },
+  {
+    id: 12,
+    question: "What industries does SCIO support?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "SCIO is designed around multiple industrial environments, including:\n• Energy & Renewable Energy\n• Manufacturing\n• Maritime\n• Logistics\n\nThe underlying platform services remain consistent while workflows, operational context and use cases adapt to each industry.\n\nFor maritime operations, this can include fleet management, vessel assets, maintenance, spares, procurement, crew readiness, safety inspections and safety equipment.",
+    badges: ["Energy", "Manufacturing", "Maritime", "Logistics"],
+  },
+  {
+    id: 13,
+    question: "Can SCIO include ERP capabilities?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "Yes.\n\nOrganizations can choose between two approaches:\n\n1. SCIO + Existing ERP\nUse the organization's existing ERP/EAM as the system of record while SCIO provides intelligence and orchestration.\n\n2. SCIO + Built-in Operational Modules\nSCIO can provide selected operational/business capabilities such as:\nAssets | Inventory | Suppliers | Procurement | Work Orders | Maintenance | Inspections | Approvals | Documents | Users/Roles | Analytics\n\nThis allows SCIO to adapt to the customer's existing architecture rather than forcing a single deployment model.",
+    badges: ["Dual Approach", "Modular ERP", "Architectural Flexibility"],
+  },
+  {
+    id: 14,
+    question: "How does SCIO protect AI governance?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "SCIO's governed AI approach includes controls such as:\n• Model/version registry\n• Drift monitoring\n• Validation\n• Approval gates\n• Champion/challenger testing\n• Rollback capability\n• Audit trails\n\nThe principle is simple:\nAI recommends. Governance determines what happens.",
+    badges: ["Drift Monitoring", "Audit Trails", "AI Recommends. Governance Determines."],
+  },
+  {
+    id: 15,
+    question: "How does SCIO create measurable business value?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "SCIO does not rely on invented ROI percentages.\n\nThe implementation begins by establishing a baseline and then measuring agreed KPIs. These can include:\n\n• Operations: Availability, MTTR, schedule adherence\n• Cost: Emergency procurement, excess inventory, demurrage, rework\n• Risk: Evidence completeness, overdue controls, approval compliance\n• Intelligence: Alert precision, recommendation acceptance, time-to-evidence, model drift\n\nThe baseline, formula, data owner, source and evaluation period can be defined before measuring improvement.",
+    badges: ["No Invented ROI", "Baseline KPIs", "Empirical Evaluation"],
+  },
+  {
+    id: 16,
+    question: "How is SCIO implemented?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "SCIO follows a phased approach:\nAlign → Connect → Validate → Pilot → Scale\n\nThe initial implementation focuses on one high-value workflow or site. Once KPI, security, integration and adoption requirements are validated, the solution can expand to additional assets, departments, sites and use cases.",
+    badges: ["Phased Rollout", "Align → Connect → Validate → Pilot → Scale"],
+  },
+  {
+    id: 17,
+    question: "How does SCIO handle enterprise security?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "SCIO's architecture includes enterprise controls such as:\nIdentity & Access Control | Encryption | SSO | Least Privilege | Segregation of Duties | Environment Isolation | Audit | Data Governance\n\nSecurity architecture is aligned with the customer's deployment and governance requirements.",
+    badges: ["SSO & RBAC", "End-to-End Encryption", "Segregation of Duties"],
+  },
+  {
+    id: 18,
+    question: "Who owns the data when SCIO is deployed?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "For customer-controlled deployments, the customer's infrastructure, systems, data location and security policies remain under the customer's control.\n\nThe specific data ownership, retention and access arrangements should be defined contractually for each implementation.",
+    badges: ["Customer Data Ownership", "Full Data Control", "Contractual Clarity"],
+  },
+  {
+    id: 19,
+    question: "Can we start with only one site or workflow?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "Yes.\n\nSCIO is designed to start with a focused, high-value operational workflow, establish a measurable baseline, validate the integration and demonstrate the operating loop before scaling across additional sites or use cases.",
+    badges: ["Single Site Start", "Low Risk", "Proven Loop"],
+  },
+  {
+    id: 20,
+    question: "How do we get started with SCIO?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "Start with one operational problem worth solving.\n\nA SCIO engagement can begin by identifying:\nThe site → The workflow → The decision owner → The operational problem → The baseline KPI → The required systems/data\n\nFrom there, SCIO can be evaluated through a controlled implementation or pilot.",
+    badges: ["One Problem First", "Controlled Pilot", "Guided Onboarding"],
+  },
+];
+
+function renderFaqFormattedAnswer(faq: EnterpriseQuestion) {
+  const paragraphs = faq.answerText.split("\n\n");
+  return paragraphs.map((paragraph, idx) => {
+    if (paragraph.startsWith("• ")) {
+      const items = paragraph.split("\n").map(p => p.replace(/^•\s*/, "").trim());
+      return (
+        <ul key={idx} className="space-y-2 pl-1 my-3">
+          {items.map((item, i) => (
+            <li key={i} className="flex items-start gap-2.5 text-slate-300">
+              <span className="text-cyan-400 font-bold shrink-0 mt-0.5">›</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    if (paragraph.includes("→")) {
+      const steps = paragraph.split("→").map(s => s.trim());
+      return (
+        <div key={idx} className="my-3 p-3.5 rounded-xl border border-cyan-500/30 bg-cyan-950/20 flex flex-wrap items-center justify-center gap-2">
+          {steps.map((step, i) => (
+            <React.Fragment key={i}>
+              <span className="px-3 py-1 rounded-lg bg-slate-900 border border-cyan-500/30 text-cyan-300 font-mono text-xs font-bold">
+                {step}
+              </span>
+              {i < steps.length - 1 && (
+                <span className="text-cyan-400 font-black text-sm">→</span>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      );
+    }
+    if (paragraph.includes("AI recommends. Governance determines what happens.")) {
+      return (
+        <div key={idx} className="my-4 p-4 rounded-xl border border-amber-500/40 bg-amber-950/30 text-amber-300 font-mono text-xs font-bold text-center shadow-lg">
+          &ldquo;AI recommends. Governance determines what happens.&rdquo;
+        </div>
+      );
+    }
+    if (paragraph.includes("Assets + People + Data")) {
+      return (
+        <div key={idx} className="my-3 p-3.5 rounded-xl border border-indigo-500/30 bg-indigo-950/30 text-indigo-200 font-mono text-xs font-bold text-center">
+          {paragraph}
+        </div>
+      );
+    }
+    return (
+      <p key={idx} className="leading-relaxed text-slate-300 text-sm font-sans">
+        {paragraph}
+      </p>
+    );
+  });
+}
+
 export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onOpenContact }: StellarHomePageProps) {
   const [mounted, setMounted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -679,6 +909,26 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
   
   // Dashboard Sub-Tab State
   const [dashboardTab, setDashboardTab] = useState("Overview");
+
+  // Enterprise Questions (FAQ) Section State
+  const [faqSearchQuery, setFaqSearchQuery] = useState("");
+  const [faqCategory, setFaqCategory] = useState<"all" | "platform" | "deployment" | "ai" | "roi">("all");
+  const [openFaqIds, setOpenFaqIds] = useState<number[]>([1, 2]);
+
+  const toggleFaq = (id: number) => {
+    setOpenFaqIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const filteredFaqs = ENTERPRISE_QUESTIONS_DATA.filter((faq) => {
+    const matchesCategory = faqCategory === "all" || faq.category === faqCategory;
+    const matchesSearch =
+      faq.question.toLowerCase().includes(faqSearchQuery.toLowerCase()) ||
+      faq.answerText.toLowerCase().includes(faqSearchQuery.toLowerCase()) ||
+      (faq.badges && faq.badges.some((b) => b.toLowerCase().includes(faqSearchQuery.toLowerCase())));
+    return matchesCategory && matchesSearch;
+  });
 
   // Interactive Integration Infographic State
   const [selectedIntegrationSource, setSelectedIntegrationSource] = useState<"erp" | "scada" | "fleet" | "cloud">("erp");
@@ -1236,10 +1486,10 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
         </div>
 
         {/* Right CTA Actions */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0 whitespace-nowrap">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 shrink-0">
           <button
             onClick={onOpenResources}
-            className="hidden lg:inline-flex px-2.5 py-1.5 rounded-full whitespace-nowrap hover:bg-indigo-50 transition-all font-semibold text-indigo-700 hover:text-indigo-900 items-center gap-1.5 border border-indigo-200 bg-white shadow-2xs text-xs shrink-0"
+            className="hidden lg:inline-flex px-2.5 py-1.5 rounded-full whitespace-nowrap hover:bg-indigo-50 transition-all font-semibold text-indigo-700 hover:text-indigo-900 items-center gap-1.5 border border-indigo-200 bg-white shadow-2xs text-xs shrink-0 cursor-pointer"
           >
             <BookOpen className="h-3.5 w-3.5 shrink-0" />
             <span>Case Studies</span>
@@ -1247,7 +1497,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
 
           <button
             onClick={() => setBetaModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-500/50 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 font-sans text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-500/50 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 font-sans text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
           >
             <Sparkles className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
             <span>Join Beta</span>
@@ -1255,7 +1505,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
 
           <button
             onClick={() => setDemoModalOpen(true)}
-            className="hidden sm:inline-flex px-3 py-1.5 rounded-full border border-slate-300 bg-white font-sans text-xs font-semibold text-slate-800 transition-all hover:bg-slate-50 hover:border-slate-400 shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
+            className="hidden md:inline-flex px-3 py-1.5 rounded-full border border-slate-300 bg-white font-sans text-xs font-semibold text-slate-800 transition-all hover:bg-slate-50 hover:border-slate-400 shadow-2xs whitespace-nowrap shrink-0 cursor-pointer"
           >
             Request Demo
           </button>
@@ -1263,36 +1513,35 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
           <a
             href="/?launch=1&industry=energy&tab=energy-dashboard"
             onClick={(e) => handleNavClick(e, "energy", "energy-dashboard")}
-            className="px-3.5 py-1.5 rounded-full font-sans text-xs font-bold shadow-sm flex items-center gap-1.5 transition-all hover:scale-[1.02] bg-[#090D16] text-white hover:bg-slate-900 whitespace-nowrap shrink-0"
+            className="px-3 sm:px-3.5 py-1.5 rounded-full font-sans text-[11px] sm:text-xs font-bold shadow-sm flex items-center gap-1 sm:gap-1.5 transition-all hover:scale-[1.02] bg-[#090D16] text-white hover:bg-slate-900 whitespace-nowrap shrink-0 cursor-pointer"
           >
             <span>Launch Platform</span>
-            <ArrowRight className="h-3.5 w-3.5 opacity-80 shrink-0" />
+            <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 opacity-80 shrink-0" />
           </a>
         </div>
       </nav>
 
       {/* ==================== 2. HERO SECTION (PURE WHITE & HIGH CONTRAST) ==================== */}
-      <section id="top" className="relative pt-16 pb-12 sm:pt-20 sm:pb-16" style={{ background: C.white }}>
-        <div className={`${SHELL} flex flex-col items-start gap-[24px]`}>
+      <section id="top" className="relative pt-12 pb-10 sm:pt-20 sm:pb-16" style={{ background: C.white }}>
+        <div className={`${SHELL} flex flex-col items-start gap-5 sm:gap-[24px]`}>
           
           {/* Eyebrow */}
-          {/* Top Category Eyebrow & Highlighted Tagline Badge */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: EASE }}
-            className="flex flex-wrap items-center gap-3"
+            className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 max-w-full"
           >
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full shrink-0 bg-blue-600 animate-pulse" />
-              <span className="uppercase font-mono font-bold text-[12px] sm:text-[13px] tracking-[2px] text-blue-600">
+              <span className="uppercase font-mono font-bold text-[10px] sm:text-[13px] tracking-[1.5px] sm:tracking-[2px] text-blue-600">
                 SCIO PLATFORM — ENTERPRISE OPERATIONS OS
               </span>
             </div>
 
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full font-mono text-[11px] sm:text-xs font-bold bg-slate-900 text-white dark:bg-emerald-950/80 dark:text-emerald-200 border border-emerald-500/50 shadow-md">
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-              <span>100% Data Sovereignty: Deployed On Your Own On-Premise &amp; Private Cloud Servers</span>
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full font-mono text-[9.5px] sm:text-xs font-bold bg-slate-900 text-white border border-emerald-500/50 shadow-md max-w-full">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+              <span className="truncate">100% Data Sovereignty: Deployed On Your Own Servers</span>
             </div>
           </motion.div>
 
@@ -1303,9 +1552,9 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
             transition={{ duration: 0.65, ease: EASE, delay: 0.1 }}
             className="max-w-[1020px] font-black text-balance"
             style={{
-              fontSize: "clamp(30px, 5.4vw + 6px, 72px)",
-              lineHeight: 1.05,
-              letterSpacing: "-.038em",
+              fontSize: "clamp(26px, 5vw + 4px, 72px)",
+              lineHeight: 1.08,
+              letterSpacing: "-.035em",
               color: C.ink,
             }}
           >
@@ -1317,24 +1566,24 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease: EASE, delay: 0.15 }}
-            className="max-w-[1020px] p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-blue-950 text-white border border-emerald-500/40 shadow-xl flex items-center gap-3.5"
+            className="w-full max-w-[1020px] p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-blue-950 text-white border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3.5"
           >
-            <div className="h-9 w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 text-emerald-400">
-              <ShieldCheck className="h-5 w-5" />
+            <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 text-emerald-400">
+              <ShieldCheck className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
             </div>
             <div className="font-mono text-xs sm:text-sm font-bold tracking-wide leading-relaxed text-emerald-300">
-              <span className="text-white font-extrabold uppercase mr-2 px-2 py-0.5 rounded bg-emerald-500/30 text-[10px] border border-emerald-400/40">Data Sovereignty Guarantee</span>
+              <span className="text-white font-extrabold uppercase mr-2 px-2 py-0.5 rounded bg-emerald-500/30 text-[9.5px] border border-emerald-400/40 inline-block mb-1 sm:mb-0">Data Sovereignty Guarantee</span>
               100% On-Premise &amp; Private Cloud Deployment — Your operational telemetry &amp; business data stay strictly on your own secure servers.
             </div>
           </motion.div>
 
           {/* Lead & CTAs Row */}
-          <div className="flex w-full flex-col items-start justify-between gap-8 pt-[8px] lg:flex-row lg:items-end lg:gap-[120px]">
+          <div className="flex w-full flex-col items-start justify-between gap-5 pt-1 lg:flex-row lg:items-end lg:gap-12">
             <motion.p
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
-              className="max-w-[740px] text-pretty text-base sm:text-lg leading-relaxed font-semibold text-slate-800"
+              className="max-w-[740px] text-pretty text-sm sm:text-lg leading-relaxed font-semibold text-slate-800"
             >
               One intelligent platform to connect your machines, people, inspections, supply chain, and operations &mdash; giving you complete visibility and control across your business.
             </motion.p>
@@ -1343,17 +1592,17 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, ease: EASE, delay: 0.25 }}
-              className="flex flex-wrap items-center gap-3 shrink-0"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full sm:w-auto"
             >
               <button
                 onClick={() => setDemoModalOpen(true)}
-                className="inline-flex items-center justify-center rounded-full px-6 py-3.5 font-mono text-xs sm:text-sm font-bold tracking-wide transition-all hover:scale-[1.02] shadow-md bg-black text-white hover:bg-slate-900"
+                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full px-6 py-3.5 font-mono text-xs sm:text-sm font-bold tracking-wide transition-all hover:scale-[1.02] shadow-md bg-black text-white hover:bg-slate-900 cursor-pointer"
               >
                 Request Enterprise Demo
               </button>
               <button
                 onClick={() => setBetaModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-full px-5 py-3.5 font-mono text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] border-2 border-indigo-600 bg-indigo-50/80 text-indigo-950 shadow-xs hover:bg-indigo-100"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 font-mono text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] border-2 border-indigo-600 bg-indigo-50/80 text-indigo-950 shadow-xs hover:bg-indigo-100 cursor-pointer"
               >
                 <Sparkles className="h-4 w-4 text-indigo-600" />
                 <span>Join Beta Version</span>
@@ -1361,7 +1610,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
               <a
                 href="/?launch=1&industry=energy&tab=energy-dashboard"
                 onClick={(e) => handleNavClick(e, "energy", "energy-dashboard")}
-                className="inline-flex items-center gap-2 rounded-full px-5 py-3.5 font-mono text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] border-2 border-emerald-500 bg-white text-slate-900 shadow-xs hover:bg-emerald-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 font-mono text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] border-2 border-emerald-500 bg-white text-slate-900 shadow-xs hover:bg-emerald-50 cursor-pointer"
               >
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 <span>Launch Live OCC</span>
@@ -3750,6 +3999,216 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
         </div>
       </section>
 
+      {/* ==================== 10.5 ENTERPRISE QUESTIONS (FAQ) ==================== */}
+      <section id="enterprise-questions" className="py-24 border-t" style={{ background: C.night, borderColor: C.lineDark }}>
+        <div className={`${SHELL} space-y-12`}>
+          {/* Section Header */}
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 font-mono text-[11px] font-bold uppercase tracking-widest">
+              <HelpCircle className="h-3.5 w-3.5 text-cyan-400" />
+              <span>Enterprise Questions</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-extrabold font-display tracking-tight text-white">
+              Straight answers for enterprise deployment.
+            </h2>
+            <p className="text-sm sm:text-base text-slate-400 font-sans leading-relaxed">
+              Clear architecture, governance, security, and integration facts for enterprise decision-makers.
+            </p>
+          </div>
+
+          {/* Search & Filter Controls */}
+          <div className="space-y-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-4 items-center">
+              {/* Search input */}
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <input
+                  type="text"
+                  value={faqSearchQuery}
+                  onChange={(e) => setFaqSearchQuery(e.target.value)}
+                  placeholder="Search questions (e.g. SAP, air-gapped, governance, ROI)..."
+                  className="w-full pl-11 pr-10 py-3 rounded-xl border bg-slate-900/80 text-white placeholder-slate-500 font-mono text-xs focus:outline-none focus:border-cyan-500/60 transition-colors"
+                  style={{ borderColor: C.lineDark }}
+                />
+                {faqSearchQuery && (
+                  <button
+                    onClick={() => setFaqSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+
+              {/* Expand / Collapse All */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setOpenFaqIds(filteredFaqs.map((f) => f.id))}
+                  className="px-3.5 py-2.5 rounded-lg border border-white/10 bg-slate-900 text-xs font-mono font-bold text-slate-300 hover:text-white hover:border-white/20 transition-all"
+                >
+                  Expand All
+                </button>
+                <button
+                  onClick={() => setOpenFaqIds([])}
+                  className="px-3.5 py-2.5 rounded-lg border border-white/10 bg-slate-900 text-xs font-mono font-bold text-slate-300 hover:text-white hover:border-white/20 transition-all"
+                >
+                  Collapse All
+                </button>
+              </div>
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {[
+                { id: "all", label: "All Questions", count: 20 },
+                { id: "platform", label: "Platform & ERP", count: 6 },
+                { id: "deployment", label: "Deployment & Security", count: 5 },
+                { id: "ai", label: "AI & Governance", count: 4 },
+                { id: "roi", label: "Value & Implementation", count: 5 },
+              ].map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setFaqCategory(cat.id as any)}
+                  className={`px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-2 border ${
+                    faqCategory === cat.id
+                      ? "bg-cyan-500 text-black border-cyan-400 shadow-lg shadow-cyan-500/20 font-extrabold"
+                      : "bg-slate-900/60 text-slate-300 border-white/10 hover:border-white/25 hover:text-white"
+                  }`}
+                >
+                  <span>{cat.label}</span>
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-[10px] ${
+                      faqCategory === cat.id ? "bg-black/20 text-black font-black" : "bg-white/10 text-slate-400"
+                    }`}
+                  >
+                    {cat.count}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Accordion Questions List */}
+          <div className="max-w-4xl mx-auto space-y-4">
+            {filteredFaqs.length === 0 ? (
+              <div className="p-12 text-center rounded-2xl border border-white/10 bg-slate-900/50 space-y-3">
+                <p className="text-slate-400 font-mono text-sm">
+                  No enterprise questions match your search &quot;{faqSearchQuery}&quot;.
+                </p>
+                <button
+                  onClick={() => {
+                    setFaqSearchQuery("");
+                    setFaqCategory("all");
+                  }}
+                  className="px-4 py-2 bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 rounded-lg font-mono text-xs font-bold hover:bg-cyan-500/30 transition-all"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              filteredFaqs.map((faq) => {
+                const isOpen = openFaqIds.includes(faq.id);
+                return (
+                  <div
+                    key={faq.id}
+                    className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                      isOpen
+                        ? "border-cyan-500/40 bg-slate-900/90 shadow-xl shadow-cyan-500/5"
+                        : "border-white/10 bg-slate-900/40 hover:border-white/20 hover:bg-slate-900/60"
+                    }`}
+                  >
+                    <button
+                      onClick={() => toggleFaq(faq.id)}
+                      className="w-full p-6 text-left flex items-start justify-between gap-4 group"
+                    >
+                      <div className="flex items-start gap-4">
+                        <span className="font-mono font-bold text-xs text-cyan-400/70 pt-0.5 shrink-0">
+                          {faq.id < 10 ? `0${faq.id}` : faq.id}
+                        </span>
+                        <div className="space-y-1">
+                          <span className="inline-block px-2 py-0.5 rounded text-[9.5px] font-mono font-bold uppercase tracking-wider bg-white/5 text-slate-400 border border-white/10 mb-1">
+                            {faq.categoryName}
+                          </span>
+                          <h3 className="font-bold text-base sm:text-lg text-white group-hover:text-cyan-300 transition-colors font-sans">
+                            {faq.question}
+                          </h3>
+                        </div>
+                      </div>
+                      <div
+                        className={`p-2 rounded-lg border shrink-0 transition-transform duration-200 ${
+                          isOpen
+                            ? "bg-cyan-500/10 border-cyan-500/30 text-cyan-400 rotate-180"
+                            : "bg-white/5 border-white/10 text-slate-400"
+                        }`}
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </div>
+                    </button>
+
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: "easeInOut" }}
+                        >
+                          <div className="px-6 pb-6 pt-2 border-t border-white/5 space-y-4 ml-10">
+                            {/* Formatted Answer */}
+                            <div className="space-y-3">
+                              {renderFaqFormattedAnswer(faq)}
+                            </div>
+
+                            {/* Takeaway Badges */}
+                            {faq.badges && faq.badges.length > 0 && (
+                              <div className="pt-3 flex flex-wrap items-center gap-2 border-t border-white/5">
+                                {faq.badges.map((b, i) => (
+                                  <span
+                                    key={i}
+                                    className="px-2.5 py-1 rounded-md text-[10.5px] font-mono font-bold bg-cyan-950/60 text-cyan-300 border border-cyan-500/30 flex items-center gap-1.5"
+                                  >
+                                    <CheckCircle2 className="h-3 w-3 text-cyan-400" />
+                                    <span>{b}</span>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Website Section CTA */}
+          <div className="max-w-4xl mx-auto pt-6">
+            <div className="p-8 sm:p-12 rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/40 text-center space-y-6 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-32 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+                Have a specific operational challenge?
+              </h3>
+
+              <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto font-sans leading-relaxed font-medium">
+                Let&apos;s explore how SCIO can connect your existing systems, operational data and workflows into one governed intelligence layer.
+              </p>
+
+              <div className="pt-2">
+                <button
+                  onClick={() => setDemoModalOpen(true)}
+                  className="px-8 py-3.5 rounded-full font-bold text-xs sm:text-sm font-mono shadow-xl transition-all hover:scale-105 bg-cyan-400 text-black hover:bg-cyan-300 border border-cyan-300"
+                >
+                  Request a SCIO Demo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ==================== 11. CLOSING CTA (DEEP OBSIDIAN BLACK) ==================== */}
       <section className="py-20" style={{ background: C.night, color: C.chalk }}>
         <div className={`${SHELL}`}>
@@ -3831,6 +4290,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
               <a href="#problem" className="hover:text-white transition-colors">The Problem</a>
               <a href="#solution" className="hover:text-white transition-colors">Our Solution</a>
               <a href="#industries" className="hover:text-white transition-colors">4 Industries</a>
+              <a href="#enterprise-questions" className="hover:text-white transition-colors text-cyan-300 font-medium">Enterprise Questions (FAQ)</a>
               <button onClick={onOpenResources} className="text-left hover:text-white transition-colors text-emerald-400 font-bold">Case Studies &amp; Blogs</button>
               <button onClick={onOpenContact} className="text-left hover:text-white transition-colors text-amber-400 font-bold">Contact &amp; Book Briefing</button>
               <button onClick={() => setBetaModalOpen(true)} className="text-left hover:text-white transition-colors text-cyan-400 font-bold flex items-center gap-1.5">

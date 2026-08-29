@@ -84,7 +84,8 @@ html.light {
    ================================================================ */
 @layer base {
   html {
-    transition: background-color 0.15s ease, color 0.15s ease;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
   body {
     background-color: var(--color-background);
@@ -92,6 +93,7 @@ html.light {
     -webkit-font-smoothing: antialiased;
     font-family: var(--font-sans);
     overflow-x: hidden;
+    min-height: 100vh;
   }
 }
 
