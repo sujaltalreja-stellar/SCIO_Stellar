@@ -61,12 +61,23 @@ export default function App() {
   const [mounted, setMounted] = useState<boolean>(false);
   const [isDark, setIsDark] = useState<boolean>(true);
 
+  const normalizeIndustry = (ind?: string | null): string => {
+    if (!ind) return "energy";
+    const lower = ind.toLowerCase().trim();
+    if (lower === "renewable-energy" || lower === "renewables" || lower === "energy" || lower === "grid") return "energy";
+    if (lower === "maritime-fleet" || lower === "maritime" || lower === "fleet") return "maritime";
+    if (lower === "manufacturing-4" || lower === "manufacturing" || lower === "factory") return "manufacturing";
+    if (lower === "supply-chain" || lower === "logistics" || lower === "cold-chain") return "logistics";
+    return lower;
+  };
+
   const handleLaunchPlatform = (industry?: string, tab?: string) => {
-    if (industry) setCurrentIndustry(industry);
+    const targetInd = normalizeIndustry(industry || currentIndustry);
+    setCurrentIndustry(targetInd);
     if (tab) {
       setActiveTab(tab);
     } else {
-      setActiveTab(industry === "energy" ? "energy-dashboard" : "dashboard");
+      setActiveTab(targetInd === "energy" ? "energy-dashboard" : "dashboard");
     }
     setViewMode("platform");
   };
@@ -74,17 +85,45 @@ export default function App() {
   useEffect(() => {
     setMounted(true);
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get("launch") === "1") {
-      const industry = urlParams.get("industry");
-      const tab = urlParams.get("tab");
-      handleLaunchPlatform(industry || undefined, tab || undefined);
-      window.history.replaceState(null, "", window.location.pathname);
-    } else if (urlParams.get("view") === "resources" || urlParams.get("tab") === "resources") {
+    const pathname = window.location.pathname.replace(/^\/+|\/+$/g, "");
+
+    let pathIndustry: string | null = null;
+    if (pathname === "energy" || pathname === "renewable-energy") pathIndustry = "energy";
+    else if (pathname === "maritime" || pathname === "maritime-fleet") pathIndustry = "maritime";
+    else if (pathname === "manufacturing") pathIndustry = "manufacturing";
+    else if (pathname === "logistics" || pathname === "supply-chain") pathIndustry = "logistics";
+
+    const industryParam = urlParams.get("industry") || pathIndustry;
+    const launchParam = urlParams.get("launch");
+    const tabParam = urlParams.get("tab");
+
+    if (launchParam === "1" || industryParam) {
+      const targetIndustry = normalizeIndustry(industryParam);
+      const defaultTab = targetIndustry === "energy" ? "energy-dashboard" : "dashboard";
+      handleLaunchPlatform(targetIndustry, tabParam || defaultTab);
+    } else if (urlParams.get("view") === "resources" || urlParams.get("tab") === "resources" || pathname === "resources") {
       setViewMode("resources");
-    } else if (urlParams.get("view") === "contact" || urlParams.get("tab") === "contact") {
+    } else if (urlParams.get("view") === "contact" || urlParams.get("tab") === "contact" || pathname === "contact") {
       setViewMode("contact");
     }
   }, []);
+
+  // Real-time URL synchronization: keeps the active industry route visible in the browser address bar!
+  useEffect(() => {
+    if (!mounted) return;
+    if (viewMode === "platform") {
+      const params = new URLSearchParams(window.location.search);
+      params.set("industry", currentIndustry);
+      if (activeTab) params.set("tab", activeTab);
+      params.delete("launch");
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, "", newUrl);
+    } else if (viewMode === "landing") {
+      if (window.location.search.includes("industry=") || window.location.search.includes("tab=")) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    }
+  }, [viewMode, currentIndustry, activeTab, mounted]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -911,6 +950,13 @@ export default function App() {
                   </div>
                 </>
               )}
+            </div>
+
+            {/* Active Industry Route Badge */}
+            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-mono">
+              <span className="text-slate-400 dark:text-slate-500">route:</span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">/{currentIndustry}</span>
+              <span className="text-slate-300 dark:text-slate-600">?tab={activeTab}</span>
             </div>
 
             {/* Dynamic Multi-Industry Live Telemetry Beacon */}

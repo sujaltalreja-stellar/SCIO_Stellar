@@ -10,47 +10,47 @@ const nextConfig = {
       },
       {
         source: '/energy',
-        destination: '/industries/energy',
+        destination: '/?industry=energy&tab=energy-dashboard',
         permanent: false,
       },
       {
         source: '/renewable-energy',
-        destination: '/industries/renewable-energy',
+        destination: '/?industry=energy&tab=energy-dashboard',
         permanent: false,
       },
       {
         source: '/maritime',
-        destination: '/industries/maritime',
+        destination: '/?industry=maritime&tab=dashboard',
         permanent: false,
       },
       {
         source: '/maritime-fleet',
-        destination: '/industries/maritime-fleet',
+        destination: '/?industry=maritime&tab=dashboard',
         permanent: false,
       },
       {
         source: '/manufacturing',
-        destination: '/industries/manufacturing',
+        destination: '/?industry=manufacturing&tab=dashboard',
         permanent: false,
       },
       {
         source: '/logistics',
-        destination: '/industries/logistics',
+        destination: '/?industry=logistics&tab=dashboard',
         permanent: false,
       },
       {
         source: '/supply-chain',
-        destination: '/industries/supply-chain',
+        destination: '/?industry=logistics&tab=dashboard',
         permanent: false,
       },
       {
         source: '/platform',
-        destination: '/?launch=1',
+        destination: '/?industry=energy&tab=energy-dashboard',
         permanent: false,
       },
       {
         source: '/dashboard',
-        destination: '/?launch=1',
+        destination: '/?industry=energy&tab=energy-dashboard',
         permanent: false,
       },
       {
