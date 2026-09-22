@@ -2030,10 +2030,19 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
 
                 </div>
 
-                <div className="pt-5 border-t flex items-center justify-between" style={{ borderColor: C.lineLight }}>
-                  <span className="text-xs font-mono text-slate-700 font-bold">
-                    Live data feeds initialized
-                  </span>
+                <div className="pt-5 border-t flex flex-wrap items-center justify-between gap-3" style={{ borderColor: C.lineLight }}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-mono text-slate-700 font-bold">
+                      Live data feeds initialized
+                    </span>
+                    <a
+                      href={`/industries/${currentInd.id}`}
+                      className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      <span>Sector Blueprint</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </a>
+                  </div>
                   <a
                     href={`/?launch=1&industry=${currentInd.id}&tab=${currentInd.tab}`}
                     onClick={(e) => handleNavClick(e, currentInd.id, currentInd.tab)}
@@ -4275,10 +4284,10 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
           <div className="space-y-2.5">
             <h5 className="font-bold uppercase text-[10px] tracking-wider text-white">Solutions</h5>
             <div className="space-y-1.5 flex flex-col">
-              <a href="/?launch=1&industry=energy&tab=energy-dashboard" onClick={(e) => handleNavClick(e, "energy", "energy-dashboard")} className="text-left hover:text-white transition-colors">Renewable Energy</a>
-              <a href="/?launch=1&industry=maritime&tab=dashboard" onClick={(e) => handleNavClick(e, "maritime", "dashboard")} className="text-left hover:text-white transition-colors">Maritime Fleet</a>
-              <a href="/?launch=1&industry=manufacturing&tab=dashboard" onClick={(e) => handleNavClick(e, "manufacturing", "dashboard")} className="text-left hover:text-white transition-colors">Manufacturing 4.0</a>
-              <a href="/?launch=1&industry=logistics&tab=dashboard" onClick={(e) => handleNavClick(e, "logistics", "dashboard")} className="text-left hover:text-white transition-colors">Supply Chain</a>
+              <a href="/industries/energy" className="text-left hover:text-white transition-colors">Renewable Energy</a>
+              <a href="/industries/maritime" className="text-left hover:text-white transition-colors">Maritime Fleet</a>
+              <a href="/industries/manufacturing" className="text-left hover:text-white transition-colors">Manufacturing 4.0</a>
+              <a href="/industries/logistics" className="text-left hover:text-white transition-colors">Supply Chain</a>
             </div>
           </div>
 

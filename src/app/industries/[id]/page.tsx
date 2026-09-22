@@ -11,7 +11,7 @@ import {
   Sparkles,
   TrendingUp
 } from "lucide-react";
-import { getIndustryPage } from "../../../config/industryPages";
+import { getIndustryPage, INDUSTRY_PAGES } from "../../../config/industryPages";
 
 export default function IndustryDetailPage({
   params
@@ -20,10 +20,35 @@ export default function IndustryDetailPage({
 }) {
   const router = useRouter();
   const [industry, setIndustry] = React.useState<ReturnType<typeof getIndustryPage>>(undefined);
+  const [isLoaded, setIsLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    params.then((p) => setIndustry(getIndustryPage(p.id)));
+    params.then((p) => {
+      setIndustry(getIndustryPage(p.id));
+      setIsLoaded(true);
+    });
   }, [params]);
+
+  if (!industry && isLoaded) {
+    return (
+      <div className="min-h-screen bg-[#06080d] text-slate-100 flex flex-col items-center justify-center p-6 text-center font-mono">
+        <h1 className="text-xl font-bold text-rose-400 mb-2">INDUSTRY NOT FOUND</h1>
+        <p className="text-xs text-slate-400 mb-6">Select from our 4 core enterprise industry sectors:</p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {INDUSTRY_PAGES.map((ind) => (
+            <Link
+              key={ind.id}
+              href={`/industries/${ind.id}`}
+              className="px-4 py-2 rounded-lg border border-slate-700 bg-slate-900 hover:bg-slate-800 text-xs font-bold text-white transition-all"
+            >
+              {ind.name}
+            </Link>
+          ))}
+        </div>
+        <Link href="/" className="mt-8 text-xs text-cyan-400 hover:underline">← Back to Overview</Link>
+      </div>
+    );
+  }
 
   if (!industry) {
     return (
@@ -56,17 +81,31 @@ export default function IndustryDetailPage({
           </div>
         </Link>
         <div className="flex items-center gap-3">
-          <Link
-            href="/#industries"
-            className="hidden sm:inline-flex px-4 py-2 rounded-lg border border-slate-700 bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-mono transition-all"
-          >
-            All Industries
-          </Link>
+          <div className="hidden md:flex items-center gap-1.5 border border-slate-800 bg-[#090c14] rounded-lg p-1">
+            {INDUSTRY_PAGES.map((ind) => {
+              const isCurrent = ind.id === industry.id;
+              const TabIcon = ind.icon;
+              return (
+                <Link
+                  key={ind.id}
+                  href={`/industries/${ind.id}`}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-mono transition-all ${
+                    isCurrent
+                      ? "bg-slate-800 text-white font-bold shadow-xs border border-slate-700"
+                      : "text-slate-400 hover:text-white hover:bg-slate-900/60"
+                  }`}
+                >
+                  <TabIcon className="h-3 w-3" />
+                  <span>{ind.name.split(" ")[0]}</span>
+                </Link>
+              );
+            })}
+          </div>
           <button
             onClick={handleLaunch}
             className="px-4 py-2 rounded-lg bg-gradient-to-b from-slate-100 via-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-950 font-bold text-xs font-mono shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center gap-1.5 transition-all"
           >
-            <span>Launch Mission Control</span>
+            <span>Launch Platform</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -77,9 +116,22 @@ export default function IndustryDetailPage({
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#1e293b0a_1px,transparent_1px),linear-gradient(to_bottom,#1e293b0a_1px,transparent_1px)] bg-[size:32px_32px]" />
         <div className={`pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[350px] ${industry.color.replace("text-", "bg-")}/5 blur-[120px]`} />
 
-        <Link href="/#industries" className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors mb-8 relative z-10">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to all industries
-        </Link>
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 relative z-10">
+          <Link href="/#industries" className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors">
+            <ArrowLeft className="h-3.5 w-3.5" /> Back to all industries
+          </Link>
+          <div className="flex md:hidden items-center gap-2 overflow-x-auto pb-1 text-[11px] font-mono">
+            {INDUSTRY_PAGES.map((ind) => (
+              <Link
+                key={ind.id}
+                href={`/industries/${ind.id}`}
+                className={`px-2.5 py-1 rounded border ${ind.id === industry.id ? "border-cyan-500 text-cyan-300 bg-cyan-950/30" : "border-slate-800 text-slate-400"}`}
+              >
+                {ind.name.split(" ")[0]}
+              </Link>
+            ))}
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
           <div className="space-y-6">
