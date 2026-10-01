@@ -80,15 +80,39 @@ export default function GISMapView({ onSelectPlant }: GISMapViewProps) {
           className="h-full w-full"
           scrollWheelZoom={true}
         >
-          {/* CARTO DB Dark Matter / Positron Tile Layer */}
-          <TileLayer
-            key={isLightMode ? "light-tiles" : "dark-tiles"}
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-            url={isLightMode 
-              ? "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-              : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            }
-          />
+          {/* Base & Reference Tile Layers (ESRI Dark/Light Gray Canvas with zero watermark, or CARTO if API key is provided) */}
+          {process.env.NEXT_PUBLIC_CARTO_API_KEY ? (
+            <TileLayer
+              key={isLightMode ? "carto-light" : "carto-dark"}
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url={isLightMode 
+                ? `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}`
+                : `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}`
+              }
+            />
+          ) : (
+            <>
+              <TileLayer
+                key={isLightMode ? "esri-light-base" : "esri-dark-base"}
+                attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, DeLorme, NAVTEQ'
+                url={isLightMode 
+                  ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+                  : "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+                }
+                maxNativeZoom={16}
+                maxZoom={19}
+              />
+              <TileLayer
+                key={isLightMode ? "esri-light-ref" : "esri-dark-ref"}
+                url={isLightMode 
+                  ? "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                  : "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
+                }
+                maxNativeZoom={16}
+                maxZoom={19}
+              />
+            </>
+          )}
 
           {plants.map((p: any) => (
             <Marker

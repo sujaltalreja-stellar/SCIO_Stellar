@@ -59,7 +59,14 @@ export default function App() {
   const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
   const [showCockpitHUD, setShowCockpitHUD] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
-  const [isDark, setIsDark] = useState<boolean>(true);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("scio_theme");
+      if (stored === "dark") return true;
+      if (stored === "light") return false;
+    }
+    return false; // Default pure light mode
+  });
 
   const normalizeIndustry = (ind?: string | null): string => {
     if (!ind) return "energy";
@@ -130,9 +137,11 @@ export default function App() {
     if (isDark) {
       document.documentElement.classList.add('dark');
       document.documentElement.classList.remove('light');
+      try { localStorage.setItem("scio_theme", "dark"); } catch (e) {}
     } else {
       document.documentElement.classList.add('light');
       document.documentElement.classList.remove('dark');
+      try { localStorage.setItem("scio_theme", "light"); } catch (e) {}
     }
   }, [isDark]);
 
