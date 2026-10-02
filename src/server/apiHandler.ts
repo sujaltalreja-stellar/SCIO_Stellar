@@ -4,12 +4,25 @@ import { api } from "../../convex/_generated/api";
 import { generateResponse } from "../lib/ai/chatbotEngine";
 
 function sendJson(res: ServerResponse, statusCode: number, data: any) {
+  if (typeof (res as any).status === "function" && typeof (res as any).json === "function") {
+    return (res as any).status(statusCode).json(data);
+  }
   res.statusCode = statusCode;
   res.setHeader("Content-Type", "application/json");
   res.end(JSON.stringify(data));
 }
 
 function parseJsonBody(req: IncomingMessage): Promise<any> {
+  if ((req as any).body) {
+    if (typeof (req as any).body === "string") {
+      try {
+        return Promise.resolve(JSON.parse((req as any).body));
+      } catch (e) {
+        return Promise.resolve({});
+      }
+    }
+    return Promise.resolve((req as any).body);
+  }
   return new Promise((resolve, reject) => {
     let body = "";
     req.on("data", (chunk) => {

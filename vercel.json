@@ -1,12 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
+  "framework": "vite",
+  "buildCommand": "vite build",
+  "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/((?!api/|_next/|_static/|favicon.ico|.*\\..*).*)",
-      "destination": "/"
+      "source": "/((?!api/|assets/|favicon.ico|.*\\..*).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
