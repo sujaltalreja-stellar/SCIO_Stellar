@@ -31,7 +31,6 @@ import {
   Eye,
   Crosshair
 } from "lucide-react";
-import dynamic from "next/dynamic";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";

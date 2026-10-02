@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" class="light" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stellar SCIO | Autonomous Enterprise Intelligence Platform</title>
+    <meta
+      name="description"
+      content="Next-generation enterprise operations control center for real-time supply chain, maritime, energy, and manufacturing intelligence."
+    />
+    <meta
+      name="keywords"
+      content="Stellar SCIO, Enterprise AI, Supply Chain Intelligence, Maritime Logistics, Energy Grid Control, Predictive Analytics"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- OpenGraph & Twitter -->
+    <meta property="og:title" content="Stellar SCIO | Autonomous Enterprise Intelligence Platform" />
+    <meta
+      property="og:description"
+      content="Next-generation enterprise operations control center for real-time supply chain, maritime, energy, and manufacturing intelligence."
+    />
+    <meta property="og:image" content="/thumbnail.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Stellar SCIO | Autonomous Enterprise Intelligence Platform" />
+    <meta
+      name="twitter:description"
+      content="Next-generation enterprise operations control center for real-time supply chain, maritime, energy, and manufacturing intelligence."
+    />
+    <meta name="twitter:image" content="/thumbnail.png" />
+
+    <!-- Google Fonts Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const cleanExtensionMarkers = () => {
+          root.removeAttribute("data-qb-installed");
+          root.removeAttribute("suppresshydrationwarning");
+        };
+        cleanExtensionMarkers();
+        const observer = new MutationObserver(cleanExtensionMarkers);
+        observer.observe(root, {
+          attributes: true,
+          attributeFilter: ["data-qb-installed", "suppresshydrationwarning"],
+        });
+        window.addEventListener("load", () => observer.disconnect(), { once: true });
+      })();
+    </script>
+  </head>
+  <body class="antialiased min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

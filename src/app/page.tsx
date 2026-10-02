@@ -10,9 +10,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 
-import dynamic from "next/dynamic";
-
-const GISMapView = dynamic(() => import("../components/energy/map/GISMapView"), { ssr: false });
+import GISMapView from "../components/energy/map/GISMapView";
 
 import DashboardOverview from "../components/energy/dashboard/DashboardOverview";
 import PlantDirectory from "../components/energy/plants/PlantDirectory";

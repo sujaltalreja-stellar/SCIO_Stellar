@@ -49,12 +49,7 @@ import {
   Cell,
 } from "recharts";
 
-import dynamic from "next/dynamic";
-
-const MultimodalFleetLiveMap = dynamic(
-  () => import("./MultimodalFleetLiveMap"),
-  { ssr: false, loading: () => <div className="h-96 w-full flex items-center justify-center font-mono text-xs text-white/40">Loading Multimodal GPS GIS Engine...</div> }
-);
+import MultimodalFleetLiveMap from "./MultimodalFleetLiveMap";
 
 interface LogisticsControlCenterProps {
   onNavigate: (tab: string) => void;
