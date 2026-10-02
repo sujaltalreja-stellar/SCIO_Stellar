@@ -4017,7 +4017,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
               <HelpCircle className="h-3.5 w-3.5 text-cyan-400" />
               <span>Enterprise Questions</span>
             </div>
-            <h2 className="text-3xl sm:text-5xl font-extrabold font-display tracking-tight text-white" style={{ color: "#ffffff" }}>
+            <h2 className="text-3xl sm:text-5xl font-extrabold font-display tracking-tight text-white">
               Straight answers for enterprise deployment.
             </h2>
             <p className="text-sm sm:text-base text-slate-400 font-sans leading-relaxed">
@@ -4138,7 +4138,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
                           <span className="inline-block px-2 py-0.5 rounded text-[9.5px] font-mono font-bold uppercase tracking-wider bg-white/5 text-slate-400 border border-white/10 mb-1">
                             {faq.categoryName}
                           </span>
-                          <h3 className="font-bold text-base sm:text-lg text-white group-hover:text-cyan-300 transition-colors font-sans" style={{ color: "#ffffff" }}>
+                          <h3 className="font-bold text-base sm:text-lg text-white group-hover:text-cyan-300 transition-colors font-sans">
                             {faq.question}
                           </h3>
                         </div>

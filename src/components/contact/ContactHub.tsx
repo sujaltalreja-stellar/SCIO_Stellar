@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -19,9 +19,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ExternalLink,
-  MessageSquare,
-  Sun,
-  Moon
+  MessageSquare
 } from "lucide-react";
 import { useForm, ValidationError } from "@formspree/react";
 import ScioSentinelOrb from "../ai/ScioSentinelOrb";
@@ -57,8 +55,8 @@ const SOCIAL_CHANNELS = [
         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
       </svg>
     ),
-    color: "#0284c7",
-    bg: "rgba(2, 132, 199, 0.12)"
+    color: "#E2E8F0",
+    bg: "rgba(255, 255, 255, 0.08)"
   },
   {
     name: "Facebook",
@@ -112,31 +110,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
   const [selectedDate, setSelectedDate] = useState<number>(new Date().getDate() + 1);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>("10:00 AM");
   const [selectedTimezone, setSelectedTimezone] = useState<string>("EST (UTC-5)");
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("scio_theme") === "dark";
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-      document.documentElement.classList.remove("light");
-    } else {
-      document.documentElement.classList.add("light");
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDark]);
-
-  const toggleTheme = () => {
-    setIsDark((prev) => {
-      const next = !prev;
-      localStorage.setItem("scio_theme", next ? "dark" : "light");
-      return next;
-    });
-  };
+  const [bookedDetails, setBookedDetails] = useState<{ email: string; name: string; date: string; time: string } | null>(null);
 
   // Calendar Day Generation (Next 14 Days)
   const today = new Date();
@@ -162,64 +136,46 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white font-sans selection:bg-slate-900 selection:text-white dark:selection:bg-cyan-500 dark:selection:text-black relative overflow-x-hidden transition-colors">
+    <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-cyan-500 selection:text-black relative overflow-x-hidden">
       
       {/* Ambient Lighting Gradients */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-500/5 dark:bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 left-1/3 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[160px] pointer-events-none" />
 
       {/* ==================== 1. TOP EXECUTIVE NAVIGATION ==================== */}
-      <header className="sticky top-0 z-40 border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-slate-950/85 backdrop-blur-2xl px-4 sm:px-8 py-3.5 flex items-center justify-between shadow-xs">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/85 backdrop-blur-2xl px-4 sm:px-8 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={onBackToHome}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 dark:text-white/80 transition-all text-xs font-mono font-bold cursor-pointer shadow-xs"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/80 hover:text-white transition-all text-xs font-mono font-bold cursor-pointer"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             <span>Back to Home</span>
           </button>
 
-          <div className="h-4 w-[1px] bg-slate-200 dark:bg-white/10 hidden sm:block" />
+          <div className="h-4 w-[1px] bg-white/10 hidden sm:block" />
 
           <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-slate-900 text-white dark:bg-white dark:text-black flex items-center justify-center font-mono font-black text-xs shadow-xs">
+            <div className="h-7 w-7 rounded-lg bg-white text-black flex items-center justify-center font-mono font-black text-xs">
               S
             </div>
-            <span className="font-extrabold text-sm tracking-tight text-slate-950 dark:text-white font-display">STELLAR SCIO</span>
-            <span className="hidden sm:inline-block px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200 dark:bg-cyan-500/15 dark:text-cyan-400 dark:border-cyan-500/30">
+            <span className="font-extrabold text-sm tracking-tight text-white font-display">STELLAR SCIO</span>
+            <span className="hidden sm:inline-block px-2 py-0.5 rounded font-mono text-[9px] font-bold uppercase bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
               CONTACT &amp; BRIEFING
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Theme Toggle Pill */}
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300 text-xs font-mono transition-all cursor-pointer shadow-xs"
-          >
-            {isDark ? (
-              <>
-                <Sun className="h-3.5 w-3.5 text-amber-400" />
-                <span className="hidden sm:inline">Light</span>
-              </>
-            ) : (
-              <>
-                <Moon className="h-3.5 w-3.5 text-slate-600" />
-                <span className="hidden sm:inline">Dark</span>
-              </>
-            )}
-          </button>
-
-          <div className="hidden md:flex items-center gap-2 text-xs font-mono text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="hidden md:flex items-center gap-2 text-xs font-mono text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>ENTERPRISE DESK LIVE &bull; RESPONSE &lt; 2 HRS</span>
           </div>
 
           <button
             onClick={() => onLaunchPlatform("energy", "energy-dashboard")}
-            className="px-4 py-1.5 rounded-full font-mono text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-black transition-all flex items-center gap-1.5 shadow-md hover:scale-105 cursor-pointer"
+            className="px-4 py-1.5 rounded-full font-mono text-xs font-bold bg-emerald-500 hover:bg-emerald-400 text-black transition-all flex items-center gap-1.5 shadow-md hover:scale-105 cursor-pointer"
           >
             <span>Launch Platform</span>
             <ArrowRight className="h-3.5 w-3.5" />
@@ -228,20 +184,20 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
       </header>
 
       {/* ==================== 2. HERO HEADER ==================== */}
-      <section className="pt-14 pb-10 px-4 sm:px-8 max-w-7xl mx-auto text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-cyan-500/10 border border-blue-200 dark:border-cyan-500/30 text-blue-700 dark:text-cyan-400 font-mono text-xs font-bold shadow-xs">
+      <section className="pt-16 pb-12 px-4 sm:px-8 max-w-7xl mx-auto text-center space-y-4">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold shadow-xs">
           <MessageSquare className="h-4 w-4" />
           <span>DIRECT ENTERPRISE ENGAGEMENT</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 dark:text-white font-display max-w-4xl mx-auto leading-[1.15]">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white font-display max-w-4xl mx-auto leading-[1.15]">
           Let&apos;s Connect with Our <br className="hidden sm:inline" />
-          <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-cyan-400 dark:via-emerald-400 dark:to-blue-400 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-cyan-400 via-emerald-400 to-blue-400 bg-clip-text text-transparent">
             Enterprise Architecture Team
           </span>
         </h1>
 
-        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed font-sans font-medium">
+        <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed font-sans font-medium">
           Schedule a live architectural briefing, request a custom industrial RFP, or book a guided sandbox walkthrough with our lead engineers.
         </p>
       </section>
@@ -250,23 +206,23 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
       <main className="max-w-7xl mx-auto px-4 sm:px-8 pb-20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* ==================== LEFT COLUMN: MEETING BOOKING CALENDAR (7 COLS) ==================== */}
-        <div className="lg:col-span-7 rounded-3xl border border-slate-200 bg-white dark:border-white/15 dark:bg-slate-900/90 backdrop-blur-2xl p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6">
+        <div className="lg:col-span-7 rounded-3xl border border-white/15 bg-slate-900/90 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl space-y-6">
           
           {/* Calendar Header & Session Selector */}
-          <div className="space-y-4 border-b border-slate-100 dark:border-white/10 pb-6">
+          <div className="space-y-4 border-b border-white/10 pb-6">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-cyan-500/15 border border-blue-200 dark:border-cyan-500/30 text-blue-600 dark:text-cyan-400 flex items-center justify-center font-bold">
+                <div className="h-10 w-10 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center font-bold">
                   <CalendarIcon className="h-5 w-5" />
                 </div>
                 <div>
-                  <h2 className="font-extrabold text-lg sm:text-xl text-slate-950 dark:text-white">Book an Architectural Briefing</h2>
-                  <p className="text-xs font-mono text-slate-500 dark:text-slate-400">Live 1-on-1 Session with Senior Solution Architect</p>
+                  <h2 className="font-extrabold text-lg sm:text-xl text-white">Book an Architectural Briefing</h2>
+                  <p className="text-xs font-mono text-slate-400">Live 1-on-1 Session with Senior Solution Architect</p>
                 </div>
               </div>
 
-              <span className="px-2.5 py-1 rounded font-mono text-[10px] font-bold bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="px-2.5 py-1 rounded font-mono text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>SLOTS OPEN FOR THIS WEEK</span>
               </span>
             </div>
@@ -278,16 +234,16 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                 onClick={() => setMeetingType("discovery")}
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                   meetingType === "discovery"
-                    ? "bg-blue-50 border-blue-500 text-blue-950 shadow-xs dark:bg-cyan-500/15 dark:border-cyan-400 dark:text-white"
-                    : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300 dark:bg-white/[0.03] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
+                    ? "bg-cyan-500/15 border-cyan-400 shadow-md text-white"
+                    : "bg-white/[0.03] border-white/10 text-slate-300 hover:border-white/20"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-[11px] font-bold uppercase text-blue-600 dark:text-cyan-400">30 MIN SESSION</span>
-                  <Zap className="h-4 w-4 text-blue-600 dark:text-cyan-400" />
+                  <span className="font-mono text-[11px] font-bold uppercase text-cyan-400">30 MIN SESSION</span>
+                  <Zap className="h-4 w-4 text-cyan-400" />
                 </div>
-                <h4 className="font-bold text-sm text-slate-950 dark:text-white">Executive Discovery Briefing</h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">High-level architecture, 4-step loop &amp; enterprise ROI roadmap.</p>
+                <h4 className="font-bold text-sm text-white">Executive Discovery Briefing</h4>
+                <p className="text-[11px] text-slate-400 mt-1">High-level architecture, 4-step loop &amp; enterprise ROI roadmap.</p>
               </button>
 
               <button
@@ -295,16 +251,16 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                 onClick={() => setMeetingType("technical")}
                 className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                   meetingType === "technical"
-                    ? "bg-emerald-50 border-emerald-500 text-emerald-950 shadow-xs dark:bg-emerald-500/15 dark:border-emerald-400 dark:text-white"
-                    : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-300 dark:bg-white/[0.03] dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20"
+                    ? "bg-emerald-500/15 border-emerald-400 shadow-md text-white"
+                    : "bg-white/[0.03] border-white/10 text-slate-300 hover:border-white/20"
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-[11px] font-bold uppercase text-emerald-600 dark:text-emerald-400">45 MIN SESSION</span>
-                  <Layers className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-mono text-[11px] font-bold uppercase text-emerald-400">45 MIN SESSION</span>
+                  <Layers className="h-4 w-4 text-emerald-400" />
                 </div>
-                <h4 className="font-bold text-sm text-slate-950 dark:text-white">Technical Deep-Dive Sandbox</h4>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">OPC-UA/Modbus pipeline, FFT harmonics &amp; SAP S/4HANA PM sync.</p>
+                <h4 className="font-bold text-sm text-white">Technical Deep-Dive Sandbox</h4>
+                <p className="text-[11px] text-slate-400 mt-1">OPC-UA/Modbus pipeline, FFT harmonics &amp; SAP S/4HANA PM sync.</p>
               </button>
             </div>
           </div>
@@ -312,8 +268,8 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
           {/* Date Picker Grid */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="font-mono text-xs font-bold uppercase text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                <CalendarIcon className="h-3.5 w-3.5 text-blue-600 dark:text-cyan-400" />
+              <label className="font-mono text-xs font-bold uppercase text-slate-300 flex items-center gap-1.5">
+                <CalendarIcon className="h-3.5 w-3.5 text-cyan-400" />
                 <span>1. Select Date (Upcoming 2 Weeks)</span>
               </label>
 
@@ -321,7 +277,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                 <select
                   value={selectedTimezone}
                   onChange={(e) => setSelectedTimezone(e.target.value)}
-                  className="px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-[11px] font-mono text-slate-800 dark:border-white/10 dark:bg-black/50 dark:text-slate-300 focus:outline-none focus:border-blue-500 dark:focus:border-cyan-400 cursor-pointer shadow-xs"
+                  className="px-2.5 py-1 rounded-lg border border-white/10 bg-black/50 text-[11px] font-mono text-slate-300 focus:outline-none focus:border-cyan-400 cursor-pointer"
                 >
                   <option value="EST (UTC-5)">EST (New York, UTC-5)</option>
                   <option value="UTC (London, UTC+0)">UTC (London, UTC+0)</option>
@@ -343,17 +299,17 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                     onClick={() => setSelectedDate(d.dayNumber)}
                     className={`p-2.5 sm:p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
                       isSelected
-                        ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-black dark:border-white shadow-md scale-105 font-bold"
-                        : "bg-slate-50 border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-slate-100 dark:bg-black/40 dark:border-white/10 dark:text-slate-300 dark:hover:border-cyan-400/50 dark:hover:bg-white/5"
+                        ? "bg-white text-black border-white shadow-lg scale-105 font-bold"
+                        : "bg-black/40 border-white/10 text-slate-300 hover:border-cyan-400/50 hover:bg-white/5"
                     }`}
                   >
-                    <span className={`text-[10px] font-mono uppercase ${isSelected ? "text-slate-300 dark:text-black/70 font-bold" : "text-slate-500"}`}>
+                    <span className={`text-[10px] font-mono uppercase ${isSelected ? "text-black/70 font-bold" : "text-slate-500"}`}>
                       {d.dayName}
                     </span>
                     <span className="text-base sm:text-lg font-black my-0.5">
                       {d.dayNumber}
                     </span>
-                    <span className={`text-[9px] font-mono ${isSelected ? "text-emerald-400 dark:text-emerald-700 font-bold" : "text-slate-400 dark:text-slate-500"}`}>
+                    <span className={`text-[9px] font-mono ${isSelected ? "text-emerald-700 font-bold" : "text-slate-500"}`}>
                       {d.monthName}
                     </span>
                   </button>
@@ -364,8 +320,8 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
 
           {/* Time Slot Picker Grid */}
           <div className="space-y-3">
-            <label className="font-mono text-xs font-bold uppercase text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+            <label className="font-mono text-xs font-bold uppercase text-slate-300 flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 text-emerald-400" />
               <span>2. Select Time Slot ({selectedTimezone})</span>
             </label>
 
@@ -379,8 +335,8 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                     onClick={() => setSelectedTimeSlot(slot)}
                     className={`py-2.5 px-3 rounded-xl border text-center font-mono text-xs font-bold transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-emerald-600 text-white border-emerald-600 dark:bg-emerald-500 dark:text-black dark:border-emerald-400 shadow-md scale-105"
-                        : "bg-slate-50 border-slate-200 text-slate-800 hover:border-emerald-500 hover:bg-emerald-50/50 dark:bg-black/40 dark:border-white/10 dark:text-slate-300 dark:hover:border-emerald-400/50 dark:hover:bg-white/5"
+                        ? "bg-emerald-500 text-black border-emerald-400 shadow-md scale-105"
+                        : "bg-black/40 border-white/10 text-slate-300 hover:border-emerald-400/50 hover:bg-white/5"
                     }`}
                   >
                     {slot}
@@ -391,20 +347,20 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
           </div>
 
           {/* Booking Confirmation Form (Formspree: mrpznygn) */}
-          <div className="pt-4 border-t border-slate-100 dark:border-white/10">
+          <div className="pt-4 border-t border-white/10">
             {bookingState.succeeded ? (
-              <div className="p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-500/15 border border-emerald-200 dark:border-emerald-500/40 text-center space-y-3">
-                <div className="h-12 w-12 rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black mx-auto flex items-center justify-center shadow-md font-bold">
+              <div className="p-6 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-center space-y-3">
+                <div className="h-12 w-12 rounded-full bg-emerald-500 text-black mx-auto flex items-center justify-center shadow-lg font-bold">
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
-                <h4 className="text-lg font-extrabold text-slate-950 dark:text-white">Meeting Confirmed &amp; Logged!</h4>
-                <p className="text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
+                <h4 className="text-lg font-extrabold text-white">Meeting Confirmed &amp; Logged!</h4>
+                <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
                   Your briefing has been scheduled for <strong>Day {selectedDate} at {selectedTimeSlot} ({selectedTimezone})</strong>. A calendar invite with secure Google Meet link has been dispatched via Formspree.
                 </p>
                 <div className="pt-2">
                   <button
                     onClick={() => onLaunchPlatform("energy", "energy-dashboard")}
-                    className="px-4 py-2 rounded-lg font-mono text-xs font-bold bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-black dark:hover:bg-slate-100 shadow-md inline-flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-lg font-mono text-xs font-bold bg-white text-black hover:bg-slate-100 shadow-md inline-flex items-center gap-1.5"
                   >
                     <span>Launch Live Platform in Sandbox</span>
                     <ArrowRight className="h-3.5 w-3.5" />
@@ -419,7 +375,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="booking-name" className="block mb-1 font-mono text-[10px] uppercase text-slate-600 dark:text-white/60 font-bold">
+                    <label htmlFor="booking-name" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
                       Your Full Name
                     </label>
                     <input
@@ -428,12 +384,12 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                       name="name"
                       required
                       placeholder="Dr. Alexander Wright"
-                      className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-slate-900 bg-white border-slate-300 focus:border-blue-500 dark:text-white dark:bg-black/50 dark:border-white/15 dark:focus:border-cyan-400 shadow-xs"
+                      className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white bg-black/50 border-white/15 focus:border-cyan-400"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="booking-email" className="block mb-1 font-mono text-[10px] uppercase text-slate-600 dark:text-white/60 font-bold">
+                    <label htmlFor="booking-email" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
                       Corporate Work Email
                     </label>
                     <input
@@ -442,14 +398,14 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                       name="email"
                       required
                       placeholder="alexander@enterprise.com"
-                      className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-slate-900 bg-white border-slate-300 focus:border-blue-500 dark:text-white dark:bg-black/50 dark:border-white/15 dark:focus:border-cyan-400 shadow-xs"
+                      className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white bg-black/50 border-white/15 focus:border-cyan-400"
                     />
-                    <ValidationError prefix="Email" field="email" errors={bookingState.errors} className="text-red-500 text-[10px] mt-1 font-mono" />
+                    <ValidationError prefix="Email" field="email" errors={bookingState.errors} className="text-red-400 text-[10px] mt-1 font-mono" />
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-1">
-                  <div className="text-[11px] font-mono text-blue-700 dark:text-cyan-400 flex items-center gap-1.5 font-semibold">
+                  <div className="text-[11px] font-mono text-cyan-400 flex items-center gap-1.5">
                     <Clock className="h-3.5 w-3.5" />
                     <span>Selected: Day {selectedDate} &bull; {selectedTimeSlot} ({selectedTimezone})</span>
                   </div>
@@ -457,11 +413,11 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                   <button
                     type="submit"
                     disabled={bookingState.submitting}
-                    className="px-6 py-2.5 font-bold text-xs font-mono rounded-xl shadow-md bg-slate-900 hover:bg-slate-800 text-white dark:bg-cyan-400 dark:hover:bg-cyan-300 dark:text-black transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="px-6 py-2.5 font-bold text-xs font-mono rounded-xl shadow-lg bg-cyan-400 hover:bg-cyan-300 text-black transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {bookingState.submitting ? (
                       <>
-                        <span className="h-3 w-3 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin" />
+                        <span className="h-3 w-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
                         <span>Reserving Slot...</span>
                       </>
                     ) : (
@@ -479,27 +435,27 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
         </div>
 
         {/* ==================== RIGHT COLUMN: CUSTOM INQUIRY FORM (5 COLS) ==================== */}
-        <div className="lg:col-span-5 rounded-3xl border border-slate-200 bg-white dark:border-white/15 dark:bg-slate-900/90 backdrop-blur-2xl p-6 sm:p-8 shadow-md dark:shadow-2xl space-y-6">
+        <div className="lg:col-span-5 rounded-3xl border border-white/15 bg-slate-900/90 backdrop-blur-2xl p-6 sm:p-8 shadow-2xl space-y-6">
           
-          <div className="space-y-1.5 border-b border-slate-100 dark:border-white/10 pb-5">
+          <div className="space-y-1.5 border-b border-white/10 pb-5">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30">
+              <span className="p-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                 <Mail className="h-4 w-4" />
               </span>
-              <h2 className="font-extrabold text-lg sm:text-xl text-slate-950 dark:text-white">Direct RFP &amp; Inquiries</h2>
+              <h2 className="font-extrabold text-lg sm:text-xl text-white">Direct RFP &amp; Inquiries</h2>
             </div>
-            <p className="text-xs font-mono text-slate-500 dark:text-slate-400">
+            <p className="text-xs font-mono text-slate-400">
               Submit custom requirements, telemetry specs, or partnership inquiries.
             </p>
           </div>
 
           {contactState.succeeded ? (
             <div className="py-10 text-center space-y-4">
-              <div className="h-14 w-14 rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black mx-auto flex items-center justify-center shadow-lg font-bold">
+              <div className="h-14 w-14 rounded-full bg-emerald-500 text-black mx-auto flex items-center justify-center shadow-xl font-bold">
                 <CheckCircle2 className="h-7 w-7" />
               </div>
-              <h4 className="text-xl font-bold text-slate-950 dark:text-white">Message Delivered to Formspree</h4>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed max-w-sm mx-auto">
+              <h4 className="text-xl font-bold text-white">Message Delivered to Formspree</h4>
+              <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
                 Thank you. Your inquiry has been routed to the relevant sector practice lead. Expect an official response within 2 hours.
               </p>
             </div>
@@ -509,7 +465,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
               <input type="hidden" name="source" value="Stellar SCIO Contact Hub" />
 
               <div>
-                <label htmlFor="contact-name" className="block mb-1 font-mono text-[10px] uppercase text-slate-600 dark:text-white/60 font-bold">
+                <label htmlFor="contact-name" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
                   Full Name &amp; Title
                 </label>
                 <input
@@ -518,12 +474,12 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                   name="name"
                   required
                   placeholder="e.g. VP of Operations / Chief Engineer"
-                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-slate-900 bg-white border-slate-300 focus:border-emerald-500 dark:text-white dark:bg-black/50 dark:border-white/15 dark:focus:border-emerald-400 shadow-xs"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white bg-black/50 border-white/15 focus:border-emerald-400"
                 />
               </div>
 
               <div>
-                <label htmlFor="contact-email" className="block mb-1 font-mono text-[10px] uppercase text-slate-600 dark:text-white/60 font-bold">
+                <label htmlFor="contact-email" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
                   Corporate Email
                 </label>
                 <input
@@ -532,13 +488,13 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                   name="email"
                   required
                   placeholder="name@enterprise.com"
-                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-slate-900 bg-white border-slate-300 focus:border-emerald-500 dark:text-white dark:bg-black/50 dark:border-white/15 dark:focus:border-emerald-400 shadow-xs"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white bg-black/50 border-white/15 focus:border-emerald-400"
                 />
-                <ValidationError prefix="Email" field="email" errors={contactState.errors} className="text-red-500 text-[10px] mt-1 font-mono" />
+                <ValidationError prefix="Email" field="email" errors={contactState.errors} className="text-red-400 text-[10px] mt-1 font-mono" />
               </div>
 
               <div>
-                <label htmlFor="contact-company" className="block mb-1 font-mono text-[10px] uppercase text-slate-600 dark:text-white/60 font-bold">
+                <label htmlFor="contact-company" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
                   Company / Organization
                 </label>
                 <input
@@ -547,18 +503,18 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                   name="company"
                   required
                   placeholder="e.g. Global Energy Utility / Shipping Line"
-                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-slate-900 bg-white border-slate-300 focus:border-emerald-500 dark:text-white dark:bg-black/50 dark:border-white/15 dark:focus:border-emerald-400 shadow-xs"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white bg-black/50 border-white/15 focus:border-emerald-400"
                 />
               </div>
 
               <div>
-                <label htmlFor="contact-sector" className="block mb-1 font-mono text-[10px] uppercase text-slate-600 dark:text-white/60 font-bold">
+                <label htmlFor="contact-sector" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
                   Operating Sector
                 </label>
                 <select
                   id="contact-sector"
                   name="sector"
-                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-slate-900 bg-white border-slate-300 focus:border-emerald-500 dark:text-white dark:bg-black/50 dark:border-white/15 dark:focus:border-emerald-400 cursor-pointer shadow-xs"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white bg-black/50 border-white/15 focus:border-emerald-400 cursor-pointer"
                 >
                   <option value="Renewable Energy & Utilities">⚡ Renewable Energy &amp; Utilities (12.4 GW)</option>
                   <option value="Maritime Fleet Operations">🚢 Maritime Fleet Operations (28 Ships)</option>
@@ -569,7 +525,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
               </div>
 
               <div>
-                <label htmlFor="contact-message" className="block mb-1 font-mono text-[10px] uppercase text-slate-600 dark:text-white/60 font-bold">
+                <label htmlFor="contact-message" className="block mb-1 font-mono text-[10px] uppercase text-white/60 font-bold">
                   Operational Requirements / Scope
                 </label>
                 <textarea
@@ -578,18 +534,18 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                   rows={3}
                   required
                   placeholder="Describe your current SCADA / ERP landscape, asset count, and primary downtime or inspection challenges..."
-                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-slate-900 bg-white border-slate-300 focus:border-emerald-500 dark:text-white dark:bg-black/50 dark:border-white/15 dark:focus:border-emerald-400 resize-none shadow-xs"
+                  className="w-full px-3.5 py-2.5 border rounded-xl font-mono focus:outline-none text-white bg-black/50 border-white/15 focus:border-emerald-400 resize-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={contactState.submitting}
-                className="w-full py-3 font-bold text-xs font-mono rounded-xl shadow-md bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-500 dark:hover:bg-emerald-400 dark:text-black transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3 font-bold text-xs font-mono rounded-xl shadow-lg bg-emerald-500 hover:bg-emerald-400 text-black transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {contactState.submitting ? (
                   <>
-                    <span className="h-3 w-3 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin" />
+                    <span className="h-3 w-3 border-2 border-black border-t-transparent rounded-full animate-spin" />
                     <span>Transmitting to Formspree...</span>
                   </>
                 ) : (
@@ -600,7 +556,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                 )}
               </button>
 
-              <p className="text-[10.5px] text-center text-slate-500 dark:text-slate-400 font-mono">
+              <p className="text-[10.5px] text-center text-slate-400 font-mono">
                 Formspree Encrypted &bull; NDA Protected &bull; SLA &lt; 2 Hours
               </p>
             </form>
@@ -611,18 +567,18 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
       </main>
 
       {/* ==================== 4. OFFICIAL SOCIAL MEDIA & COMMUNITY CHANNELS ==================== */}
-      <section className="border-t border-slate-200 dark:border-white/10 bg-slate-100/70 dark:bg-slate-900/60 py-16 px-4 sm:px-8">
+      <section className="border-t border-white/10 bg-slate-900/60 py-16 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto space-y-8">
           
           <div className="text-center space-y-2 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-300 dark:bg-white/5 dark:border-white/10 text-slate-800 dark:text-white/80 font-mono text-xs font-bold shadow-xs">
-              <Globe className="h-3.5 w-3.5 text-blue-600 dark:text-cyan-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 font-mono text-xs font-bold">
+              <Globe className="h-3.5 w-3.5" />
               <span>OFFICIAL STELLAR CHANNELS</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white font-display">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
               Connect Across Our Global Network
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-sans">
+            <p className="text-xs sm:text-sm text-slate-400 font-sans">
               Follow our engineering research updates, case studies, and industrial webinars on your preferred platform.
             </p>
           </div>
@@ -635,7 +591,8 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-5 rounded-2xl border border-slate-200 bg-white hover:border-slate-300 dark:border-white/10 dark:bg-slate-950/80 dark:hover:bg-slate-900 transition-all flex flex-col justify-between space-y-4 group hover:scale-[1.03] shadow-xs hover:shadow-md cursor-pointer"
+                className="p-5 rounded-2xl border border-white/10 bg-slate-950/80 hover:bg-slate-900 transition-all flex flex-col justify-between space-y-4 group hover:scale-[1.03] shadow-lg cursor-pointer"
+                style={{ borderColor: "rgba(255, 255, 255, 0.1)" }}
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -645,22 +602,22 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                     >
                       {item.icon}
                     </div>
-                    <ExternalLink className="h-3.5 w-3.5 text-slate-400 dark:text-white/40 group-hover:text-slate-900 dark:group-hover:text-white transition-colors" />
+                    <ExternalLink className="h-3.5 w-3.5 text-white/40 group-hover:text-white transition-colors" />
                   </div>
 
                   <div>
-                    <h3 className="font-extrabold text-sm text-slate-950 dark:text-white group-hover:text-blue-600 dark:group-hover:text-cyan-300 transition-colors">
+                    <h3 className="font-extrabold text-sm text-white group-hover:text-cyan-300 transition-colors">
                       {item.name}
                     </h3>
-                    <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">{item.handle}</p>
+                    <p className="text-[11px] font-mono text-slate-400 mt-0.5">{item.handle}</p>
                   </div>
 
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
+                  <p className="text-xs text-slate-400 font-sans leading-relaxed">
                     {item.description}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] font-mono font-bold" style={{ color: item.color }}>
+                <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono font-bold" style={{ color: item.color }}>
                   <span>Follow Channel</span>
                   <span>→</span>
                 </div>
@@ -672,24 +629,24 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
       </section>
 
       {/* ==================== 5. GLOBAL SUPPORT & HEADQUARTERS ==================== */}
-      <footer className="border-t border-slate-200 dark:border-white/10 bg-white dark:bg-slate-950 py-12 px-4 sm:px-8 text-xs font-mono text-slate-500 dark:text-slate-400">
+      <footer className="border-t border-white/10 bg-slate-950 py-12 px-4 sm:px-8 text-xs font-mono text-slate-400">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <div className="space-y-1.5">
             <div className="flex items-center justify-center md:justify-start gap-2">
-              <div className="h-6 w-6 rounded bg-slate-950 text-white dark:bg-white dark:text-black font-black flex items-center justify-center text-[10px]">
+              <div className="h-6 w-6 rounded bg-white text-black font-black flex items-center justify-center text-[10px]">
                 S
               </div>
-              <span className="font-bold text-slate-950 dark:text-white uppercase tracking-wider">STELLAR SCIO MISSION CONTROL</span>
+              <span className="font-bold text-white uppercase tracking-wider">STELLAR SCIO MISSION CONTROL</span>
             </div>
             <p className="text-[11px] text-slate-500">
-              Direct Contact: <a href="mailto:info@stellarmind.ai" className="text-blue-600 dark:text-cyan-400 hover:underline">info@stellarmind.ai</a> &bull; Support: <a href="mailto:support@stellarmind.ai" className="text-emerald-600 dark:text-emerald-400 hover:underline">support@stellarmind.ai</a>
+              Direct Contact: <a href="mailto:info@stellarmind.ai" className="text-cyan-400 hover:underline">info@stellarmind.ai</a> &bull; Support: <a href="mailto:support@stellarmind.ai" className="text-emerald-400 hover:underline">support@stellarmind.ai</a>
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-slate-500 dark:text-slate-400">
-            <button onClick={onBackToHome} className="hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer">Home</button>
-            <button onClick={onOpenResources} className="hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer">Resources</button>
-            <button onClick={() => onLaunchPlatform("energy", "energy-dashboard")} className="hover:text-slate-950 dark:hover:text-white transition-colors cursor-pointer text-emerald-600 dark:text-emerald-400 font-bold">Platform</button>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-slate-400">
+            <button onClick={onBackToHome} className="hover:text-white transition-colors cursor-pointer">Home</button>
+            <button onClick={onOpenResources} className="hover:text-white transition-colors cursor-pointer">Resources</button>
+            <button onClick={() => onLaunchPlatform("energy", "energy-dashboard")} className="hover:text-white transition-colors cursor-pointer text-emerald-400">Platform</button>
             <span>&copy; 2026 StellarMind.ai</span>
           </div>
         </div>

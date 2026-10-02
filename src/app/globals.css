@@ -8,7 +8,7 @@
    ================================================================ */
 
 :root {
-  /* Dark Cockpit Palette (Default) */
+  /* Obsidian, Steel Grey & Brushed Silver (Dark Default) */
   --color-background: #08090d;
   --color-panel: #0f1219;
   --color-panelLight: #161a24;
@@ -22,7 +22,7 @@
   --color-silver-accent: #cbd5e1;
   --color-silver-glow: rgba(226, 232, 240, 0.15);
 
-  /* Vivid Color Accents */
+  /* Heavy Vivid Color Spectrum */
   --color-electric-cyan: #00f0ff;
   --color-cyber-violet: #a855f7;
   --color-laser-amber: #f59e0b;
@@ -60,12 +60,6 @@ html.light {
   --color-borderMuted: #e2e8f0;
   --color-textMuted: #64748b;
   --color-textBright: #0f172a;
-
-  --color-steel-base: #f8fafc;
-  --color-steel-surface: #ffffff;
-  --color-steel-highlight: #f1f5f9;
-  --color-silver-accent: #475569;
-  --color-silver-glow: rgba(0, 0, 0, 0.05);
 
   --glass-bg: #ffffff;
   --glass-border: #e2e8f0;
@@ -114,12 +108,6 @@ html.light {
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 4px 20px rgba(0, 0, 0, 0.5);
   border-radius: 0.875rem;
 }
-html[data-theme="light"] .cockpit-panel,
-html.light .cockpit-panel {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
-}
 
 /* Brushed Silver Hairline Card */
 .silver-card {
@@ -138,16 +126,6 @@ html.light .cockpit-panel {
   height: 1px;
   background: linear-gradient(90deg, transparent 0%, rgba(226, 232, 240, 0.4) 50%, transparent 100%);
 }
-html[data-theme="light"] .silver-card,
-html.light .silver-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-}
-html[data-theme="light"] .silver-card::before,
-html.light .silver-card::before {
-  background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.2) 50%, transparent 100%);
-}
 
 /* Metallic Badge Plate */
 .chrome-plate {
@@ -155,24 +133,11 @@ html.light .silver-card::before {
   border: 1px solid rgba(203, 213, 225, 0.25);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 4px rgba(0, 0, 0, 0.4);
 }
-html[data-theme="light"] .chrome-plate,
-html.light .chrome-plate {
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  border: 1px solid #cbd5e1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 1px 2px rgba(0, 0, 0, 0.04);
-  color: #0f172a;
-}
 
 .glow-card {
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.06);
   border: 1px solid rgba(148, 163, 184, 0.16);
   background: #11151e;
-}
-html[data-theme="light"] .glow-card,
-html.light .glow-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .card-hover {
@@ -182,11 +147,6 @@ html.light .glow-card {
   transform: translateY(-2px);
   border-color: rgba(203, 213, 225, 0.35);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
-}
-html[data-theme="light"] .card-hover:hover,
-html.light .card-hover:hover {
-  border-color: #cbd5e1;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
 }
 
 /* Animated Beacon */
@@ -213,11 +173,21 @@ html.light .card-hover:hover {
 /* ================================================================
    4. SPECTRUM COLOR ACCENTS & GLOWS
    ================================================================ */
-.glow-cyan { box-shadow: 0 0 16px rgba(0, 240, 255, 0.25); }
-.glow-emerald { box-shadow: 0 0 16px rgba(0, 255, 157, 0.25); }
-.glow-amber { box-shadow: 0 0 16px rgba(245, 158, 11, 0.25); }
-.glow-crimson { box-shadow: 0 0 16px rgba(255, 0, 85, 0.25); }
-.glow-violet { box-shadow: 0 0 16px rgba(168, 85, 247, 0.25); }
+.glow-cyan {
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+}
+.glow-emerald {
+  box-shadow: 0 0 16px rgba(0, 255, 157, 0.25);
+}
+.glow-amber {
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+}
+.glow-crimson {
+  box-shadow: 0 0 16px rgba(255, 0, 85, 0.25);
+}
+.glow-violet {
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.25);
+}
 
 /* ================================================================
    5. THEME TOGGLE PILL
@@ -260,154 +230,56 @@ html.light .theme-toggle-knob {
 }
 
 /* ================================================================
-   6. CLEAN & RELIABLE LIGHT MODE SYSTEM (NO CONFLICTS)
+   6. CLEAN & RELIABLE LIGHT/DARK THEME SYSTEM
    ================================================================ */
 html[data-theme="light"],
 html.light {
   background-color: #f8fafc;
   color: #0f172a;
 
-  /* Surfaces & Containers */
+  /* Surfaces */
+  main,
   .bg-background {
-    background-color: #f8fafc !important;
-  }
-  .bg-panel {
-    background-color: #ffffff !important;
-    border-color: #e2e8f0 !important;
-    color: #0f172a !important;
-  }
-  .bg-panelLight {
-    background-color: #f1f5f9 !important;
-    border-color: #e2e8f0 !important;
-  }
-  .border-borderMuted {
-    border-color: #e2e8f0 !important;
+    background-color: #f8fafc;
   }
 
-  /* Text White Protection: Always pure white when explicitly requested */
-  .text-white,
-  [class*="text-white"] {
-    color: #ffffff !important;
+  /* Headings & Text */
+  .text-textBright {
+    color: #0f172a;
   }
 
-  /* BUTTON PROTECTION: Solid action buttons ALWAYS keep their contrast background and white text */
-  button.bg-slate-900,
-  button.bg-black,
-  button.bg-slate-950,
-  button.bg-zinc-900,
-  button[class*="bg-slate-900"],
-  button[class*="bg-black"],
-  button[class*="bg-slate-950"],
-  button[class*="bg-emerald-600"],
-  button[class*="bg-blue-600"],
-  button[class*="bg-cyan-600"],
-  button[class*="bg-indigo-600"],
-  button[class*="bg-rose-600"],
-  a[class*="bg-slate-900"],
-  a[class*="bg-black"],
-  a[class*="bg-slate-950"] {
-    color: #ffffff !important;
+  .text-textMuted {
+    color: #64748b;
   }
 
-  button.bg-slate-900 *,
-  button.bg-black *,
-  button.bg-slate-950 *,
-  button.bg-zinc-900 *,
-  button[class*="bg-slate-900"] *,
-  button[class*="bg-black"] *,
-  button[class*="bg-slate-950"] *,
-  button[class*="bg-emerald-600"] *,
-  button[class*="bg-blue-600"] *,
-  button[class*="bg-cyan-600"] *,
-  button[class*="bg-indigo-600"] *,
-  button[class*="bg-rose-600"] *,
-  a[class*="bg-slate-900"] *,
-  a[class*="bg-black"] *,
-  a[class*="bg-slate-950"] * {
-    color: #ffffff !important;
+  /* Sidebar */
+  aside.scio-sidebar {
+    background: #ffffff;
+    border-color: #e2e8f0;
   }
 
-  /* Active Sidebar Buttons in Light Mode */
-  aside.scio-sidebar button.bg-slate-900,
-  aside button.bg-slate-900 {
-    background-color: #0f172a !important;
-    color: #ffffff !important;
-  }
-  aside.scio-sidebar button.bg-slate-900 *,
-  aside button.bg-slate-900 * {
-    color: #ffffff !important;
+  aside.scio-sidebar button {
+    color: #475569;
   }
 
-  /* Inactive Sidebar Buttons */
-  aside.scio-sidebar button:not(.bg-slate-900):hover,
-  aside button:not(.bg-slate-900):hover {
-    background-color: #f1f5f9 !important;
-    color: #0f172a !important;
+  aside.scio-sidebar button:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
   }
 
-  /* Inputs & Selects in Light Mode */
+  /* Inputs */
   input:not([type="hidden"]),
   select,
   textarea {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #0f172a !important;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04) !important;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
   }
 
   input::placeholder,
   textarea::placeholder {
-    color: #94a3b8 !important;
+    color: #94a3b8;
   }
-
-  /* Tables in Light Mode */
-  table thead tr {
-    background-color: #f8fafc !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-  }
-
-  table thead th {
-    color: #475569 !important;
-    font-weight: 600 !important;
-  }
-
-  table tbody tr {
-    background-color: #ffffff !important;
-    border-bottom: 1px solid #f1f5f9 !important;
-  }
-
-  table tbody tr:hover {
-    background-color: #f8fafc !important;
-  }
-
-  table tbody td {
-    color: #334155 !important;
-  }
-
-  /* Leaflet Container & Popups in Light Mode */
-  .leaflet-container {
-    background-color: #f1f5f9 !important;
-  }
-  .leaflet-popup-content-wrapper,
-  .leaflet-popup-tip {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #e2e8f0 !important;
-  }
-
-  /* Status Badges & Accents in Light Mode */
-  .text-healthy, .text-emerald-400, .text-emerald-500 { color: #047857 !important; }
-  .bg-healthy\/5, .bg-healthy\/10, .bg-emerald-500\/5, .bg-emerald-500\/10 { background-color: #ecfdf5 !important; }
-  .border-healthy\/20, .border-healthy\/30, .border-emerald-500\/10, .border-emerald-500\/20 { border-color: #a7f3d0 !important; }
-
-  .text-critical, .text-red-400, .text-red-500, .text-rose-400, .text-rose-500 { color: #b91c1c !important; }
-  .bg-critical\/5, .bg-critical\/10, .bg-red-500\/10, .bg-rose-500\/10 { background-color: #fef2f2 !important; }
-  .border-critical\/20, .border-critical\/30, .border-red-500\/20, .border-rose-500\/20 { border-color: #fecaca !important; }
-
-  .text-medium, .text-high, .text-yellow-400, .text-yellow-500, .text-amber-400, .text-amber-500 { color: #b45309 !important; }
-  .bg-medium\/10, .bg-high\/10, .bg-yellow-500\/10, .bg-amber-500\/10 { background-color: #fffbeb !important; }
-  .border-medium\/30, .border-high\/30, .border-yellow-500\/20, .border-amber-500\/20 { border-color: #fde68a !important; }
 }
 
 /* ================================================================

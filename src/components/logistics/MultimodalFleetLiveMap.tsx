@@ -31,6 +31,7 @@ import {
   Eye,
   Crosshair
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -353,27 +354,10 @@ export default function MultimodalFleetLiveMap({
             className="h-full w-full"
             scrollWheelZoom={true}
           >
-            {/* Base & Reference Tile Layers (ESRI Dark Gray Canvas with zero watermark, or CARTO if API key is provided) */}
-            {process.env.NEXT_PUBLIC_CARTO_API_KEY ? (
-              <TileLayer
-                attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
-                url={`https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=${process.env.NEXT_PUBLIC_CARTO_API_KEY}`}
-              />
-            ) : (
-              <>
-                <TileLayer
-                  attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a> &mdash; Esri, DeLorme, NAVTEQ'
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
-                  maxNativeZoom={16}
-                  maxZoom={19}
-                />
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
-                  maxNativeZoom={16}
-                  maxZoom={19}
-                />
-              </>
-            )}
+            <TileLayer
+              attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+            />
 
             {/* Distribution Hub Markers */}
             {showHubs && DISTRIBUTION_HUBS.map(hub => (

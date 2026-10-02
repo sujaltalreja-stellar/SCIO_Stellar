@@ -57,14 +57,7 @@ export default function App() {
   const [selectedPlantId, setSelectedPlantId] = useState<string | null>(null);
   const [showCockpitHUD, setShowCockpitHUD] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("scio_theme");
-      if (stored === "dark") return true;
-      if (stored === "light") return false;
-    }
-    return false; // Default pure light mode
-  });
+  const [isDark, setIsDark] = useState<boolean>(true);
 
   const normalizeIndustry = (ind?: string | null): string => {
     if (!ind) return "energy";
