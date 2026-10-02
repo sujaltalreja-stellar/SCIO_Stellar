@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { generateResponse } from "../../lib/ai/chatbotEngine";
 import {
   X,
   Bot,
@@ -105,6 +106,14 @@ export default function GenerativeVisualCopilot({
       }
 
       let responseText = data.text || "";
+      if (!responseText) {
+        try {
+          const dynamicResult = await generateResponse(currentIndustry, query);
+          responseText = dynamicResult.text || "";
+        } catch (e) {
+          // Continue to fallback visual synthesis
+        }
+      }
       let visual: Message["visual"] | undefined;
 
       const lowerQ = query.toLowerCase();

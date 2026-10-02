@@ -259,76 +259,7 @@ class SectorChatbotIndexCache {
    * Pre-seed high-value industrial knowledge into the inverted index
    */
   private seedDefaultKnowledge() {
-    // HOMEPAGE KNOWLEDGE SEEDS
-    this.store("homepage", "What is Stellar SCIO and what problem does it solve for enterprise operations?", {
-      text: `**Stellar SCIO Platform Overview**:\n\n` +
-        `• **What It Is**: An enterprise AI operations software that unifies industrial machines, sensors, repair logs, and supply chains into a central dashboard.\n` +
-        `• **4 Supported Sectors**: Built natively for **Renewable Energy & Power Grid**, **Maritime Fleet Operations**, **Manufacturing 4.0 Smart Factories**, and **Cold-Chain Logistics**.\n` +
-        `• **Key Problems Solved**: Prevents catastrophic machine breakdowns by predicting failures **14 to 21 days in advance**, eliminates 91% of false alarms, and automates work orders in SAP PM & IBM Maximo.\n` +
-        `• **Proven Business Impact**: Reduces unplanned downtime, increases asset lifespan, and saves **$1.4M to $2.8M annually per site**.`,
-      provider: "Stellar SCIO Platform AI",
-      suggestedAction: { type: "open_beta", label: "Apply for Private Beta Access" }
-    });
-
-    this.store("homepage", "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act.", {
-      text: `**Stellar SCIO 4-Step Process**:\n\n` +
-        `• **1. CONNECT**: Connects live sensor data from PLCs, SCADA, and IoT systems without requiring any hardware replacement.\n` +
-        `• **2. UNDERSTAND**: Combines machine telemetry with equipment manuals, parts lists, and repair history into a live digital twin.\n` +
-        `• **3. PREDICT**: Analyzes machine vibration and temperature trends to catch equipment wear 14 to 21 days before failure.\n` +
-        `• **4. ACT**: Automatically creates maintenance work orders and orders required spare parts in SAP S/4HANA PM and IBM Maximo.`,
-      provider: "Stellar SCIO Platform AI",
-      suggestedAction: { type: "scroll", label: "View How SCIO Works (4 Steps)", payload: "#how-it-works" }
-    });
-
-    this.store("homepage", "Which 4 industries does SCIO support and what are the main features?", {
-      text: `**Stellar SCIO Supported Industries**:\n\n` +
-        `• **Renewable Energy & Power Grid**: Power generation monitoring, wind/solar panel health, and battery storage.\n` +
-        `• **Maritime Fleet Operations**: Live ship GPS tracking, engine status, fuel consumption logs, and safety inspection checklists.\n` +
-        `• **Manufacturing 4.0 & OEE**: Factory OEE tracking across robotic cells, downtime cause analysis, and machine tool wear.\n` +
-        `• **Cold-Chain Logistics**: Temperature tracking for refrigerated containers, shipment delay predictions, and warehouse spare parts stock.`,
-      provider: "Stellar SCIO Platform AI",
-      suggestedAction: { type: "scroll", label: "Explore 4 Sector Hubs", payload: "#industries" }
-    });
-
-    // ENERGY KNOWLEDGE SEEDS
-    this.store("energy", "Check wind turbine gearbox health and vibration monitoring", {
-      text: `**Wind Turbine Health & Diagnostics**:\n\n` +
-        `• **Vibration Analysis**: Monitors generator bearings and gearbox vibration patterns to catch wear weeks before breakdown.\n` +
-        `• **Blade Pitch Drive**: Tracks hydraulic torque spikes and temperature variations to prevent blade pitch jamming.\n` +
-        `• **Generation Output**: Helps sustain optimal power output while protecting mechanical components during heavy wind gusts.`,
-      provider: "Renewable Energy AI Assistant",
-      suggestedAction: { type: "launch_occ", label: "View Renewable Energy Control Tower", payload: { industry: "energy", tab: "energy-dashboard" } }
-    });
-
-    // MARITIME KNOWLEDGE SEEDS
-    this.store("maritime", "How does SCIO track ship fuel levels and consumption?", {
-      text: `**Maritime Fleet Fuel & Bunker Monitoring**:\n\n` +
-        `• **Tank Levels**: Continuous sensor monitoring of fuel tank levels (HFO and MGO) in metric tons.\n` +
-        `• **Daily Fuel Burn Rate**: Compares fuel consumption against vessel speed to recommend fuel-efficient sailing speeds.\n` +
-        `• **Port Bunkering**: Flags refueling needs days before arrival so bunker fuel delivery can be scheduled at the next port berth.`,
-      provider: "Maritime Fleet AI Assistant",
-      suggestedAction: { type: "launch_occ", label: "Launch Maritime Fleet Control Center", payload: { industry: "maritime", tab: "dashboard" } }
-    });
-
-    // MANUFACTURING KNOWLEDGE SEEDS
-    this.store("manufacturing", "Explain how SCIO calculates real-time OEE across Availability, Performance, and Quality", {
-      text: `**Factory OEE Breakdown (91.4%)**:\n\n` +
-        `• **Availability**: Tracks machine uptime vs planned downtime for tool changes or maintenance.\n` +
-        `• **Performance**: Compares actual machine cycle speeds against rated speeds, flagging short conveyor jams and micro-stoppages.\n` +
-        `• **Quality**: Camera vision AI inspects 100% of manufactured parts to isolate defect clusters and stop defective batches.`,
-      provider: "Manufacturing AI Assistant",
-      suggestedAction: { type: "launch_occ", label: "Launch Manufacturing 4.0 Control Center", payload: { industry: "manufacturing", tab: "dashboard" } }
-    });
-
-    // LOGISTICS KNOWLEDGE SEEDS
-    this.store("logistics", "Check live temperature telemetry across all refrigerated reefers for excursion breaches", {
-      text: `**Cold-Chain Container Temperature Control**:\n\n` +
-        `• **Live Temperature Tracking**: IoT sensors transmit core container temperature every 15 seconds across refrigerated reefers.\n` +
-        `• **Temperature Alerts**: Instant alerts trigger when container temperatures drift outside the safe range (-25°C to +4°C).\n` +
-        `• **Shipment Delay Warnings**: Predicts port delays so depot crews can prepare backup generators and protect cargo.`,
-      provider: "Supply Chain AI Assistant",
-      suggestedAction: { type: "launch_occ", label: "Launch Supply Chain Control Center", payload: { industry: "logistics", tab: "dashboard" } }
-    });
+    // Dynamic initialization - knowledge is served dynamically via skillEmbeddings vector engine
   }
 }
 

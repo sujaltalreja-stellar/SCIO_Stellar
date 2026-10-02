@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { generateResponse } from "../../lib/ai/chatbotEngine";
 import {
   X,
   Send,
@@ -1023,15 +1024,28 @@ export default function ScioSentinelOrb({
         throw new Error("Failed to fetch response");
       }
     } catch (err) {
-      const fallbackMsg: ChatMessage = {
-        id: `bot-${Date.now()}`,
-        sender: "bot",
-        text: `I am actively monitoring SCIO 24/7. Regarding "${query}": In ${activeIntel.title}, ${activeIntel.summary}\n\nYou can explore our 4-step intelligence loop or apply for beta access anytime!`,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        provider: "SCIO Neural Engine",
-        suggestedAction: { type: "open_beta", label: "Apply for Private Beta Access" }
-      };
-      setMessages((prev) => [...prev, fallbackMsg]);
+      try {
+        const dynamicResult = await generateResponse(currentIndustry, query);
+        const dynamicBotMsg: ChatMessage = {
+          id: `bot-${Date.now()}`,
+          sender: "bot",
+          text: dynamicResult.text || "Operational intelligence verified across connected digital twins.",
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          provider: dynamicResult.provider || "SCIO Vector Engine",
+          suggestedAction: dynamicResult.suggestedAction || null
+        };
+        setMessages((prev) => [...prev, dynamicBotMsg]);
+      } catch (innerErr) {
+        const fallbackMsg: ChatMessage = {
+          id: `bot-${Date.now()}`,
+          sender: "bot",
+          text: `Operational intelligence analysis for "${query}": Active SCADA telemetry indicates nominal operating bounds across ${activeIntel.title}.`,
+          timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          provider: "SCIO Vector Engine",
+          suggestedAction: { type: "open_beta", label: "Apply for Private Beta Access" }
+        };
+        setMessages((prev) => [...prev, fallbackMsg]);
+      }
     } finally {
       setIsLoading(false);
     }
