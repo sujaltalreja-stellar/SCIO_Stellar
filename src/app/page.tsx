@@ -868,13 +868,13 @@ export default function App() {
       <div className="flex-1 flex flex-col min-w-0 bg-[#F1F5F9]/60 dark:bg-[#08090d] transition-colors">
 
         {/* EXECUTIVE TOP HEADER (ALIGNED WITH HOMEPAGE DESIGN SYSTEM) */}
-        <header className="h-16 border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#090D14]/90 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between relative z-50 shadow-xs transition-colors">
-          <div className="flex items-center space-x-3 sm:space-x-4">
+        <header className="h-16 border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#090D14]/90 backdrop-blur-xl px-3 sm:px-5 flex items-center justify-between gap-3 relative z-50 shadow-xs transition-colors">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
 
             {/* Back to Homepage Gateway */}
             <button
               onClick={() => setViewMode("landing")}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/12 border border-slate-200 dark:border-white/10 rounded-lg text-xs font-medium text-slate-800 dark:text-slate-200 transition-all shadow-2xs cursor-pointer group"
+              className="h-8 flex items-center gap-1.5 px-2.5 sm:px-3 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/12 border border-slate-200 dark:border-white/10 rounded-lg text-xs font-medium text-slate-800 dark:text-slate-200 transition-all shadow-2xs cursor-pointer group whitespace-nowrap shrink-0"
               title="Return to Stellar SCIO Product Homepage"
             >
               <ArrowLeft className="h-3.5 w-3.5 text-slate-500 group-hover:-translate-x-0.5 transition-transform" />
@@ -882,12 +882,12 @@ export default function App() {
             </button>
 
             {/* Industry Selector Dropdown */}
-            <div className="relative z-50">
+            <div className="relative z-50 shrink-0">
               <button
                 onClick={() => setIndustryDropdownOpen(!industryDropdownOpen)}
-                className="flex items-center gap-2 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.08] dark:hover:bg-white/15 border border-slate-200 dark:border-white/12 rounded-lg text-xs font-semibold text-slate-900 dark:text-white transition-all shadow-2xs cursor-pointer"
+                className="h-8 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.08] dark:hover:bg-white/15 border border-slate-200 dark:border-white/12 rounded-lg text-xs font-semibold text-slate-900 dark:text-white transition-all shadow-2xs cursor-pointer whitespace-nowrap shrink-0"
               >
-                <span className="p-1 rounded-md bg-white dark:bg-black/40 shadow-2xs">
+                <span className="p-0.5 rounded-md bg-white dark:bg-black/40 shadow-2xs flex items-center justify-center">
                   {currentIndustry === "energy" && <Zap className="h-3.5 w-3.5 text-emerald-500" />}
                   {currentIndustry === "manufacturing" && <Building2 className="h-3.5 w-3.5 text-amber-500" />}
                   {currentIndustry === "maritime" && <Ship className="h-3.5 w-3.5 text-blue-500" />}
@@ -953,74 +953,81 @@ export default function App() {
             </div>
 
             {/* Active Industry Route Badge */}
-            <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-mono">
+            <div className="hidden lg:flex items-center h-8 gap-1.5 px-2.5 bg-slate-100 dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-mono whitespace-nowrap shrink-0">
               <span className="text-slate-400 dark:text-slate-500">route:</span>
               <span className="font-bold text-emerald-600 dark:text-emerald-400">/{currentIndustry}</span>
-              <span className="text-slate-300 dark:text-slate-600">?tab={activeTab}</span>
+              <span className="hidden 2xl:inline text-slate-400 dark:text-slate-500">?tab={activeTab}</span>
             </div>
 
             {/* Dynamic Multi-Industry Live Telemetry Beacon */}
-            <div className="hidden xl:flex items-center gap-2.5 px-3 py-1.5 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-sans text-slate-700 dark:text-slate-300">
-              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
+            <div className="hidden xl:flex items-center h-8 gap-1.5 sm:gap-2 px-2.5 sm:px-3 bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 rounded-lg text-[11px] font-sans text-slate-700 dark:text-slate-300 whitespace-nowrap shrink-0">
+              <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold shrink-0">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 LIVE
               </span>
               <span className="text-slate-300 dark:text-white/20">/</span>
               {currentIndustry === "energy" && (
-                <span className="font-medium text-slate-700 dark:text-slate-200">
-                  <strong className="text-slate-900 dark:text-white">12.4 GW</strong> Grid Load • <strong className="text-slate-900 dark:text-white">50.02 Hz</strong> • 8 Substations
+                <span className="font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  <strong className="text-slate-900 dark:text-white">12.4 GW</strong>
+                  <span className="hidden 2xl:inline"> Grid Load • <strong className="text-slate-900 dark:text-white">50.02 Hz</strong> • 8 Substations</span>
                 </span>
               )}
               {currentIndustry === "maritime" && (
-                <span className="font-medium text-slate-700 dark:text-slate-200">
-                  <strong className="text-slate-900 dark:text-white">12 Vessels</strong> Active • AIS Satellite Sync • 0 Port Detentions
+                <span className="font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  <strong className="text-slate-900 dark:text-white">12 Vessels</strong>
+                  <span className="hidden 2xl:inline"> Active • AIS Satellite Sync • 0 Port Detentions</span>
                 </span>
               )}
               {currentIndustry === "manufacturing" && (
-                <span className="font-medium text-slate-700 dark:text-slate-200">
-                  <strong className="text-slate-900 dark:text-white">91.4% OEE</strong> • 24 Robotic Cells • 0 Batch Defects
+                <span className="font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  <strong className="text-slate-900 dark:text-white">91.4% OEE</strong>
+                  <span className="hidden 2xl:inline"> • 24 Robotic Cells • 0 Batch Defects</span>
                 </span>
               )}
               {currentIndustry === "logistics" && (
-                <span className="font-medium text-slate-700 dark:text-slate-200">
-                  <strong className="text-slate-900 dark:text-white">142 Reefers</strong> • -21.4°C Avg • 0 Temp Excursions
+                <span className="font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                  <strong className="text-slate-900 dark:text-white">142 Reefers</strong>
+                  <span className="hidden 2xl:inline"> • -21.4°C Avg • 0 Temp Excursions</span>
                 </span>
               )}
-              <span className="text-slate-300 dark:text-white/20">/</span>
-              <span className="font-mono text-[10px] text-slate-400 dark:text-slate-400">14ms latency</span>
+              <span className="hidden 2xl:inline text-slate-300 dark:text-white/20">/</span>
+              <span className="hidden 2xl:inline font-mono text-[10px] text-slate-400 dark:text-slate-400">14ms latency</span>
             </div>
           </div>
 
           {/* Right Action Suite */}
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={() => setShowCockpitHUD(!showCockpitHUD)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border cursor-pointer ${showCockpitHUD
+              className={`h-8 flex items-center gap-1.5 px-2.5 sm:px-3 rounded-lg text-xs font-semibold transition-all border cursor-pointer whitespace-nowrap shrink-0 ${showCockpitHUD
                   ? "bg-blue-50 text-blue-700 border-blue-300 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/40 shadow-xs"
                   : "bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 dark:bg-white/[0.06] dark:text-slate-300 dark:border-white/10 dark:hover:bg-white/12"
                 }`}
+              title="Toggle Industrial Telemetry HUD"
             >
               <Gauge className="h-3.5 w-3.5 text-blue-500" />
-              <span>{showCockpitHUD ? "HUD Active" : "Telemetry HUD"}</span>
+              <span>{showCockpitHUD ? "HUD Active" : <><span className="hidden 2xl:inline">Telemetry </span>HUD</>}</span>
             </button>
 
             <button
               onClick={() => setCopilotOpen(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-black dark:hover:bg-slate-100 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer group"
+              className="h-8 flex items-center gap-1.5 px-2.5 sm:px-3.5 bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-black dark:hover:bg-slate-100 rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer group whitespace-nowrap shrink-0"
+              title="Ask Industrial AI Copilot"
             >
               <Sparkles className="h-3.5 w-3.5 text-cyan-400 dark:text-blue-600 group-hover:scale-110 transition-transform" />
-              <span>Ask AI Copilot</span>
+              <span><span className="hidden 2xl:inline">Ask </span>AI Copilot</span>
             </button>
 
             <button
               onClick={() => setCreateWoModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer"
+              className="h-8 flex items-center gap-1.5 px-2.5 sm:px-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold transition-all shadow-xs cursor-pointer whitespace-nowrap shrink-0"
+              title="Create New Work Order"
             >
               <Plus className="h-3.5 w-3.5 text-white" />
-              <span>New Work Order</span>
+              <span>New <span className="hidden 2xl:inline">Work </span>Order</span>
             </button>
 
-            <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-white/[0.08] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-white/15 transition-colors">
+            <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-white/[0.08] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 flex items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-white/15 transition-colors shrink-0">
               <User className="h-4 w-4" />
             </div>
           </div>

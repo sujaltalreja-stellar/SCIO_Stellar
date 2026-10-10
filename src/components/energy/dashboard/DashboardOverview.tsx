@@ -131,10 +131,10 @@ function Card({
 }) {
   return (
     <div
-      className={`rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-4 sm:p-5 transition-all hover:border-slate-300 dark:hover:border-white/[0.12] shadow-xs dark:shadow-none ${className}`}
+      className={`rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 sm:p-5 transition-all hover:border-white/[0.12] ${className}`}
     >
       <div className="flex items-center justify-between gap-2">
-        <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-slate-900 dark:text-white font-bold sm:text-[11.5px]">
+        <p className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-white/40 sm:text-[11.5px]">
           <span
             className="h-1.5 w-1.5 rounded-full shrink-0"
             style={{ backgroundColor: accentColor }}
@@ -148,7 +148,7 @@ function Card({
   );
 }
 
-// Reusable Meter Bar Component (High Contrast Dark Text in Light Mode, Sleek in Dark Mode)
+// Reusable Meter Bar Component (Matching Control Tower theme)
 function Meter({
   label,
   value,
@@ -166,10 +166,10 @@ function Meter({
 }) {
   return (
     <div className="grid grid-cols-[110px_minmax(0,1fr)_48px] items-center gap-3 sm:grid-cols-[140px_minmax(0,1fr)_56px]">
-      <span className="truncate font-mono text-[11px] text-slate-900 dark:text-white/80 font-bold sm:text-[11.5px]" title={label}>
+      <span className="truncate font-mono text-[11px] text-white/50 sm:text-[11.5px]" title={label}>
         {label}
       </span>
-      <span className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-[#FFFDFA]/[0.06]">
+      <span className="h-1.5 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
         <motion.span
           className="block h-full rounded-full"
           style={{ background: color }}
@@ -178,7 +178,7 @@ function Meter({
           transition={{ duration: 0.8, ease: ENTRANCE, delay }}
         />
       </span>
-      <span className="text-right font-mono text-[11px] text-slate-950 dark:text-white font-black sm:text-[11.5px]">
+      <span className="text-right font-mono text-[11px] text-white/75 sm:text-[11.5px]">
         {display ?? (typeof value === "number" ? `${value}%` : value)}
       </span>
     </div>
@@ -330,20 +330,20 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
   ];
 
   return (
-    <section className="bg-white dark:bg-[#0B0D0F] rounded-2xl border border-slate-200 dark:border-white/[0.08] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-10 shadow-sm dark:shadow-2xl transition-colors">
+    <section className="bg-[#0B0D0F] rounded-2xl border border-white/[0.08] px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-10 shadow-2xl">
       <div className="mx-auto w-full max-w-[1360px] space-y-8">
         
         {/* ==================== 1. TOP HERO SECTION INTRO ==================== */}
-        <div className="flex flex-col justify-between gap-6 border-b border-slate-200 dark:border-white/[0.07] pb-8 xl:flex-row xl:items-end">
+        <div className="flex flex-col justify-between gap-6 border-b border-white/[0.07] pb-8 xl:flex-row xl:items-end">
           <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-50 dark:border-white/[0.09] dark:bg-white/[0.03] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-emerald-800 dark:text-[#10B981] font-bold">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-[#10B981]">
               <Zap className="h-3.5 w-3.5" />
               01 — GRID · UTILITIES & RENEWABLE ENERGY OPERATIONS CONTROL TOWER
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-[#090D16] dark:text-white sm:text-3xl lg:text-4xl">
+            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-4xl">
               One Control Tower for Renewable & Hybrid Grid Assets
             </h1>
-            <p className="max-w-3xl text-sm leading-relaxed text-slate-800 dark:text-white/60 sm:text-[14.5px] font-medium">
+            <p className="max-w-3xl text-sm leading-relaxed text-white/50 sm:text-[14.5px]">
               Centralized, real-time SCADA telemetry into utility solar PV arrays, wind turbine farms, BESS storage banks,
               substation thermals, and automated NERC/IEC trip interlocks — with sub-second node diagnostics behind every number.
             </p>
@@ -352,15 +352,15 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => onSelectPlant("plant_1")}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white shadow-xs dark:shadow-none dark:border-white/[0.12] dark:bg-[#101315] px-4 py-2.5 font-mono text-xs font-bold text-slate-900 dark:text-white/80 transition-all hover:border-[#10B981]/50 hover:bg-[#10B981]/10 hover:text-emerald-800 dark:hover:text-white"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/[0.12] bg-[#101315] px-4 py-2.5 font-mono text-xs font-semibold text-white/80 transition-all hover:border-[#10B981]/50 hover:bg-[#10B981]/10 hover:text-white"
             >
-              <Layers className="h-4 w-4 text-emerald-700 dark:text-[#10B981]" />
+              <Layers className="h-4 w-4 text-[#10B981]" />
               <span>Plant Infrastructure Registry</span>
-              <ArrowUpRight className="h-3.5 w-3.5 opacity-70" />
+              <ArrowUpRight className="h-3.5 w-3.5 opacity-60" />
             </button>
             <button
               onClick={() => onSelectPlant("plant_1")}
-              className="inline-flex items-center gap-2 rounded-xl border border-rose-300 bg-rose-50 dark:border-[#F0526B]/30 dark:bg-[#F0526B]/10 px-4 py-2.5 font-mono text-xs font-bold text-rose-900 dark:text-[#F0526B] transition-all hover:border-rose-400 dark:hover:border-[#F0526B]/60 hover:bg-rose-100 dark:hover:bg-[#F0526B]/20"
+              className="inline-flex items-center gap-2 rounded-xl border border-[#F0526B]/30 bg-[#F0526B]/10 px-4 py-2.5 font-mono text-xs font-semibold text-[#F0526B] transition-all hover:border-[#F0526B]/60 hover:bg-[#F0526B]/20"
             >
               <CircleAlert className="h-4 w-4" />
               <span>2 SCADA Priority Trips</span>
@@ -370,7 +370,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
 
         {/* ==================== 2. MAIN CONTROL TOWER SHELL ==================== */}
         <motion.div
-          className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/[0.07] bg-[#F8FAFC] dark:bg-[#101315] shadow-sm dark:shadow-2xl transition-colors"
+          className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#101315] shadow-2xl"
           variants={stagger(0.08, 0.12)}
           initial="hidden"
           whileInView="visible"
@@ -379,13 +379,13 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
           {/* Sub-Nav Header Bar */}
           <motion.div
             variants={fadeUp}
-            className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-b border-slate-200 dark:border-white/[0.07] bg-[#F1F5F9] dark:bg-[#0E1113] px-4 py-3 sm:px-6 transition-colors"
+            className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-b border-white/[0.07] bg-[#0E1113] px-4 py-3 sm:px-6"
           >
             <div className="flex items-center gap-4">
-              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-slate-950 dark:text-white/60 font-black">
+              <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-white/35">
                 CONTROL TOWER
               </span>
-              <span className="h-3 w-[1px] bg-slate-300 dark:bg-white/[0.1]" />
+              <span className="h-3 w-[1px] bg-white/[0.1]" />
               <div className="flex flex-wrap items-center gap-1 sm:gap-2">
                 {TABS.map((tab) => {
                   const isActive = selectedTab === tab;
@@ -393,17 +393,17 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     <button
                       key={tab}
                       onClick={() => setSelectedTab(tab)}
-                      className={`relative px-3 py-1.5 text-xs font-bold transition-all rounded-md ${
+                      className={`relative px-3 py-1.5 text-xs font-medium transition-all rounded-md ${
                         isActive
-                          ? "text-black bg-white shadow-xs dark:text-white dark:bg-white/[0.06] font-black"
-                          : "text-slate-800 hover:text-black hover:bg-white/80 dark:text-white/50 dark:hover:text-white/80 dark:hover:bg-white/[0.02]"
+                          ? "text-white bg-white/[0.06] font-semibold"
+                          : "text-white/40 hover:text-white/70 hover:bg-white/[0.02]"
                       }`}
                     >
                       {tab}
                       {isActive && (
                         <motion.span
                           layoutId="activeEnergyTabUnderline"
-                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-emerald-600 dark:bg-[#10B981]"
+                          className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-[#10B981]"
                         />
                       )}
                     </button>
@@ -412,10 +412,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
               </div>
             </div>
 
-            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-emerald-800 dark:text-[#2FBF71] font-black">
+            <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[#2FBF71]">
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 dark:bg-[#2FBF71] opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600 dark:bg-[#2FBF71]" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2FBF71] opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2FBF71]" />
               </span>
               <span>Live · Global SCADA Grid Feed · 50 Infra Nodes</span>
             </div>
@@ -438,17 +438,17 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                   {/* Top 4 KPI Metric Cards */}
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                     {/* KPI 1: Total Grid Pool */}
-                    <div className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-slate-300 dark:hover:border-white/[0.14] shadow-xs dark:shadow-none">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-slate-900 dark:text-white/60 font-bold sm:text-[11.5px]">
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
                         Total Grid Pool Capacity
                       </p>
-                      <p className="mt-3 text-[32px] font-black leading-none tracking-[-0.03em] text-black dark:text-white sm:text-[38px]">
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
                         <CountUp to={2.49} decimals={2} />
-                        <span className="text-[18px] font-bold text-slate-800 dark:text-white/55 ml-1">GW</span>
+                        <span className="text-[18px] font-medium text-white/55 ml-1">GW</span>
                       </p>
-                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-slate-200 dark:bg-[#FFFDFA]/[0.06]">
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
                         <motion.span
-                          className="block h-full rounded-full bg-[#06B6D4] dark:bg-[#3FC8D8]"
+                          className="block h-full rounded-full bg-[#3FC8D8]"
                           initial={{ width: 0 }}
                           animate={{ width: "99.9%" }}
                           transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.1 }}
@@ -457,17 +457,17 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     </div>
 
                     {/* KPI 2: Live Generation Output */}
-                    <div className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-slate-300 dark:hover:border-white/[0.14] shadow-xs dark:shadow-none">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-slate-900 dark:text-white/60 font-bold sm:text-[11.5px]">
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
                         Live Generation Output
                       </p>
-                      <p className="mt-3 text-[32px] font-black leading-none tracking-[-0.03em] text-black dark:text-white sm:text-[38px]">
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
                         <CountUp to={livePower} decimals={1} />
-                        <span className="text-[18px] font-bold text-slate-800 dark:text-white/55 ml-1">MW</span>
+                        <span className="text-[18px] font-medium text-white/55 ml-1">MW</span>
                       </p>
-                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-slate-200 dark:bg-[#FFFDFA]/[0.06]">
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
                         <motion.span
-                          className="block h-full rounded-full bg-[#10B981] dark:bg-[#2FBF71]"
+                          className="block h-full rounded-full bg-[#2FBF71]"
                           initial={{ width: 0 }}
                           animate={{ width: `${loadFactor}%` }}
                           transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.2 }}
@@ -476,17 +476,17 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     </div>
 
                     {/* KPI 3: Fleet MTBF & Reliability */}
-                    <div className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-slate-300 dark:hover:border-white/[0.14] shadow-xs dark:shadow-none">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-slate-900 dark:text-white/60 font-bold sm:text-[11.5px]">
+                    <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/40 sm:text-[11.5px]">
                         Fleet Reliability Factor
                       </p>
-                      <p className="mt-3 text-[32px] font-black leading-none tracking-[-0.03em] text-black dark:text-white sm:text-[38px]">
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
                         <CountUp to={fleetHealth} decimals={1} />
-                        <span className="text-[18px] font-bold text-slate-800 dark:text-white/55 ml-0.5">%</span>
+                        <span className="text-[18px] font-medium text-white/55 ml-0.5">%</span>
                       </p>
-                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-slate-200 dark:bg-[#FFFDFA]/[0.06]">
+                      <span className="mt-4 block h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
                         <motion.span
-                          className="block h-full rounded-full bg-[#7C3AED] dark:bg-[#8B5CF6]"
+                          className="block h-full rounded-full bg-[#8B5CF6]"
                           initial={{ width: 0 }}
                           animate={{ width: `${fleetHealth}%` }}
                           transition={{ duration: 0.8, ease: ENTRANCE, delay: 0.3 }}
@@ -495,15 +495,14 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     </div>
 
                     {/* KPI 4: Active SCADA Priority Alarms */}
-                    <div className="rounded-xl border border-rose-300 bg-rose-50/80 dark:border-[#F0526B]/30 dark:bg-[#F0526B]/[0.07] p-4 shadow-xs dark:shadow-none">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-rose-900 dark:text-[#F0526B]/80 font-bold sm:text-[11.5px]">
+                    <div className="rounded-xl border border-[#F0526B]/30 bg-[#F0526B]/[0.07] p-4">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-[#F0526B]/80 sm:text-[11.5px]">
                         Grid Alarm Incidents
                       </p>
-                      <p className="mt-3 text-[32px] font-black leading-none tracking-[-0.03em] text-rose-950 dark:text-white sm:text-[38px]">
+                      <p className="mt-3 text-[32px] font-semibold leading-none tracking-[-0.03em] text-white sm:text-[38px]">
                         <CountUp to={2} />
-                        <span className="text-[18px] font-bold text-rose-800 dark:text-white/55 ml-1">Active</span>
                       </p>
-                      <p className="mt-3 font-mono text-[11px] text-rose-900 dark:text-[#F0526B] font-bold sm:text-[11.5px]">
+                      <p className="mt-3 font-mono text-[11px] text-[#F0526B] sm:text-[11.5px]">
                         1 IGBT junction overheat · 1 Yaw offset discrepancy
                       </p>
                     </div>
@@ -539,22 +538,22 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                                 <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.05}/>
                               </linearGradient>
                             </defs>
-                            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-300 dark:text-white/[0.05]" vertical={false} />
-                            <XAxis dataKey="date" stroke="currentColor" className="text-slate-900 dark:text-white/40 font-bold" fontSize={10.5} tickLine={false} />
-                            <YAxis stroke="currentColor" className="text-slate-900 dark:text-white/40 font-bold" fontSize={10.5} tickLine={false} axisLine={false} />
+                            <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-white/[0.05]" vertical={false} />
+                            <XAxis dataKey="date" stroke="currentColor" className="text-white/40" fontSize={10.5} tickLine={false} />
+                            <YAxis stroke="currentColor" className="text-white/40" fontSize={10.5} tickLine={false} axisLine={false} />
                             <Tooltip
                               contentStyle={{
-                                backgroundColor: "var(--color-panel, #FFFFFF)",
-                                borderColor: "var(--color-borderMuted, #E2E8F0)",
+                                backgroundColor: "#101315",
+                                borderColor: "rgba(255, 255, 255, 0.1)",
                                 borderRadius: "10px",
                                 fontSize: "11px",
                                 fontFamily: "monospace",
-                                color: "var(--color-textBright, #090D16)",
-                                boxShadow: "0 4px 20px rgba(0,0,0,0.12)"
+                                color: "#FFFFFF",
+                                boxShadow: "0 4px 20px rgba(0,0,0,0.5)"
                               }}
                             />
-                            <Area type="monotone" dataKey="solar" name="Solar" stroke="#D97706" strokeWidth={2} fillOpacity={1} fill="url(#colorSolarE)" />
-                            <Area type="monotone" dataKey="wind" name="Wind" stroke="#0891B2" strokeWidth={2} fillOpacity={1} fill="url(#colorWindE)" />
+                            <Area type="monotone" dataKey="solar" name="Solar" stroke="#F59E0B" strokeWidth={2} fillOpacity={1} fill="url(#colorSolarE)" />
+                            <Area type="monotone" dataKey="wind" name="Wind" stroke="#06B6D4" strokeWidth={2} fillOpacity={1} fill="url(#colorWindE)" />
                             <Area type="monotone" dataKey="bess" name="BESS" stroke="#7C3AED" strokeWidth={2} fillOpacity={1} fill="url(#colorBessE)" />
                           </AreaChart>
                         </ResponsiveContainer>
@@ -574,7 +573,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                               r="15.915"
                               fill="transparent"
                               stroke="currentColor"
-                              className="text-slate-200 dark:text-white/[0.05]"
+                              className="text-white/[0.05]"
                               strokeWidth="4"
                             />
                             {GENERATION_MIX.map((item, index) => {
@@ -609,10 +608,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                           </svg>
                           <span className="absolute inset-0 grid place-items-center text-center">
                             <span>
-                              <span className="block text-[19px] font-black leading-none text-black dark:text-white">
+                              <span className="block text-[19px] font-bold leading-none text-white">
                                 <CountUp to={2488} />
                               </span>
-                              <span className="mt-1 block font-mono text-[9.5px] uppercase tracking-[0.14em] text-slate-800 dark:text-white/40 font-bold">
+                              <span className="mt-1 block font-mono text-[9.5px] uppercase tracking-[0.14em] text-white/40">
                                 MW Total
                               </span>
                             </span>
@@ -627,9 +626,9 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                                   className="h-2 w-2 shrink-0 rounded-full"
                                   style={{ background: item.color }}
                                 />
-                                <span className="truncate text-slate-900 dark:text-white/80 font-bold">{item.label}</span>
+                                <span className="truncate text-white/80">{item.label}</span>
                               </span>
-                              <span className="font-mono text-black dark:text-white font-black">
+                              <span className="font-mono text-white font-semibold">
                                 {item.value} MW ({item.percent}%)
                               </span>
                             </li>
@@ -645,7 +644,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                       title="Cluster Availability & SCADA Readiness"
                       accentColor="#10B981"
                       badge={
-                        <span className="font-mono text-[10.5px] uppercase tracking-wider text-slate-900 dark:text-white/60 font-bold">
+                        <span className="font-mono text-[10.5px] uppercase tracking-wider text-white/60">
                           42 of 50 Online
                         </span>
                       }
@@ -668,7 +667,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                       title="AI SCADA Sensor & Anomaly Detection Precision"
                       accentColor="#06B6D4"
                       badge={
-                        <span className="font-mono text-[10.5px] uppercase tracking-wider text-cyan-900 dark:text-[#3FC8D8]/80 font-bold">
+                        <span className="font-mono text-[10.5px] uppercase tracking-wider text-[#3FC8D8]/80">
                           SCIO PowerOps Engine v4.2
                         </span>
                       }
@@ -693,13 +692,13 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     {FOOTER_CARDS.map((card) => (
                       <div
                         key={card.label}
-                        className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-slate-300 dark:hover:border-white/[0.14] shadow-xs dark:shadow-none"
+                        className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]"
                       >
-                        <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-slate-900 dark:text-white/50 font-bold sm:text-[11.5px]">
+                        <p className="font-mono text-[11px] uppercase tracking-[0.13em] text-white/50 sm:text-[11.5px]">
                           {card.label}
                         </p>
                         <p className="mt-3 flex items-baseline gap-2">
-                          <span className="text-[25px] font-black leading-none text-black dark:text-white">
+                          <span className="text-[25px] font-semibold leading-none text-white">
                             {card.value}
                           </span>
                           <span
@@ -709,7 +708,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                             {card.highlight}
                           </span>
                         </p>
-                        <p className="mt-2.5 text-[12px] leading-relaxed text-slate-800 dark:text-white/50 font-medium">
+                        <p className="mt-2.5 text-[12px] leading-relaxed text-white/50">
                           {card.body}
                         </p>
                       </div>
@@ -731,11 +730,11 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                   <div className="grid gap-4 sm:grid-cols-3">
                     <Card title="Grid Frequency Stability" accentColor="#10B981">
                       <div className="mt-3">
-                        <span className="text-[30px] font-black font-mono text-black dark:text-white">
+                        <span className="text-[30px] font-semibold font-mono text-white">
                           {gridFreq.toFixed(2)}
                         </span>
-                        <span className="text-xs text-slate-800 dark:text-white/50 font-mono font-bold ml-1">Hz</span>
-                        <p className="mt-1 text-xs text-emerald-800 dark:text-[#2FBF71] font-mono font-bold">
+                        <span className="text-xs text-white/50 font-mono ml-1">Hz</span>
+                        <p className="mt-1 text-xs text-[#2FBF71] font-mono">
                           Nominal Corridor: 49.95 - 50.05 Hz
                         </p>
                       </div>
@@ -743,11 +742,11 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
 
                     <Card title="Voltage Interconnection (HV)" accentColor="#06B6D4">
                       <div className="mt-3">
-                        <span className="text-[30px] font-black font-mono text-black dark:text-white">
+                        <span className="text-[30px] font-semibold font-mono text-white">
                           500.2
                         </span>
-                        <span className="text-xs text-slate-800 dark:text-white/50 font-mono font-bold ml-1">kV</span>
-                        <p className="mt-1 text-xs text-cyan-800 dark:text-[#3FC8D8] font-mono font-bold">
+                        <span className="text-xs text-white/50 font-mono ml-1">kV</span>
+                        <p className="mt-1 text-xs text-[#3FC8D8] font-mono">
                           Phase Balance: 99.8% Sym
                         </p>
                       </div>
@@ -755,11 +754,11 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
 
                     <Card title="Power Factor (Cos φ)" accentColor="#7C3AED">
                       <div className="mt-3">
-                        <span className="text-[30px] font-black font-mono text-black dark:text-white">
+                        <span className="text-[30px] font-semibold font-mono text-white">
                           0.98
                         </span>
-                        <span className="text-xs text-slate-800 dark:text-white/50 font-mono font-bold ml-1">Inductive</span>
-                        <p className="mt-1 text-xs text-violet-800 dark:text-[#8B5CF6] font-mono font-bold">
+                        <span className="text-xs text-white/50 font-mono ml-1">Inductive</span>
+                        <p className="mt-1 text-xs text-[#8B5CF6] font-mono">
                           Reactive Power: 18.4 MVAr
                         </p>
                       </div>
@@ -787,22 +786,22 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                               <stop offset="95%" stopColor="#7C3AED" stopOpacity={0}/>
                             </linearGradient>
                           </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-slate-300 dark:text-white/[0.05]" />
-                          <XAxis dataKey="date" stroke="currentColor" className="text-slate-900 dark:text-white/40 font-bold" fontSize={11} />
-                          <YAxis stroke="currentColor" className="text-slate-900 dark:text-white/40 font-bold" fontSize={11} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="text-white/[0.05]" />
+                          <XAxis dataKey="date" stroke="currentColor" className="text-white/40" fontSize={11} />
+                          <YAxis stroke="currentColor" className="text-white/40" fontSize={11} />
                           <Tooltip
                             contentStyle={{
-                              backgroundColor: "var(--color-panel, #FFFFFF)",
-                              borderColor: "var(--color-borderMuted, #E2E8F0)",
+                              backgroundColor: "#101315",
+                              borderColor: "rgba(255, 255, 255, 0.1)",
                               borderRadius: "10px",
                               fontSize: "11px",
                               fontFamily: "monospace",
-                              color: "var(--color-textBright, #090D16)",
-                              boxShadow: "0 4px 20px rgba(0,0,0,0.12)"
+                              color: "#FFFFFF",
+                              boxShadow: "0 4px 20px rgba(0,0,0,0.5)"
                             }}
                           />
-                          <Area type="monotone" dataKey="solar" name="Solar PV" stroke="#D97706" strokeWidth={2.2} fillOpacity={1} fill="url(#colSolarFull)" />
-                          <Area type="monotone" dataKey="wind" name="Wind Fleet" stroke="#0891B2" strokeWidth={2.2} fillOpacity={1} fill="url(#colWindFull)" />
+                          <Area type="monotone" dataKey="solar" name="Solar PV" stroke="#F59E0B" strokeWidth={2.2} fillOpacity={1} fill="url(#colSolarFull)" />
+                          <Area type="monotone" dataKey="wind" name="Wind Fleet" stroke="#06B6D4" strokeWidth={2.2} fillOpacity={1} fill="url(#colWindFull)" />
                           <Area type="monotone" dataKey="bess" name="BESS Battery" stroke="#7C3AED" strokeWidth={2.2} fillOpacity={1} fill="url(#colBessFull)" />
                         </AreaChart>
                       </ResponsiveContainer>
@@ -834,10 +833,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                       </div>
                     }
                   >
-                    <div className="mt-4 p-4 rounded-xl bg-slate-50 dark:bg-[#080A0D] border border-slate-200 dark:border-white/[0.05]">
-                      <div className="flex items-center justify-between mb-3 text-xs font-mono text-slate-900 dark:text-white/70 border-b border-slate-200 dark:border-white/[0.05] pb-2 font-bold">
+                    <div className="mt-4 p-4 rounded-xl bg-[#080A0D] border border-white/[0.05]">
+                      <div className="flex items-center justify-between mb-3 text-xs font-mono text-white/70 border-b border-white/[0.05] pb-2 font-bold">
                         <span>24-BAND FFT SPECTRUM (20Hz - 28kHz) · LIVE 96.0 kS/s</span>
-                        <span className="text-emerald-800 dark:text-[#2FBF71] font-black">ACOUSTIC BEARING SIGNATURE: NOMINAL</span>
+                        <span className="text-[#2FBF71] font-black">ACOUSTIC BEARING SIGNATURE: NOMINAL</span>
                       </div>
 
                       {/* Precision Slim Bars Container */}
@@ -851,11 +850,11 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                               className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer"
                               title={`${freqLabel}: ${amp}% amplitude`}
                             >
-                              <span className="opacity-0 group-hover:opacity-100 text-[9px] font-mono text-black dark:text-white transition-opacity font-black">
+                              <span className="opacity-0 group-hover:opacity-100 text-[9px] font-mono text-white transition-opacity font-bold">
                                 {amp}%
                               </span>
                               
-                              <div className="w-full max-w-[14px] bg-slate-200/90 dark:bg-white/[0.04] rounded-t-[2px] overflow-hidden flex flex-col justify-end h-4/5">
+                              <div className="w-full max-w-[14px] bg-white/[0.04] rounded-t-[2px] overflow-hidden flex flex-col justify-end h-4/5">
                                 <div
                                   className="w-full rounded-t-[2px] transition-all duration-300"
                                   style={{
@@ -866,7 +865,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                                 />
                               </div>
 
-                              <span className="text-[8.5px] font-mono text-slate-900 dark:text-white/45 truncate max-w-[24px] font-bold">
+                              <span className="text-[8.5px] font-mono text-white/45 truncate max-w-[24px]">
                                 {freqLabel}
                               </span>
                             </div>
@@ -881,23 +880,23 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     {thermalZones.map((zone) => (
                       <div
                         key={zone.name}
-                        className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-slate-300 dark:hover:border-white/[0.14] shadow-xs dark:shadow-none"
+                        className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-4 transition-all hover:border-white/[0.14]"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-mono text-[11px] text-slate-900 dark:text-white/60 uppercase tracking-wider font-bold">
+                          <span className="font-mono text-[11px] text-white/60 uppercase tracking-wider">
                             {zone.name}
                           </span>
                           <Flame className="h-3.5 w-3.5" style={{ color: zone.color }} />
                         </div>
                         <div className="mt-3">
-                          <span className="text-2xl font-black font-mono text-black dark:text-white">
+                          <span className="text-2xl font-black font-mono text-white">
                             {zone.temp.toFixed(1)}°C
                           </span>
-                          <span className="text-xs font-mono ml-2 font-black" style={{ color: zone.color }}>
+                          <span className="text-xs font-mono ml-2 font-bold" style={{ color: zone.color }}>
                             {zone.status}
                           </span>
                         </div>
-                        <div className="mt-3 h-1 overflow-hidden rounded-full bg-slate-200 dark:bg-[#FFFDFA]/[0.06]">
+                        <div className="mt-3 h-1 overflow-hidden rounded-full bg-[#FFFDFA]/[0.06]">
                           <div
                             className="h-full rounded-full"
                             style={{
@@ -906,7 +905,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                             }}
                           />
                         </div>
-                        <p className="mt-2 text-[10px] font-mono text-slate-800 dark:text-white/40 font-bold">
+                        <p className="mt-2 text-[10px] font-mono text-white/40">
                           Threshold: {zone.limit}
                         </p>
                       </div>
@@ -925,44 +924,44 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                   transition={{ duration: 0.3 }}
                   className="space-y-4"
                 >
-                  <div className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-5 shadow-xs dark:shadow-none">
-                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-white/[0.07] pb-4">
+                  <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/[0.07] pb-4">
                       <div>
-                        <h3 className="text-sm font-black text-black dark:text-white">
+                        <h3 className="text-sm font-semibold text-white">
                           IEC 61850 SCADA Priority Alarms
                         </h3>
-                        <p className="text-xs text-slate-800 dark:text-white/50 mt-0.5 font-medium">
+                        <p className="text-xs text-white/50 mt-0.5">
                           Real-time substation bus events, inverter thermal trips, and automated interlocks
                         </p>
                       </div>
-                      <span className="px-2.5 py-1 rounded-full border border-rose-300 bg-rose-50 dark:border-[#F0526B]/30 dark:bg-[#F0526B]/10 font-mono text-[10px] text-rose-900 dark:text-[#F0526B] font-bold uppercase">
+                      <span className="px-2.5 py-1 rounded-full border border-[#F0526B]/30 bg-[#F0526B]/10 font-mono text-[10px] text-[#F0526B] font-bold uppercase">
                         2 Critical / High Active
                       </span>
                     </div>
 
-                    <div className="mt-4 divide-y divide-slate-200 dark:divide-white/[0.05]">
+                    <div className="mt-4 divide-y divide-white/[0.05]">
                       <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-rose-300 bg-rose-50 dark:border-[#F0526B]/30 dark:bg-[#F0526B]/10 text-rose-700 dark:text-[#F0526B]">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#F0526B]/30 bg-[#F0526B]/10 text-[#F0526B]">
                             <ShieldAlert className="h-4 w-4" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm text-black dark:text-white">
+                              <span className="font-semibold text-sm text-white">
                                 Mojave Solar One - Inverter Array #04
                               </span>
-                              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-rose-100 text-rose-900 border border-rose-300 dark:bg-[#F0526B]/15 dark:text-[#F0526B] dark:border-[#F0526B]/30 font-black">
+                              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#F0526B]/15 text-[#F0526B] border border-[#F0526B]/30 font-bold uppercase">
                                 CRITICAL
                               </span>
                             </div>
-                            <p className="text-xs text-slate-800 dark:text-white/50 mt-0.5 font-medium">
+                            <p className="text-xs text-white/50 mt-0.5">
                               IGBT Junction Overheat · 84.2°C (14.2°C above nominal safety margin)
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => onSelectPlant("plant_1")}
-                          className="font-mono text-xs text-emerald-800 dark:text-[#10B981] hover:underline flex items-center gap-1 shrink-0 font-bold"
+                          className="font-mono text-xs text-[#10B981] hover:underline flex items-center gap-1 shrink-0 font-medium"
                         >
                           <span>Inspect Plant Details</span>
                           <ChevronRight className="h-3.5 w-3.5" />
@@ -971,26 +970,26 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
 
                       <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-300 bg-amber-50 dark:border-[#E8A33D]/30 dark:bg-[#E8A33D]/10 text-amber-700 dark:text-[#E8A33D]">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#E8A33D]/30 bg-[#E8A33D]/10 text-[#E8A33D]">
                             <AlertTriangle className="h-4 w-4" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm text-black dark:text-white">
+                              <span className="font-semibold text-sm text-white">
                                 Roscoe Wind Farm - Turbine #12
                               </span>
-                              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-300 dark:bg-[#E8A33D]/15 dark:text-[#E8A33D] dark:border-[#E8A33D]/30 font-black">
+                              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#E8A33D]/15 text-[#E8A33D] border border-[#E8A33D]/30 font-bold uppercase">
                                 WARNING
                               </span>
                             </div>
-                            <p className="text-xs text-slate-800 dark:text-white/50 mt-0.5 font-medium">
+                            <p className="text-xs text-white/50 mt-0.5">
                               Yaw Discrepancy · 0.8° offset relative to anemometer vector
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => onSelectPlant("plant_2")}
-                          className="font-mono text-xs text-emerald-800 dark:text-[#10B981] hover:underline flex items-center gap-1 shrink-0 font-bold"
+                          className="font-mono text-xs text-[#10B981] hover:underline flex items-center gap-1 shrink-0 font-medium"
                         >
                           <span>Inspect Plant Details</span>
                           <ChevronRight className="h-3.5 w-3.5" />
@@ -999,26 +998,26 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
 
                       <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-violet-300 bg-violet-50 dark:border-[#8B5CF6]/30 dark:bg-[#8B5CF6]/10 text-violet-700 dark:text-[#8B5CF6]">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#8B5CF6]/30 bg-[#8B5CF6]/10 text-[#8B5CF6]">
                             <Activity className="h-4 w-4" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm text-black dark:text-white">
+                              <span className="font-semibold text-sm text-white">
                                 Moss Landing Storage - BESS Rack B2
                               </span>
-                              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-violet-100 text-violet-900 border border-violet-300 dark:bg-[#8B5CF6]/15 dark:text-[#8B5CF6] dark:border-[#8B5CF6]/30 font-black">
+                              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#8B5CF6]/15 text-[#8B5CF6] border border-[#8B5CF6]/30 font-bold uppercase">
                                 ADVISORY
                               </span>
                             </div>
-                            <p className="text-xs text-slate-800 dark:text-white/50 mt-0.5 font-medium">
+                            <p className="text-xs text-white/50 mt-0.5">
                               Cell ΔV Imbalance · 18mV variance during fast peak discharge cycle
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => onSelectPlant("plant_3")}
-                          className="font-mono text-xs text-emerald-800 dark:text-[#10B981] hover:underline flex items-center gap-1 shrink-0 font-bold"
+                          className="font-mono text-xs text-[#10B981] hover:underline flex items-center gap-1 shrink-0 font-medium"
                         >
                           <span>Inspect Plant Details</span>
                           <ChevronRight className="h-3.5 w-3.5" />
@@ -1040,10 +1039,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                   className="grid gap-6 lg:grid-cols-2"
                 >
                   {/* Top Generating Infrastructure */}
-                  <div className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-5 shadow-xs dark:shadow-none">
-                    <div className="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-white/[0.07] pb-3">
-                      <h3 className="text-sm font-black text-black dark:text-white">Top Generating Infrastructure</h3>
-                      <span className="font-mono text-[10px] text-emerald-900 dark:text-[#2FBF71] bg-emerald-100 dark:bg-[#2FBF71]/10 px-2 py-0.5 rounded border border-emerald-300 dark:border-[#2FBF71]/20 font-black uppercase">
+                  <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-5">
+                    <div className="flex items-center justify-between mb-4 border-b border-white/[0.07] pb-3">
+                      <h3 className="text-sm font-semibold text-white">Top Generating Infrastructure</h3>
+                      <span className="font-mono text-[10px] text-[#2FBF71] bg-[#2FBF71]/10 px-2 py-0.5 rounded border border-[#2FBF71]/20 uppercase font-bold">
                         LIVE DISPATCH
                       </span>
                     </div>
@@ -1051,37 +1050,37 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs font-mono">
                         <thead>
-                          <tr className="border-b border-slate-200 dark:border-white/[0.07] text-slate-900 dark:text-white/60 font-black">
-                            <th className="pb-2 font-black">PLANT NAME</th>
-                            <th className="pb-2 font-black">TYPE</th>
-                            <th className="pb-2 text-right font-black">CAPACITY</th>
-                            <th className="pb-2 text-right font-black">OUTPUT</th>
-                            <th className="pb-2 text-right font-black">ACTION</th>
+                          <tr className="border-b border-white/[0.07] text-white/60">
+                            <th className="pb-2 font-semibold">PLANT NAME</th>
+                            <th className="pb-2 font-semibold">TYPE</th>
+                            <th className="pb-2 text-right font-semibold">CAPACITY</th>
+                            <th className="pb-2 text-right font-semibold">OUTPUT</th>
+                            <th className="pb-2 text-right font-semibold">ACTION</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-200/80 dark:divide-white/[0.04]">
+                        <tbody className="divide-y divide-white/[0.04]">
                           {topPlants.map((p: any) => (
-                            <tr key={p._id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-all">
-                              <td className="font-bold text-black dark:text-white py-3">{p.name}</td>
+                            <tr key={p._id} className="hover:bg-white/[0.02] transition-all">
+                              <td className="font-semibold text-white py-3">{p.name}</td>
                               <td className="py-3">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                                   p.type === "solar"
-                                    ? "bg-amber-100 text-amber-950 border border-amber-300 dark:bg-[#E8A33D]/15 dark:text-[#E8A33D] dark:border-[#E8A33D]/30"
+                                    ? "bg-[#E8A33D]/15 text-[#E8A33D] border border-[#E8A33D]/30"
                                     : p.type === "wind"
-                                    ? "bg-cyan-100 text-cyan-950 border border-cyan-300 dark:bg-[#3FC8D8]/15 dark:text-[#3FC8D8] dark:border-[#3FC8D8]/30"
-                                    : "bg-violet-100 text-violet-950 border border-violet-300 dark:bg-[#8B5CF6]/15 dark:text-[#8B5CF6] dark:border-[#8B5CF6]/30"
+                                    ? "bg-[#3FC8D8]/15 text-[#3FC8D8] border border-[#3FC8D8]/30"
+                                    : "bg-[#8B5CF6]/15 text-[#8B5CF6] border border-[#8B5CF6]/30"
                                 }`}>
                                   {p.type}
                                 </span>
                               </td>
-                              <td className="text-right py-3 text-slate-900 dark:text-white/60 font-bold">{p.capacity} MW</td>
-                              <td className="text-right text-emerald-800 dark:text-[#2FBF71] py-3 font-black">
+                              <td className="text-right py-3 text-white/60">{p.capacity} MW</td>
+                              <td className="text-right text-[#2FBF71] py-3 font-semibold">
                                 {p.currentPower ? p.currentPower.toFixed(1) : p.capacity} MW
                               </td>
                               <td className="text-right py-3">
                                 <button
                                   onClick={() => onSelectPlant(p._id)}
-                                  className="text-slate-700 hover:text-black dark:text-white/40 dark:hover:text-white"
+                                  className="text-white/40 hover:text-white"
                                 >
                                   <ChevronRight className="h-4 w-4 ml-auto" />
                                 </button>
@@ -1094,10 +1093,10 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                   </div>
 
                   {/* Underperforming & Risk Sites */}
-                  <div className="rounded-xl border border-slate-200/90 dark:border-white/[0.07] bg-white dark:bg-[#FFFDFA]/[0.02] p-5 shadow-xs dark:shadow-none">
-                    <div className="flex items-center justify-between mb-4 border-b border-slate-200 dark:border-white/[0.07] pb-3">
-                      <h3 className="text-sm font-black text-black dark:text-white">Underperforming & Risk Sites</h3>
-                      <span className="font-mono text-[10px] text-rose-900 dark:text-[#F0526B] bg-rose-100 dark:bg-[#F0526B]/10 px-2 py-0.5 rounded border border-rose-300 dark:border-[#F0526B]/20 font-black uppercase">
+                  <div className="rounded-xl border border-white/[0.07] bg-[#FFFDFA]/[0.02] p-5">
+                    <div className="flex items-center justify-between mb-4 border-b border-white/[0.07] pb-3">
+                      <h3 className="text-sm font-semibold text-white">Underperforming & Risk Sites</h3>
+                      <span className="font-mono text-[10px] text-[#F0526B] bg-[#F0526B]/10 px-2 py-0.5 rounded border border-[#F0526B]/20 uppercase font-bold">
                         INTERVENTION QUEUE
                       </span>
                     </div>
@@ -1105,39 +1104,39 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse text-xs font-mono">
                         <thead>
-                          <tr className="border-b border-slate-200 dark:border-white/[0.07] text-slate-900 dark:text-white/60 font-black">
-                            <th className="pb-2 font-black">PLANT NAME</th>
-                            <th className="pb-2 font-black">TYPE</th>
-                            <th className="pb-2 text-right font-black">HEALTH</th>
-                            <th className="pb-2 text-right font-black">STATUS</th>
-                            <th className="pb-2 text-right font-black">ACTION</th>
+                          <tr className="border-b border-white/[0.07] text-white/60">
+                            <th className="pb-2 font-semibold">PLANT NAME</th>
+                            <th className="pb-2 font-semibold">TYPE</th>
+                            <th className="pb-2 text-right font-semibold">HEALTH</th>
+                            <th className="pb-2 text-right font-semibold">STATUS</th>
+                            <th className="pb-2 text-right font-semibold">ACTION</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-200/80 dark:divide-white/[0.04]">
+                        <tbody className="divide-y divide-white/[0.04]">
                           {strugglingPlants.map((p: any) => (
-                            <tr key={p._id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-all">
-                              <td className="font-bold text-black dark:text-white py-3">{p.name}</td>
+                            <tr key={p._id} className="hover:bg-white/[0.02] transition-all">
+                              <td className="font-semibold text-white py-3">{p.name}</td>
                               <td className="py-3">
-                                <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                                   p.type === "solar"
-                                    ? "bg-amber-100 text-amber-950 border border-amber-300 dark:bg-[#E8A33D]/15 dark:text-[#E8A33D] dark:border-[#E8A33D]/30"
+                                    ? "bg-[#E8A33D]/15 text-[#E8A33D] border border-[#E8A33D]/30"
                                     : p.type === "wind"
-                                    ? "bg-cyan-100 text-cyan-950 border border-cyan-300 dark:bg-[#3FC8D8]/15 dark:text-[#3FC8D8] dark:border-[#3FC8D8]/30"
-                                    : "bg-violet-100 text-violet-950 border border-violet-300 dark:bg-[#8B5CF6]/15 dark:text-[#8B5CF6] dark:border-[#8B5CF6]/30"
+                                    ? "bg-[#3FC8D8]/15 text-[#3FC8D8] border border-[#3FC8D8]/30"
+                                    : "bg-[#8B5CF6]/15 text-[#8B5CF6] border border-[#8B5CF6]/30"
                                 }`}>
                                   {p.type}
                                 </span>
                               </td>
-                              <td className={`text-right py-3 font-black ${
-                                p.healthScore < 88 ? "text-rose-700 dark:text-[#F0526B]" : "text-amber-800 dark:text-[#E8A33D]"
+                              <td className={`text-right py-3 font-semibold ${
+                                p.healthScore < 88 ? "text-[#F0526B]" : "text-[#E8A33D]"
                               }`}>
                                 {p.healthScore.toFixed(1)}%
                               </td>
                               <td className="text-right py-3">
-                                <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-black ${
+                                <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${
                                   p.status === "offline"
-                                    ? "bg-rose-100 text-rose-950 border border-rose-300 dark:bg-[#F0526B]/15 dark:text-[#F0526B] dark:border-[#F0526B]/30"
-                                    : "bg-amber-100 text-amber-950 border border-amber-300 dark:bg-[#E8A33D]/15 dark:text-[#E8A33D] dark:border-[#E8A33D]/30"
+                                    ? "bg-[#F0526B]/15 text-[#F0526B] border border-[#F0526B]/30"
+                                    : "bg-[#E8A33D]/15 text-[#E8A33D] border border-[#E8A33D]/30"
                                 }`}>
                                   {p.status}
                                 </span>
@@ -1145,7 +1144,7 @@ export default function DashboardOverview({ onSelectPlant }: DashboardOverviewPr
                               <td className="text-right py-3">
                                 <button
                                   onClick={() => onSelectPlant(p._id)}
-                                  className="text-slate-700 hover:text-black dark:text-white/40 dark:hover:text-white"
+                                  className="text-white/40 hover:text-white"
                                 >
                                   <ChevronRight className="h-4 w-4 ml-auto" />
                                 </button>
