@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:api": "esbuild src/server/vercelEntry.ts --bundle --platform=node --target=node20 --format=esm --outfile=api/index.js --banner:js=\"import { createRequire as __cr } from 'module'; const require = __cr(import.meta.url);\" --log-level=warning",
     "preview": "vite preview",
     "start": "vite preview",
     "lint": "oxlint",
