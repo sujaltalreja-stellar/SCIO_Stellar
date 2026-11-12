@@ -1,7 +1,11 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { scioTables } from "./scioSchema";
 
 export default defineSchema({
+  // SCIO demo database (see scioSchema.ts)
+  ...scioTables,
+
   organizations: defineTable({
     name: v.string(),
     industry: v.string(), // "maritime" | "energy" | "manufacturing" | "logistics"

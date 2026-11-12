@@ -81,14 +81,12 @@ export default function AppLayout({ children, activeTab, setActiveTab }: AppLayo
   return (
     <div className="min-h-screen bg-background text-textBright flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
       {/* HEADER Telemetry Banner */}
-      <header className="bg-panel border-b border-borderMuted sticky top-0 z-40 backdrop-blur-md px-6 py-3 flex items-center justify-between shadow-xs">
+      <header className="bg-black border-b border-borderMuted sticky top-0 z-40 backdrop-blur-md px-6 py-3 flex items-center justify-between shadow-xs">
         <div className="flex items-center space-x-3">
-          <div className="bg-emerald-500/10 p-2 rounded-lg border border-emerald-500/20">
-            <Activity className="h-6 w-6 text-emerald-600 dark:text-emerald-500 animate-pulse" />
-          </div>
+          <img src="/favicon.svg" alt="SCIO Logo" className="h-8 w-8" />
           <div>
             <h1 className="text-md font-bold tracking-wider text-textBright flex items-center gap-2">
-              STELLAR SCIO <span className="text-emerald-600 dark:text-emerald-500 text-xs font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">ENERGY</span>
+              SCIO <span className="text-emerald-600 dark:text-emerald-500 text-xs font-semibold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">ENERGY</span>
             </h1>
             <p className="text-[10px] text-textMuted tracking-widest font-mono">OPERATIONS CONTROL CENTER</p>
           </div>

@@ -10,6 +10,12 @@
 
 import type * as mutations from "../mutations.js";
 import type * as queries from "../queries.js";
+import type * as scioAuth from "../scioAuth.js";
+import type * as scioData from "../scioData.js";
+import type * as scioLib from "../scioLib.js";
+import type * as scioRetail from "../scioRetail.js";
+import type * as scioSchema from "../scioSchema.js";
+import type * as scioSeed from "../scioSeed.js";
 import type * as seed from "../seed.js";
 
 import type {
@@ -21,6 +27,12 @@ import type {
 declare const fullApi: ApiFromModules<{
   mutations: typeof mutations;
   queries: typeof queries;
+  scioAuth: typeof scioAuth;
+  scioData: typeof scioData;
+  scioLib: typeof scioLib;
+  scioRetail: typeof scioRetail;
+  scioSchema: typeof scioSchema;
+  scioSeed: typeof scioSeed;
   seed: typeof seed;
 }>;
 

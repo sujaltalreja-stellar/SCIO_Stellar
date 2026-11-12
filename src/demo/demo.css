@@ -1,0 +1,210 @@
+@keyframes scan {
+  0% {
+    top: -20%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes slidein {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    max-height: 80px;
+  }
+}
+@keyframes ping-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, -20px) scale(1.08);
+  }
+}
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes flash-up {
+  0% {
+    color: #059669;
+  }
+  100% {
+    color: inherit;
+  }
+}
+
+.scio-rise {
+  animation: rise 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.scio-page {
+  animation: fadein 0.35s ease-out both;
+}
+.scio-slidein {
+  animation: slidein 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  overflow: hidden;
+}
+.scio-ping {
+  animation: ping-soft 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+.scio-drift {
+  animation: drift 14s ease-in-out infinite;
+}
+.scio-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
+  animation: shimmer 1.1s ease-out 1;
+  pointer-events: none;
+}
+.scio-lift {
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+.scio-lift:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.04),
+    0 18px 36px -16px rgba(30, 64, 175, 0.25);
+}
+.scio-flash {
+  animation: flash-up 1.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scio-rise,
+  .scio-page,
+  .scio-slidein,
+  .scio-ping,
+  .scio-drift,
+  .scio-flash,
+  .scio-shimmer::after {
+    animation: none !important;
+  }
+  .scio-lift:hover {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   SCIO theme tokens. Dark mode remaps Tailwind's palette variables so every
+   existing utility (bg-white, text-slate-500, bg-blue-50…) follows the theme.
+   --------------------------------------------------------------------------- */
+:root {
+  --scio-page: #f4f6fb;
+  --scio-surface: #ffffff;
+}
+html.scio-dark {
+  color-scheme: dark;
+  --scio-page: #000000;
+  --scio-surface: #0b0b0d;
+  --color-white: #0b0b0d;
+  --color-slate-50: #131316;
+  --color-slate-100: #1a1a1e;
+  --color-slate-200: #26262c;
+  --color-slate-300: #3a3a42;
+  --color-slate-400: #71717a;
+  --color-slate-500: #a1a1aa;
+  --color-slate-600: #b8b8c0;
+  --color-slate-700: #d4d4d8;
+  --color-slate-800: #e4e4e7;
+  --color-slate-900: #f4f4f5;
+  --color-slate-950: #fafafa;
+}
+html.scio-dark body {
+  background: var(--scio-page);
+}
+html.scio-theming,
+html.scio-theming *,
+html.scio-theming *::before,
+html.scio-theming *::after {
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    fill 0.35s ease !important;
+}
+html.scio-dark ::-webkit-scrollbar-thumb {
+  background: #2a2a30;
+}
+html.scio-dark .scio-lift:hover {
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 18px 40px -16px rgba(37, 99, 235, 0.45);
+}
+html.scio-dark .recharts-cartesian-axis-tick-value {
+  fill: #8f9cb4;
+}
+html.scio-dark .recharts-default-tooltip {
+  background: #0b0b0d !important;
+  border-color: #26262c !important;
+}
+html.scio-app,
+html.scio-app body {
+  background: var(--scio-page);
+}
+
+.scio-login {
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+}
+.scio-login-dark {
+  --color-slate-300: #e2e8f0;
+  --color-slate-400: #cbd5e1;
+  --color-slate-500: #a8b4c7;
+  --color-slate-600: #94a3b8;
+  --color-slate-700: #64748b;
+}

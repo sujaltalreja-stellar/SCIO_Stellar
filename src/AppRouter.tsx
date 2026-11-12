@@ -3,10 +3,17 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-
 import App from "./app/page";
 import ContactPage from "./app/contact/page";
 import IndustryDetailPage from "./app/industries/[id]/page";
+// Loaded on demand so the public site bundle doesn't include the demo.
+const DemoApp = React.lazy(() => import("./demo/DemoApp"));
 
 function IndustryDetailRouteWrapper() {
   const params = useParams<{ id: string }>();
   return <IndustryDetailPage params={Promise.resolve({ id: params.id || "" })} />;
+}
+
+function LegacyRedirect() {
+  const params = useParams();
+  return <Navigate to={`/app/${params["*"] ?? ""}`} replace />;
 }
 
 export default function AppRouter() {
@@ -18,6 +25,17 @@ export default function AppRouter() {
 
         {/* Contact Page */}
         <Route path="/contact" element={<ContactPage />} />
+
+        {/* SCIO application (unlisted; reachable only by URL). Old /demo links redirect here. */}
+        <Route path="/demo/*" element={<LegacyRedirect />} />
+        <Route
+          path="/app/*"
+          element={
+            <React.Suspense fallback={<div className="min-h-screen bg-[#0a0d14]" />}>
+              <DemoApp />
+            </React.Suspense>
+          }
+        />
 
         {/* Dynamic Industry Pages */}
         <Route path="/industries/:id" element={<IndustryDetailRouteWrapper />} />
