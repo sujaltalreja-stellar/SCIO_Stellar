@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { scioHeaders } from "../auth";
+import { readApi, scioHeaders } from "../auth";
 import { FileText, Inbox, Upload, ScanText, Sparkles, GitCompareArrows, CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Mail, Globe, ScanLine, Eye, EyeOff } from "lucide-react";
 import { useDataset } from "../useDataset";
 import { buildInbox, invoiceTotals, type InvoiceDoc } from "../data/documents";
@@ -100,7 +100,7 @@ export default function DocumentsPage({ docs, sector = "industrial" }: { docs?: 
         headers: scioHeaders(),
         body: JSON.stringify({ text: ocr.text, sector }),
       });
-      const data = await res.json();
+      const data = await readApi<any>(res);
       if (!res.ok || data.error) throw new Error(data.error || `Request failed (${res.status})`);
       const extractMs = Math.round(performance.now() - t0);
       patch(w.key, { stage: "match", timings: { extract: extractMs } });

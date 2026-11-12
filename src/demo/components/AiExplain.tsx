@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { scioHeaders } from "../auth";
+import { readApi, scioHeaders } from "../auth";
 import { Sparkles } from "lucide-react";
 
 // Fetches and shows a plain-language AI explanation for an asset or inventory item.
@@ -20,7 +20,7 @@ export default function AiExplain({ kind, id }: { kind: "asset" | "item"; id: st
         headers: scioHeaders(),
         body: JSON.stringify({ kind, id }),
       });
-      const data = await res.json();
+      const data = await readApi<any>(res);
       if (!res.ok || data.error) throw new Error(data.error || "Failed");
       setText(data.explanation);
       setState("done");

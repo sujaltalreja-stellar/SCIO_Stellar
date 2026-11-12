@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { scioHeaders } from "../auth";
+import { readApi, scioHeaders } from "../auth";
 import { ImagePlus, ScanSearch, Eye, BrainCircuit, Download, RefreshCw, History, X, ShieldAlert } from "lucide-react";
 import { useDataset } from "../useDataset";
 import { Badge, Card, CardTitle, cx } from "../ui";
@@ -198,7 +198,7 @@ export default function VisionPage({ targets, title = "Vision Inspection", subti
         headers: scioHeaders(),
         body: JSON.stringify({ image, previousImage: mode === "compare" ? previous : null }),
       });
-      const data = await res.json();
+      const data = await readApi<any>(res);
       if (!res.ok || data.error) throw new Error(data.error || `Request failed (${res.status})`);
       setResult(data as VisionResult);
       setAnalysedImage(image);

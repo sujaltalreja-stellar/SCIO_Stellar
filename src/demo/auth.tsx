@@ -118,6 +118,22 @@ export function RequireDemoAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+/** Read an API response; turns empty or non-JSON platform errors into a clear message. */
+export async function readApi<T = Record<string, unknown>>(res: Response): Promise<T & { error?: string }> {
+  const text = await res.text();
+  try {
+    return JSON.parse(text) as T & { error?: string };
+  } catch {
+    const reason =
+      res.status === 504 ? "The AI took too long to respond. Please try again." :
+      res.status === 413 ? "The file is too large to upload. Please use a smaller file." :
+      res.status === 401 ? "Your session has ended. Please sign in again." :
+      res.status === 405 || res.status === 404 ? "The AI service endpoint is not reachable on this deployment." :
+      `The server returned an unexpected response (${res.status}). Please try again.`;
+    return { error: reason } as T & { error?: string };
+  }
+}
+
 /** JSON headers plus the session token, for calls to the SCIO API routes. */
 export function scioHeaders(): Record<string, string> {
   const s = readSession();

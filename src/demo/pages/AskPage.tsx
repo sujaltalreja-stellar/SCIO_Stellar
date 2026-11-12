@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { scioHeaders } from "../auth";
+import { readApi, scioHeaders } from "../auth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowUp, Sparkles, Database, RotateCcw, PackageX, Wrench, Wallet, Truck, ClipboardX, Coins } from "lucide-react";
 import type { CopilotResponse, CopilotTurn } from "../copilotTypes";
@@ -171,7 +171,7 @@ export default function AskPage({ endpoint = "/api/scio/copilot", suggestions = 
         headers: scioHeaders(),
         body: JSON.stringify({ question: q, history, ...(extraBody ? extraBody() : {}) }),
       });
-      const data = (await res.json()) as CopilotResponse & { error?: string };
+      const data = await readApi<CopilotResponse>(res);
       if (!res.ok || data.error) throw new Error(data.error || `Request failed (${res.status})`);
       setMessages((ms) => [...ms, { id: idRef.current++, role: "assistant", content: data.answer, response: data }]);
     } catch (e: any) {
