@@ -1,3 +1,4 @@
+import { lazyWithReload } from "../lazyWithReload";
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { DemoAuthProvider, RequireDemoAuth } from "./auth";
@@ -20,7 +21,7 @@ import { DataGate } from "./DataGate";
 import "./demo.css";
 import "./theme-dark.css";
 
-const RetailApp = React.lazy(() => import("./retail/RetailApp"));
+const RetailApp = lazyWithReload(() => import("./retail/RetailApp"));
 
 // SCIO application, mounted at /demo/* (not linked from the public site).
 export default function DemoApp() {

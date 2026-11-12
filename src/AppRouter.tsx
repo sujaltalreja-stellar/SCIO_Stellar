@@ -4,7 +4,8 @@ import App from "./app/page";
 import ContactPage from "./app/contact/page";
 import IndustryDetailPage from "./app/industries/[id]/page";
 // Loaded on demand so the public site bundle doesn't include the demo.
-const DemoApp = React.lazy(() => import("./demo/DemoApp"));
+import { lazyWithReload } from "./lazyWithReload";
+const DemoApp = lazyWithReload(() => import("./demo/DemoApp"));
 
 function IndustryDetailRouteWrapper() {
   const params = useParams<{ id: string }>();

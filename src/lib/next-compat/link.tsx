@@ -26,7 +26,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   }
 
   return (
-    <RouterLink to={href} replace={replace} className={className} onClick={onClick} ref={ref} {...rest}>
+    <RouterLink to={href} replace={replace} className={className} onClick={onClick} ref={ref} {...(rest as Record<string, unknown>)}>
       {children}
     </RouterLink>
   );

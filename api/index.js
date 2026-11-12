@@ -9450,7 +9450,8 @@ Today is ${ds.anchorDate}. Currency is AED. Warehouses: ${ds.warehouses.map((w) 
 
 Rules:
 - ALWAYS call one or more tools to get data before answering any business question. Never guess or invent numbers.
-- Use only figures returned by tools. If the data does not cover the question, say so plainly.
+- Use only figures returned by tools; never invent numbers.
+- Never refuse or say "I do not have access". For broader business questions (sales growth, revenue, customers, strategy) give practical, specific advice: connect it to the operational levers you can measure (downtime limiting output and on-time delivery, spare-parts shortages, supplier delays, excess inventory freeing cash) using tool figures, add proven business practices, and mention that store sales, margin and basket analytics are in the Retail workspace (Retail \u2192 Ask SCIO or Master Dashboard).
 - Answer for a busy manager: start with a one-sentence direct answer, then 2-5 short bullet points with the key figures (use **bold** for numbers), then a line starting with "Recommendation:" giving a concrete next action grounded in the data.
 - Charts and tables are shown to the user automatically from the tool results, so do not reproduce long tables; refer to them briefly.
 - For estimates, mention the key assumption in one short clause.
@@ -10056,6 +10057,74 @@ function supplierScorecards(st) {
   });
 }
 
+// src/demo/retail/metrics.ts
+var inScope2 = (scope, s) => !scope || scope.has(s);
+var SQFT_PER_SQM = 10.7639;
+function totals(rows, days) {
+  let gross = 0, discounts = 0, returns = 0, net = 0, cogs = 0, txns = 0, units = 0, footfall = 0, lyNet = 0;
+  for (const d of rows) {
+    gross += d.grossSales;
+    discounts += d.discounts;
+    returns += d.returns;
+    net += d.netSales;
+    cogs += d.cogs;
+    txns += d.transactions;
+    units += d.units;
+    footfall += d.footfall;
+    lyNet += d.lyNetSales;
+  }
+  const gm = net - cogs;
+  return {
+    gross,
+    discounts,
+    returns,
+    net,
+    cogs,
+    gm,
+    gmPct: net ? gm / net : 0,
+    txns,
+    units,
+    footfall,
+    atv: txns ? net / txns : 0,
+    upt: txns ? units / txns : 0,
+    asp: units ? net / units : 0,
+    conversion: footfall ? txns / footfall : 0,
+    lyNet,
+    lfl: lyNet ? net / lyNet - 1 : 0,
+    discountRate: gross ? discounts / gross : 0,
+    days
+  };
+}
+function windowRows(st, scope, days, endOffset = 0, storeIdx) {
+  const to = addDaysIso(st.base.anchorDate, -endOffset);
+  const from = addDaysIso(to, -days);
+  return st.base.storeDays.filter((d) => d.date > from && d.date <= to && inScope2(scope, d.storeIdx) && (storeIdx === void 0 || d.storeIdx === storeIdx));
+}
+function salesTotals(st, scope, days = 30, endOffset = 0, storeIdx) {
+  return totals(windowRows(st, scope, days, endOffset, storeIdx), days);
+}
+function salesPrev(st, scope, days = 30, storeIdx) {
+  return salesTotals(st, scope, days, days, storeIdx);
+}
+function salesByStore(st, scope, days = 30) {
+  const by = /* @__PURE__ */ new Map();
+  for (const d of windowRows(st, scope, days)) {
+    const a = by.get(d.storeIdx) ?? [];
+    a.push(d);
+    by.set(d.storeIdx, a);
+  }
+  return [...by.entries()].map(([storeIdx, rows]) => {
+    const t = totals(rows, days);
+    const store = st.base.stores[storeIdx];
+    return { storeIdx, store, ...t, salesPerSqft: t.net / (store.sizeSqm * SQFT_PER_SQM) };
+  });
+}
+function upcomingEvents(st, scope, days = 45) {
+  const countries = new Set(st.base.stores.filter((s) => inScope2(scope, s.idx)).map((s) => s.country));
+  const to = addDaysIso(st.base.anchorDate, days);
+  return st.base.calendar.filter((e) => e.end >= st.base.anchorDate && e.start <= to && e.countries.some((c) => countries.has(c)));
+}
+
 // src/server/demo/retailCopilot.ts
 var r02 = (n) => Math.round(n);
 var r13 = (n) => Math.round(n * 10) / 10;
@@ -10264,6 +10333,64 @@ function tools(st, scope) {
           visuals: [{ kind: "table", title: `${sku.name} \xB7 lowest cover`, columns: [{ key: "store", label: "Store" }, { key: "onHand", label: "On hand", format: "number" }, { key: "perDay", label: "Sales/day", format: "number" }, { key: "dos", label: "Days of supply", format: "days" }], rows: rows.slice(0, 10) }]
         };
       }
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_sales_growth_levers",
+        description: "Sales & margin analysis with the biggest levers to grow sales: net sales, LFL growth, gross margin, ATV, UPT, conversion, discount leakage, weakest stores, lost sales from stockouts, basket cross-sell pairs and upcoming trading events. Use for any question about increasing sales, revenue, growth, margin or store performance.",
+        parameters: { type: "object", properties: { days: { type: "number", description: "Period in days (default 30)" } } }
+      },
+      run: (a) => {
+        const days = Math.min(120, Math.max(7, Number(a.days) || 30));
+        const t = salesTotals(st, scope, days);
+        const prev = salesPrev(st, scope, days);
+        const stores = salesByStore(st, scope, days);
+        const weakest = [...stores].sort((x, y) => x.lfl - y.lfl).slice(0, 5);
+        const k = retailKpis(st, scope);
+        const lost30 = k.perf.reduce((s, p) => s + p.lostSales30, 0);
+        const byCity = /* @__PURE__ */ new Map();
+        for (const s of stores) {
+          const e = byCity.get(s.store.city) ?? { net: 0, gross: 0, disc: 0, cogs: 0 };
+          e.net += s.net;
+          e.gross += s.gross;
+          e.disc += s.discounts;
+          e.cogs += s.cogs;
+          byCity.set(s.store.city, e);
+        }
+        const leakage = [...byCity.entries()].map(([city, e]) => ({ city, discountRate: r13(e.disc / Math.max(1, e.gross) * 100), gmPct: r13((e.net - e.cogs) / Math.max(1, e.net) * 100), net: r02(e.net) })).sort((x, y) => y.discountRate - x.discountRate).slice(0, 4);
+        const events = upcomingEvents(st, scope, 45).map((e) => ({ name: e.name, start: e.start, end: e.end, upliftByDepartment: e.uplift }));
+        const cross = base.basket.filter((_, i) => i % 2 === 0).slice(0, 4).map((b) => ({ ifBuys: b.a, alsoBuys: b.b, confidencePct: r02(b.confidence * 100), lift: b.lift }));
+        return {
+          data: {
+            periodDays: days,
+            netSalesAED: r02(t.net),
+            vsPriorPeriodPct: r13((t.net / Math.max(1, prev.net) - 1) * 100),
+            lflGrowthPct: r13(t.lfl * 100),
+            grossMarginPct: r13(t.gmPct * 100),
+            grossMarginChangePp: r13((t.gmPct - prev.gmPct) * 100),
+            atvAED: r13(t.atv),
+            unitsPerTransaction: r13(t.upt),
+            conversionPct: r13(t.conversion * 100),
+            discountRatePct: r13(t.discountRate * 100),
+            lostSalesFromStockouts30dAED: r02(lost30),
+            outOfStockNow: k.outOfStock,
+            weakestStoresByLfl: weakest.map((s) => ({ store: `${s.store.id} ${s.store.name}`, city: s.store.city, lflPct: r13(s.lfl * 100), conversionPct: r13(s.conversion * 100), netAED: r02(s.net) })),
+            highestDiscountCities: leakage,
+            crossSellPairs: cross,
+            upcomingEvents: events
+          },
+          visuals: [
+            { kind: "hbar", title: "Weakest stores \xB7 LFL growth %", xKey: "name", series: [{ key: "lfl", label: "LFL %" }], format: "number", rows: weakest.map((s) => ({ name: `${s.store.id} ${s.store.name}`, lfl: r13(s.lfl * 100) })) },
+            { kind: "table", title: "Growth levers", columns: [{ key: "lever", label: "Lever" }, { key: "evidence", label: "Evidence" }, { key: "value", label: "Size (AED)", format: "money" }], rows: [
+              { lever: "Fix stockouts", evidence: `${k.outOfStock} store-SKUs out of stock now`, value: r02(lost30) },
+              { lever: "Stop discount leakage", evidence: `${leakage[0]?.city ?? "\u2014"} discount rate ${leakage[0]?.discountRate ?? 0}% \xB7 GM ${leakage[0]?.gmPct ?? 0}%`, value: r02(t.discounts - prev.discounts > 0 ? t.discounts - prev.discounts : 0) },
+              { lever: "Lift basket size (cross-sell)", evidence: cross[0] ? `${cross[0].ifBuys} \u2192 ${cross[0].alsoBuys} (lift ${cross[0].lift}\xD7)` : "\u2014", value: r02(t.net * 0.02) },
+              { lever: "Turn around weakest stores", evidence: weakest[0] ? `${weakest[0].store.id} LFL ${r13(weakest[0].lfl * 100)}%` : "\u2014", value: r02(weakest.reduce((s, x) => s + Math.max(0, x.lyNet - x.net), 0)) }
+            ] }
+          ]
+        };
+      }
     }
   ];
 }
@@ -10277,7 +10404,8 @@ var FOLLOW = {
   get_expiring_products: ["Which SKUs are overstocked?", "What is the total inventory loss risk?"],
   get_inventory_accuracy: ["Which stores will run out of stock this week?", "Why is Store 118 losing sales?"],
   get_equipment_issues: ["Why is Store 118 losing sales?", "Which products will expire within 15 days?"],
-  get_sku_analysis: ["Which products should be transferred between stores?", "Which SKUs are overstocked?"]
+  get_sku_analysis: ["Which products should be transferred between stores?", "Which SKUs are overstocked?"],
+  get_sales_growth_levers: ["Why is gross margin declining in Dubai stores?", "Why is Store 118 losing sales?", "Which stores will run out of stock this week?"]
 };
 var STEP = {
   get_retail_overview: () => "Read chain KPIs across stores, stock, suppliers and expiry",
@@ -10289,7 +10417,8 @@ var STEP = {
   get_expiring_products: (a) => `Checked perishable batches expiring within ${a.days ?? 15} days`,
   get_inventory_accuracy: () => "Looked for phantom inventory and open cycle counts",
   get_equipment_issues: () => "Read equipment sensors, faults and open tickets",
-  get_sku_analysis: (a) => `Analysed ${String(a.sku ?? "the SKU")} across all stores`
+  get_sku_analysis: (a) => `Analysed ${String(a.sku ?? "the SKU")} across all stores`,
+  get_sales_growth_levers: (a) => `Analysed ${a.days ?? 30}-day POS sales, margin, baskets and lost sales across stores`
 };
 var ACTION = {
   get_retail_overview: () => ({ label: "Open master dashboard", to: "/app/retail/master" }),
@@ -10301,7 +10430,8 @@ var ACTION = {
   get_expiring_products: () => ({ label: "Apply markdowns & transfers", to: "/app/retail/replenishment?tab=expiry" }),
   get_inventory_accuracy: () => ({ label: "Start cycle counts", to: "/app/retail/replenishment?tab=phantom" }),
   get_equipment_issues: () => ({ label: "Create maintenance tickets", to: "/app/retail/maintenance" }),
-  get_sku_analysis: (a) => ({ label: "Open SKU details", to: `/app/retail/skus?sku=${encodeURIComponent(String(a.sku ?? ""))}` })
+  get_sku_analysis: (a) => ({ label: "Open SKU details", to: `/app/retail/skus?sku=${encodeURIComponent(String(a.sku ?? ""))}` }),
+  get_sales_growth_levers: () => ({ label: "Open sales & margin dashboard", to: "/app/retail/insights/sales" })
 };
 function chartFor(t) {
   if (t.kind !== "table" || t.rows.length < 2) return null;
@@ -10328,6 +10458,7 @@ ${scope ? `The user can only see these stores: ${[...scope].map((s) => base.stor
 Store ids look like S101-S150 ("Store 118" = S118).
 Rules:
 - ALWAYS call tools before answering. Never invent numbers; use only tool figures.
+- Never refuse or say you lack data. For growth, revenue, sales or margin questions call get_sales_growth_levers (plus other tools as useful) and give a prioritised action plan: the biggest levers first, each with its AED size and who should act.
 - Format: one-sentence direct answer, then 2-5 short bullets with key figures (**bold** numbers), then a line starting "Recommendation:" with concrete actions (who should do what).
 - Mention that tables/charts below show the evidence. Never write markdown tables (the evidence tables are rendered separately). Under 180 words.
 - If asked where the data comes from, say it is sample data for this workspace; never present it as a real customer's data.`;

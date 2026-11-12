@@ -1025,7 +1025,7 @@ export default function ScioSentinelOrb({
       }
     } catch (err) {
       try {
-        const dynamicResult = await generateResponse(currentIndustry, query);
+        const dynamicResult = (await generateResponse(currentIndustry, query)) as { text?: string; provider?: string; suggestedAction?: any };
         const dynamicBotMsg: ChatMessage = {
           id: `bot-${Date.now()}`,
           sender: "bot",

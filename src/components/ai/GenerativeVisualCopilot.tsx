@@ -109,7 +109,7 @@ export default function GenerativeVisualCopilot({
       if (!responseText) {
         try {
           const dynamicResult = await generateResponse(currentIndustry, query);
-          responseText = dynamicResult.text || "";
+          responseText = ("text" in dynamicResult ? dynamicResult.text : "") || "";
         } catch (e) {
           // Continue to fallback visual synthesis
         }

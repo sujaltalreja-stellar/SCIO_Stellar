@@ -1,5 +1,5 @@
 import type { Plugin } from "vite";
-import { handleApiRequest } from "./src/server/apiHandler.ts";
+import { handleApiRequest } from "./src/server/apiHandler";
 
 export function viteApiPlugin(): Plugin {
   return {
