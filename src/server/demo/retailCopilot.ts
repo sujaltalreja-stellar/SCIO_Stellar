@@ -456,15 +456,34 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
     let card: AnswerCard | undefined;
     if (mode === "card") {
       const m = raw.match(/\{[\s\S]*\}/);
+      // The model occasionally emits near-JSON (an unquoted/garbled key, a trailing comma).
+      // Try strict first, then a light repair, so the user sees a card instead of raw JSON.
+      const parseCard = (s: string) => {
+        try {
+          return JSON.parse(s);
+        } catch {
+          const repaired = s
+            .replace(/([{,]\s*)([^\s"{}[\],:][^"{}[\],:\n]*?)\s*:/g, '$1"$2":')
+            .replace(/,\s*([}\]])/g, "$1");
+          return JSON.parse(repaired);
+        }
+      };
       try {
-        const j = m ? (JSON.parse(m[0]) as Partial<AnswerCard> & { plain?: string }) : null;
+        const j = m ? (parseCard(m[0]) as Partial<AnswerCard> & { plain?: string }) : null;
         if (j && typeof j.plain === "string") {
           answer = j.plain;
         } else if (j && typeof j.summary === "string") {
           card = {
             headline: typeof j.headline === "string" ? j.headline : "Here's what I found.",
             summary: j.summary,
-            kpis: Array.isArray(j.kpis) ? j.kpis.filter((k) => k && k.label && k.value).slice(0, 4).map((k) => ({ ...k, value: String(k.value) })) : [],
+            kpis: Array.isArray(j.kpis) ? j.kpis
+              .map((k) => {
+                if (!k || k.label) return k;
+                // salvage a garbled "label" key: take the first other string field
+                const alt = Object.entries(k as unknown as Record<string, unknown>).find(([key, v]) => !["value", "note", "tone"].includes(key) && typeof v === "string");
+                return alt ? { ...k, label: alt[1] as string } : k;
+              })
+              .filter((k) => k && k.label && k.value).slice(0, 4).map((k) => ({ ...k, value: String(k.value) })) : [],
             drivers: Array.isArray(j.drivers) ? j.drivers.filter((d) => d && d.title).slice(0, 3) : [],
             next: Array.isArray(j.next) ? j.next.filter((x) => typeof x === "string").slice(0, 4) : [],
           };
