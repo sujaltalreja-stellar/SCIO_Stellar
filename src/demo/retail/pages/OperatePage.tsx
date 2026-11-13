@@ -122,7 +122,7 @@ export default function OperatePage() {
           <RotateCcw className="h-4 w-4" />
         </button>
       )}
-      <button type="submit" disabled={busy || !q.trim()} aria-label="Send" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-slate-900 text-[#fff] transition hover:bg-slate-700 disabled:bg-slate-200 disabled:text-slate-400">
+      <button type="submit" disabled={busy || !q.trim()} aria-label="Send" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[#111113] ring-1 ring-[#fff]/10 text-[#fff] transition hover:bg-[#2a2a30] disabled:bg-slate-200 disabled:text-slate-400">
         {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
       </button>
     </form>
@@ -217,7 +217,7 @@ function StatusPart({ children, onClick }: { children: React.ReactNode; onClick:
 const Dot = () => <span className="text-slate-300">·</span>;
 
 function Mark() {
-  return <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-slate-900 text-[13px] font-bold text-[#fff]">S</span>;
+  return <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-[#111113] ring-1 ring-[#fff]/10 text-[13px] font-bold text-[#fff]">S</span>;
 }
 
 function Thinking() {
@@ -337,7 +337,7 @@ function Answer({ turn, onDecide, canDo, onAsk }: { turn: Turn; onDecide: (p: Ac
                         <button onClick={() => onDecide(p, false)} className="rounded-lg px-2.5 py-1.5 text-[13px] text-slate-500 hover:bg-slate-100">
                           Dismiss
                         </button>
-                        <button onClick={() => onDecide(p, true)} className="rounded-lg bg-slate-900 px-3 py-1.5 text-[13px] font-medium text-[#fff] hover:bg-slate-700">
+                        <button onClick={() => onDecide(p, true)} className="rounded-lg bg-[#111113] ring-1 ring-[#fff]/10 px-3 py-1.5 text-[13px] font-medium text-[#fff] hover:bg-[#2a2a30]">
                           Approve
                         </button>
                       </div>

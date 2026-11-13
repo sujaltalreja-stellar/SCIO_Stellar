@@ -125,7 +125,7 @@ function SystemsMap() {
 
         {/* Centre: SCIO */}
         <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center">
-          <span className="relative grid h-16 w-16 place-items-center rounded-2xl bg-slate-900 text-[28px] font-black text-[#fff] ring-8 ring-slate-100">
+          <span className="relative grid h-16 w-16 place-items-center rounded-2xl bg-[#111113] ring-1 ring-[#fff]/10 text-[28px] font-black text-[#fff] ring-8 ring-slate-100">
             S
             <span className="absolute -right-1 -top-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
           </span>

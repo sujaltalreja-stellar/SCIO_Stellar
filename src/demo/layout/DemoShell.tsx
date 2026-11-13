@@ -301,7 +301,7 @@ export default function DemoShell() {
             </div>
             <div className="relative">
               <button onClick={() => setMenuOpen((o) => !o)} className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-slate-100">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800 text-[13px] font-semibold text-[#fff]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#111113] text-[13px] font-semibold text-[#fff] ring-1 ring-[#fff]/15">
                   {user?.name.split(" ").map((p) => p[0]).join("").slice(0, 2)}
                 </span>
                 <span className="hidden text-left sm:block">

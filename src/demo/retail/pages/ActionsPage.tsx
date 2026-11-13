@@ -199,7 +199,7 @@ export default function ActionsPage() {
                 </div>
                 <p className="mt-1.5 text-[14px] leading-relaxed text-slate-800">{selected.p.action}</p>
               </div>
-              <Link to={selected.p.link} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3 text-[14.5px] font-semibold text-[#fff] transition hover:bg-slate-800">
+              <Link to={selected.p.link} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#111113] ring-1 ring-[#fff]/10 py-3 text-[14.5px] font-semibold text-[#fff] transition hover:bg-[#2a2a30]">
                 Review & Take Action <ArrowRight className="h-4 w-4" />
               </Link>
               {can("alert.manage") && (
@@ -298,7 +298,7 @@ function Row({ p, status, owner, avatar, active, onSelect }: { p: Problem; statu
         <span className="truncate text-[13.5px] text-slate-800">{owner}</span>
       </div>
       <span className={cx("w-fit rounded-lg px-2.5 py-1 text-[12.5px] font-semibold", STATUS_TONE[status])}>{status}</span>
-      <Link to={p.link} onClick={(e) => e.stopPropagation()} className="inline-flex w-[104px] items-center justify-center gap-1.5 rounded-xl bg-slate-900 py-2.5 text-[13.5px] font-semibold text-[#fff] transition hover:bg-slate-800">
+      <Link to={p.link} onClick={(e) => e.stopPropagation()} className="inline-flex w-[104px] items-center justify-center gap-1.5 rounded-xl bg-[#111113] ring-1 ring-[#fff]/10 py-2.5 text-[13.5px] font-semibold text-[#fff] transition hover:bg-[#2a2a30]">
         Review <ArrowRight className="h-4 w-4" />
       </Link>
     </div>
