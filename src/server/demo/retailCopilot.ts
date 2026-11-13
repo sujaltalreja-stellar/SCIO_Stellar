@@ -544,7 +544,7 @@ ${mode === "card" ? `- OUTPUT FORMAT. Decide per message. Use {"plain":"..."} (a
 - ONLY when the user asks for an analysis or diagnosis that needs several figures (e.g. 'why are my Kuwait stores underperforming', 'how is the business doing', 'action plan for today'), your final reply must be ONLY a JSON object (no prose, no code fences) shaped:
 {"headline":"Here's what I found.","summary":"one sentence direct answer","kpis":[{"label":"Stores affected","value":"2 of 6","note":"optional short note","tone":"bad|good|neutral"}],"drivers":[{"title":"Stockouts","detail":"short cause with figure","impact":"~AED 142.3K impact"}],"next":["Transfer 2,000 units to the affected stores","Expedite the pending purchase order"]}
 headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g. "AED 871.9K", "4 of 6") and notes under 6 words; 1-3 drivers with detail under 15 words and impact like "AED 222K"; 2-3 next steps as short imperative actions that are NOT already drafted with draft_actions. All figures from tools.` : ""}
-- VALUE / OBJECTION QUESTIONS (e.g. "why should I get SCIO", "I already have SKUs/an ERP/reports", "what's different", "is it worth it"): never say they don't need SCIO and never recommend staying as they are. First call get_retail_overview (and get_stockout_forecast or get_equipment_issues if useful) so you can quote THEIR live numbers. Then answer confidently in plain words: (1) their ERP/POS each hold one piece and record what happened; SCIO joins all 12 systems and explains WHY across them (e.g. empty shelf -> late supplier -> stock sitting in another store); (2) it shows money being lost right now in AED, which no single system shows; (3) it predicts what runs out next instead of reporting yesterday; (4) it drafts the fix (transfer, order, technician) and they approve in one click, nothing re-entered; (5) it works on top of their existing systems, no replacement. Back points with 2-3 of their actual figures, then offer one concrete next step (e.g. "Want me to fix today's stockouts now?"). Stay honest: no invented customers, guarantees or ROI promises.
+- Questions about SCIO's value (why buy it, how it differs, whether it's worth it): respond to the user's specific doubt in your own words - never reuse a stock pitch and vary your wording every time. What is true and worth conveying when relevant: SCIO acts on requests (it investigates across the connected data and drafts real actions the user approves), it works on top of what they already run, and it shows money impact and what's coming next. Ground the answer in their live figures from tools. Where it helps, demonstrate rather than claim - e.g. draft one action for their biggest current issue - but only if it fits the question. Don't concede that they don't need SCIO, and if they ask you not to compare with other systems, don't. No invented customers, guarantees or ROI promises.
 - Data sources: SCIO unifies the connected systems ERP (finance, costs, inventory), POS (sales, returns), CRM (customers, loyalty), WMS (warehouse stock), SCM (forecasts, deliveries), P2P (POs, suppliers, invoices), HRMS (employees), WFM (shifts), CMMS (equipment work orders), OMS (online orders), IoT (sensors) and SOTM (store tasks, inspections). If asked where data comes from, name the relevant systems and note this workspace uses sample data; never present it as a real customer's data.`;
   const messages: ChatMessage[] = [{ role: "system", content: system }, ...history.slice(-8).map((t) => ({ role: t.role, content: t.content.slice(0, 2000) }) as ChatMessage), { role: "user", content: question.slice(0, 1000) }];
   const visuals: Visual[] = [];
@@ -558,7 +558,26 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
       const m = raw.match(/\{[\s\S]*\}/);
       // The model occasionally emits near-JSON (an unquoted/garbled key, a trailing comma).
       // Try strict first, then a light repair, so the user sees a card instead of raw JSON.
-      const parseCard = (s: string) => {
+      // Escape raw line breaks / tabs that the model leaves inside JSON strings.
+      const escapeInStrings = (src: string) => {
+        let out = "";
+        let inStr = false;
+        let esc = false;
+        for (const ch of src) {
+          if (inStr) {
+            if (esc) esc = false;
+            else if (ch === "\\") esc = true;
+            else if (ch === '"') inStr = false;
+            else if (ch === "\n") { out += "\\n"; continue; }
+            else if (ch === "\r") continue;
+            else if (ch === "\t") { out += "\\t"; continue; }
+          } else if (ch === '"') inStr = true;
+          out += ch;
+        }
+        return out;
+      };
+      const parseCard = (raw0: string) => {
+        const s = escapeInStrings(raw0);
         try {
           return JSON.parse(s);
         } catch {
@@ -592,6 +611,9 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
       } catch {
         /* fall back to plain text */
       }
+      // Safety net: never show a raw {"plain": "..."} wrapper to the user.
+      const wrapped = /^\s*\{\s*"plain"\s*:\s*"([\s\S]*)"\s*\}\s*$/.exec(answer);
+      if (!card && wrapped) answer = wrapped[1].replace(/\\n/g, "\n").replace(/\\"/g, '"').replace(/\\\\/g, "\\");
     }
     return {
     answer,
