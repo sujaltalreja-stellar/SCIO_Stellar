@@ -525,6 +525,8 @@ export async function runRetailCopilot(question: string, history: CopilotTurn[],
   const st = buildState(base, Array.isArray(events) ? events.slice(-2000) : []);
   const scope: Scope = scopeStores ? new Set(scopeStores) : null;
   const proposals: ActionProposal[] = [];
+  let tokensUsed = 0;
+  let aiCalls = 0;
   const T = tools(st, scope, proposals);
   const defs: ToolDef[] = T.map(({ type, function: f }) => ({ type, function: f }));
   const system = `You are SCIO, the retail operations copilot inside SCIO Retail OS for a retail chain operating in the UAE, Saudi Arabia, Qatar, Kuwait, Oman and Bahrain (${base.stores.length} stores in UAE, Saudi Arabia, Qatar, Kuwait, Oman and Bahrain; ${base.skus.length} SKUs). Today is ${base.anchorDate}. Reporting currency AED.
@@ -624,10 +626,13 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
     steps: [...steps, ...(used.length ? [`Ranked findings by business impact and drafted actions`] : [])],
     actions: actions.filter((a, i) => actions.findIndex((x) => x.to === a.to) === i).slice(0, 3),
     proposals,
+    usage: { tokens: tokensUsed, aiCalls },
   };
   };
   for (let step = 0; step < 6; step++) {
-    const { message } = await sarvamChat({ messages, tools: defs, maxTokens: 900 });
+    const { message, tokens: used0 } = await sarvamChat({ messages, tools: defs, maxTokens: 900 });
+    tokensUsed += used0;
+    aiCalls++;
     const calls = message.tool_calls ?? [];
     if (!calls.length) {
       return finish((message.content ?? "").trim() || "I couldn't answer that. Try rephrasing.");
@@ -661,6 +666,8 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
       messages.push({ role: "tool", tool_call_id: c.id, content });
     }
   }
-  const { message } = await sarvamChat({ messages, maxTokens: 900 });
+  const { message, tokens: used1 } = await sarvamChat({ messages, maxTokens: 900 });
+  tokensUsed += used1;
+  aiCalls++;
   return finish((message.content ?? "").trim());
 }

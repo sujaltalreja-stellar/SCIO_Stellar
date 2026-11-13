@@ -38,6 +38,8 @@ export interface CopilotResponse {
   proposals?: ActionProposal[];
   /** Structured answer for the Operations assistant (card mode). */
   card?: AnswerCard;
+  /** AI usage for this answer (total tokens across all model calls). */
+  usage?: { tokens: number; aiCalls: number };
   error?: string;
 }
 
