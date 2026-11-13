@@ -15,7 +15,7 @@ import {
   type Scope,
 } from "../../demo/retail/analytics";
 import { salesByStore, salesPrev, salesTotals, upcomingEvents } from "../../demo/retail/metrics";
-import type { CopilotResponse, CopilotTurn, Visual } from "../../demo/copilotTypes";
+import type { ActionProposal, AnswerCard, CopilotResponse, CopilotTurn, ProposalKind, Visual } from "../../demo/copilotTypes";
 import { sarvamChat, type ChatMessage, type ToolDef } from "./sarvam";
 
 // ---------------------------------------------------------------------------
@@ -51,9 +51,73 @@ function countryScope(st: RetailState, c: unknown, base: Scope): Scope {
 }
 const sname = (st: RetailState, s: number) => `${st.base.stores[s].id} ${st.base.stores[s].name}`;
 
-function tools(st: RetailState, scope: Scope): Array<ToolDef & { run: (a: Args) => ToolResult }> {
+function tools(st: RetailState, scope: Scope, proposals: ActionProposal[] = []): Array<ToolDef & { run: (a: Args) => ToolResult }> {
   const { base } = st;
   return [
+    {
+      type: "function",
+      function: {
+        name: "draft_actions",
+        description:
+          "AGENT ACTION. Draft concrete operations for the user to approve: 'transfer' (move stock from donor stores/DCs to stores running out), 'reorder' (purchase orders for stockouts with no internal stock), 'technician' (open maintenance tickets and dispatch technicians for equipment faults), 'markdown' (discount batches about to expire). Optionally limit to a store or country. Call this whenever the user asks you to fix, do, act, approve, send, reorder, transfer, dispatch or mark down.",
+        parameters: {
+          type: "object",
+          properties: {
+            kind: { type: "string", enum: ["transfer", "reorder", "technician", "markdown"] },
+            store: { type: "string", description: "Store id or name, optional" },
+            country: { type: "string", description: "Country, optional" },
+            limit: { type: "number", description: "Max operations, default 10" },
+          },
+          required: ["kind"],
+        },
+      },
+      run: (a) => {
+        const kind = (["transfer", "reorder", "technician", "markdown"].includes(String(a.kind)) ? String(a.kind) : "transfer") as ProposalKind;
+        const one = findStore(st, a.store);
+        const sc: Scope = one !== null ? new Set([one]) : countryScope(st, a.country, scope);
+        const n = lim(a, 10, 25);
+        const pending = new Set(st.transfers.filter((t) => t.status === "Requested" || t.status === "Approved · in transit").map((t) => `${t.toStore}-${t.skuIdx}`));
+        let ids: string[] = [];
+        let impact = 0;
+        let rows: Array<Record<string, string | number>> = [];
+        if (kind === "transfer" || kind === "reorder") {
+          const so = stockoutRisks(st, sc)
+            .filter((x) => (kind === "transfer" ? !!x.donor : !x.donor) && !pending.has(`${x.storeIdx}-${x.skuIdx}`))
+            .sort((x, y) => y.lostSalesPerDay - x.lostSalesPerDay)
+            .slice(0, n);
+          ids = so.map((x) => x.id);
+          impact = so.reduce((t, x) => t + x.lostSalesPerDay * 7, 0);
+          rows = so.map((x) => ({ product: base.skus[x.skuIdx].name, store: sname(st, x.storeIdx), qty: r0(kind === "transfer" ? x.donor!.qty : x.needQty), from: kind === "transfer" ? (x.donor!.type === "store" ? sname(st, x.donor!.idx) : base.dcs[x.donor!.idx].name) : base.suppliers[base.skus[x.skuIdx].supplierIdx].name, lostSales7d: r0(x.lostSalesPerDay * 7) }));
+        } else if (kind === "technician") {
+          const eq = equipmentIssues(st, sc).filter((x) => !x.ticketId).sort((x, y) => y.stockAtRiskValue - x.stockAtRiskValue).slice(0, n);
+          ids = eq.map((x) => x.id);
+          impact = eq.reduce((t, x) => t + x.stockAtRiskValue, 0);
+          rows = eq.map((x) => ({ equipment: `${x.equipment.type} ${x.equipment.id}`, store: sname(st, x.storeIdx), issue: x.equipment.fault?.kind ?? "Fault", stockAtRisk: r0(x.stockAtRiskValue) }));
+        } else {
+          const ex = expiryRisks(st, sc).filter((x) => !x.markedDown && x.recommendation === "markdown").sort((x, y) => y.atRiskValue - x.atRiskValue).slice(0, n);
+          ids = ex.map((x) => x.id);
+          impact = ex.reduce((t, x) => t + x.atRiskValue, 0);
+          rows = ex.map((x) => ({ product: base.skus[x.skuIdx].name, store: sname(st, x.storeIdx), lot: x.lot, daysLeft: x.daysLeft, atRisk: r0(x.atRiskValue) }));
+        }
+        const label = ({ transfer: ["stock transfer", "stock transfers"], reorder: ["purchase order", "purchase orders"], technician: ["technician dispatch", "technician dispatches"], markdown: ["expiry markdown", "expiry markdowns"] } as const)[kind][ids.length === 1 ? 0 : 1];
+        if (ids.length) {
+          proposals.push({
+            id: `P-${Date.now().toString(36)}-${proposals.length}`,
+            kind,
+            title: `${ids.length} ${label}`,
+            detail: one !== null ? sname(st, one) : typeof a.country === "string" && a.country ? String(a.country) : "Across your stores",
+            impact: r0(impact),
+            itemIds: ids,
+          });
+        }
+        return {
+          data: { drafted: ids.length, kind, impactAed: r0(impact), note: ids.length ? "Drafted and shown to the user for approval. NOT executed yet." : "Nothing to draft.", items: rows.slice(0, 8) },
+          visuals: rows.length
+            ? [{ kind: "table", title: `Drafted ${label}`, columns: Object.keys(rows[0]).map((k) => ({ key: k, label: k.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase()), format: /lostSales|stockAtRisk|atRisk/.test(k) ? ("money" as const) : typeof rows[0][k] === "number" ? ("number" as const) : ("text" as const) })), rows }]
+            : [],
+        };
+      },
+    },
     {
       type: "function",
       function: { name: "get_retail_overview", description: "Chain KPIs: stores, active SKUs, inventory value, stockouts, overstock, supplier delays, expiry risk, losses, sales vs target and the top problems.", parameters: { type: "object", properties: {} } },
@@ -316,6 +380,7 @@ const FOLLOW: Record<string, string[]> = {
 
 /** What SCIO did for each tool, shown to the user as a step. */
 const STEP: Record<string, (a: Args) => string> = {
+  draft_actions: (a) => `Drafted ${String(a.kind ?? "")} actions for your approval`,
   get_retail_overview: () => "Read chain KPIs across stores, stock, suppliers and expiry",
   get_stockout_forecast: () => "Forecast days of supply for every store-SKU",
   get_overstock: () => "Scanned store-SKUs above the overstock threshold",
@@ -360,11 +425,12 @@ function chartFor(t: Visual): Visual | null {
   return { kind: "hbar", title: `${valueCol.label} by ${catCol.label.toLowerCase()}`, xKey: "name", series: [{ key: "value", label: valueCol.label }], format: valueCol.format === "money" ? "money" : "number", rows };
 }
 
-export async function runRetailCopilot(question: string, history: CopilotTurn[], events: RetailEvent[], scopeStores: number[] | null, token?: string): Promise<CopilotResponse> {
+export async function runRetailCopilot(question: string, history: CopilotTurn[], events: RetailEvent[], scopeStores: number[] | null, token?: string, mode: "text" | "card" = "text"): Promise<CopilotResponse> {
   const base = await getRetailData(token);
   const st = buildState(base, Array.isArray(events) ? events.slice(-2000) : []);
   const scope: Scope = scopeStores ? new Set(scopeStores) : null;
-  const T = tools(st, scope);
+  const proposals: ActionProposal[] = [];
+  const T = tools(st, scope, proposals);
   const defs: ToolDef[] = T.map(({ type, function: f }) => ({ type, function: f }));
   const system = `You are SCIO, the retail operations copilot inside SCIO Retail OS for a retail chain operating in the UAE, Saudi Arabia, Qatar, Kuwait, Oman and Bahrain (${base.stores.length} stores in UAE, Saudi Arabia, Qatar, Kuwait, Oman and Bahrain; ${base.skus.length} SKUs). Today is ${base.anchorDate}. Reporting currency AED.
 ${scope ? `The user can only see these stores: ${[...scope].map((s) => base.stores[s].id).join(", ")}.` : "The user sees all stores."}
@@ -374,20 +440,51 @@ Rules:
 - Never refuse or say you lack data. For growth, revenue, sales or margin questions call get_sales_growth_levers (plus other tools as useful) and give a prioritised action plan: the biggest levers first, each with its AED size and who should act.
 - Format: one-sentence direct answer, then 2-5 short bullets with key figures (**bold** numbers), then a line starting "Recommendation:" with concrete actions (who should do what).
 - Mention that tables/charts below show the evidence. Never write markdown tables (the evidence tables are rendered separately). Under 180 words.
-- If asked where the data comes from, say it is sample data for this workspace; never present it as a real customer's data.`;
+- You are an AGENT: when the user asks you to fix, do, handle, approve, reorder, transfer, dispatch or mark down anything, call draft_actions (one call per kind needed) and say the drafted actions are shown below, ready for their approval. Never claim an action has already been executed.
+${mode === "card" ? `- CONVERSATION: if the user asks you to explain, simplify, clarify, rephrase, or says something conversational, or asks a follow-up about your previous answer, do NOT repeat the dashboard. Reply ONLY with {"plain":"..."} — plain everyday words a shop owner understands, 3-6 short sentences or bullets, no jargon (say "arrives late" not "OTIF"), focus on what it means and what to do. No tool calls needed for this.
+- OTHERWISE (a new data question), your final reply must be ONLY a JSON object (no prose, no code fences) shaped:
+{"headline":"Here's what I found.","summary":"one sentence direct answer","kpis":[{"label":"Stores affected","value":"2 of 6","note":"optional short note","tone":"bad|good|neutral"}],"drivers":[{"title":"Stockouts","detail":"short cause with figure","impact":"~AED 142.3K impact"}],"next":["Transfer 2,000 units to the affected stores","Expedite the pending purchase order"]}
+headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g. "AED 871.9K", "4 of 6") and notes under 6 words; 1-3 drivers with detail under 15 words and impact like "AED 222K"; 2-3 next steps as short imperative actions that are NOT already drafted with draft_actions. All figures from tools.` : ""}
+- Data sources: SCIO unifies the connected systems ERP (finance, costs, inventory), POS (sales, returns), CRM (customers, loyalty), WMS (warehouse stock), SCM (forecasts, deliveries), P2P (POs, suppliers, invoices), HRMS (employees), WFM (shifts), CMMS (equipment work orders), OMS (online orders), IoT (sensors) and SOTM (store tasks, inspections). If asked where data comes from, name the relevant systems and note this workspace uses sample data; never present it as a real customer's data.`;
   const messages: ChatMessage[] = [{ role: "system", content: system }, ...history.slice(-8).map((t) => ({ role: t.role, content: t.content.slice(0, 2000) }) as ChatMessage), { role: "user", content: question.slice(0, 1000) }];
   const visuals: Visual[] = [];
   const used: string[] = [];
   const steps: string[] = [];
   const actions: Array<{ label: string; to: string }> = [];
-  const finish = (answer: string): CopilotResponse => ({
+  const finish = (raw: string): CopilotResponse => {
+    let answer = raw;
+    let card: AnswerCard | undefined;
+    if (mode === "card") {
+      const m = raw.match(/\{[\s\S]*\}/);
+      try {
+        const j = m ? (JSON.parse(m[0]) as Partial<AnswerCard> & { plain?: string }) : null;
+        if (j && typeof j.plain === "string") {
+          answer = j.plain;
+        } else if (j && typeof j.summary === "string") {
+          card = {
+            headline: typeof j.headline === "string" ? j.headline : "Here's what I found.",
+            summary: j.summary,
+            kpis: Array.isArray(j.kpis) ? j.kpis.filter((k) => k && k.label && k.value).slice(0, 4).map((k) => ({ ...k, value: String(k.value) })) : [],
+            drivers: Array.isArray(j.drivers) ? j.drivers.filter((d) => d && d.title).slice(0, 3) : [],
+            next: Array.isArray(j.next) ? j.next.filter((x) => typeof x === "string").slice(0, 4) : [],
+          };
+          answer = card.summary;
+        }
+      } catch {
+        /* fall back to plain text */
+      }
+    }
+    return {
     answer,
+    card,
     visuals,
     toolsUsed: used,
     followUps: Array.from(new Set(used.flatMap((t) => FOLLOW[t] ?? []))).slice(0, 3),
     steps: [...steps, ...(used.length ? [`Ranked findings by business impact and drafted actions`] : [])],
     actions: actions.filter((a, i) => actions.findIndex((x) => x.to === a.to) === i).slice(0, 3),
-  });
+    proposals,
+  };
+  };
   for (let step = 0; step < 4; step++) {
     const { message } = await sarvamChat({ messages, tools: defs, maxTokens: 900 });
     const calls = message.tool_calls ?? [];

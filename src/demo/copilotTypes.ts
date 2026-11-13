@@ -34,5 +34,30 @@ export interface CopilotResponse {
   steps?: string[];
   /** Places in the app where the user can act on the answer. */
   actions?: Array<{ label: string; to: string }>;
+  /** Actions SCIO drafted for the user to approve (agentic mode). */
+  proposals?: ActionProposal[];
+  /** Structured answer for the Operations assistant (card mode). */
+  card?: AnswerCard;
   error?: string;
+}
+
+export type ProposalKind = "transfer" | "reorder" | "technician" | "markdown";
+
+/** A batch of concrete operations SCIO drafted; executed in the browser only after approval. */
+export interface ActionProposal {
+  id: string;
+  kind: ProposalKind;
+  title: string;
+  detail: string;
+  impact: number; // AED protected
+  /** ids of the stockout / equipment / expiry rows to act on */
+  itemIds: string[];
+}
+
+export interface AnswerCard {
+  headline: string;
+  summary: string;
+  kpis: Array<{ label: string; value: string; note?: string; tone?: "good" | "bad" | "neutral" }>;
+  drivers: Array<{ title: string; detail: string; impact?: string }>;
+  next: string[];
 }

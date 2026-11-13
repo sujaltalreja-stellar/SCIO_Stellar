@@ -23,7 +23,7 @@ function open(title: string, body: string, who: string, scopeLabel: string) {
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SCIO Retail · ${esc(title)}</title>
 <style>body{font-family:Inter,Arial,sans-serif;color:#0f172a;max-width:980px;margin:28px auto;padding:0 24px}h1{font-size:23px;margin:4px 0 0}h2{font-size:14px;margin:24px 0 8px;color:#1e3a8a}
 .muted{color:#64748b;font-size:12px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}.kpi{border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px}.kpi b{display:block;font-size:19px;margin-top:4px}
-table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;background:#f1f5f9;padding:6px 8px}td{padding:5px 8px;border-bottom:1px solid #e2e8f0}.bar{height:4px;background:linear-gradient(90deg,#2563eb,#38bdf8);border-radius:4px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:12px}th{text-align:left;background:#f1f5f9;padding:6px 8px}td{padding:5px 8px;border-bottom:1px solid #e2e8f0}.bar{height:4px;background:linear-gradient(90deg,#e8901a,#38bdf8);border-radius:4px;margin-bottom:16px}
 .note{margin-top:20px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#92400e}</style></head>
 <body><div class="bar"></div><div class="muted">SCIO Retail OS · ${esc(scopeLabel)}</div><h1>${esc(title)}</h1><div class="muted">Generated ${new Date().toLocaleString("en-GB", { timeZone: "Asia/Dubai" })} by ${esc(who)}</div>${body}
 <script>setTimeout(()=>window.print(),400)</script></body></html>`);
@@ -151,7 +151,7 @@ export default function RetailReports() {
                 <p className="mt-1 text-sm text-slate-600">{r.desc}</p>
               </div>
             </div>
-            <button onClick={() => open(r.title, r.build(state, k, scope), `${user?.name} · ${user?.role}`, scopeLabel)} className="mt-4 inline-flex items-center gap-2 self-start rounded-xl bg-[#2563eb] px-4 py-2 text-sm font-semibold text-[#fff] hover:bg-[#1d4ed8]">
+            <button onClick={() => open(r.title, r.build(state, k, scope), `${user?.name} · ${user?.role}`, scopeLabel)} className="mt-4 inline-flex items-center gap-2 self-start rounded-xl bg-[#111113] px-4 py-2 text-sm font-semibold text-[#fff] hover:bg-[#2a2a30]">
               <Download className="h-4 w-4" /> Generate PDF
             </button>
           </Card>

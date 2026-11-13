@@ -135,7 +135,7 @@ function Thinking() {
 
 function Avatar() {
   return (
-    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] shadow-sm shadow-blue-600/20">
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#111113] shadow-sm shadow-blue-600/20">
       <Sparkles className="h-4 w-4 text-[#fff]" />
     </span>
   );
@@ -204,7 +204,7 @@ export default function AskPage({ endpoint = "/api/scio/copilot", suggestions = 
         <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
           <div className="relative">
             <div className="absolute inset-0 -z-10 animate-pulse rounded-full bg-indigo-500/30 blur-2xl" />
-            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#2563eb] shadow-xl shadow-indigo-500/30">
+            <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#111113] shadow-xl shadow-indigo-500/30">
               <Sparkles className="h-7 w-7 text-[#fff]" />
             </span>
           </div>
@@ -238,7 +238,7 @@ export default function AskPage({ endpoint = "/api/scio/copilot", suggestions = 
           {messages.map((m) =>
             m.role === "user" ? (
               <div key={m.id} className="flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-[#2563eb] px-4 py-2.5 text-sm text-[#fff] shadow-lg shadow-blue-900/10">
+                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-[#111113] px-4 py-2.5 text-sm text-[#fff] shadow-lg shadow-blue-900/10">
                   {m.content}
                 </div>
               </div>
@@ -294,7 +294,7 @@ export default function AskPage({ endpoint = "/api/scio/copilot", suggestions = 
                               onClick={() => navigate(a.to)}
                               className={cx(
                                 "inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[13px] font-semibold transition",
-                                i === 0 ? "bg-[#2563eb] text-[#fff] shadow-sm hover:bg-[#1d4ed8]" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                                i === 0 ? "bg-[#111113] text-[#fff] shadow-sm hover:bg-[#2a2a30]" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                               )}
                             >
                               {a.label} →
@@ -351,7 +351,7 @@ export default function AskPage({ endpoint = "/api/scio/copilot", suggestions = 
         <button
           type="submit"
           disabled={!input.trim() || busy}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-[#fff] transition enabled:hover:bg-[#1d4ed8] disabled:opacity-40"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#111113] text-[#fff] transition enabled:hover:bg-[#2a2a30] disabled:opacity-40"
           aria-label="Send"
         >
           <ArrowUp className="h-4 w-4" />

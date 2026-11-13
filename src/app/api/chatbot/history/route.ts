@@ -12,7 +12,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, messages: [], reason: "Convex URL not configured" });
     }
 
-    const client = new ConvexHttpClient(convexUrl);
+    const client = new ConvexHttpClient(convexUrl.replace(/\/+$/, ""));
     const history = await client.query(api.queries.getChatHistory, { industry });
 
     const formattedMessages = history.map((record: any) => ({
@@ -41,7 +41,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ success: false, reason: "Convex URL not configured" });
     }
 
-    const client = new ConvexHttpClient(convexUrl);
+    const client = new ConvexHttpClient(convexUrl.replace(/\/+$/, ""));
     await client.mutation(api.mutations.clearChatHistory, { industry });
 
     return NextResponse.json({ success: true });

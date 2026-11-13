@@ -208,3 +208,38 @@ html.scio-app body {
   --color-slate-600: #94a3b8;
   --color-slate-700: #64748b;
 }
+
+/* ---------------------------------------------------------------------------
+   Brand: black + gold (matches the sign-in page). The app's "blue/indigo"
+   accent utilities are remapped to the SCIO gold ramp in light mode, so every
+   module (retail and industrial) picks up the same identity.
+   --------------------------------------------------------------------------- */
+html.scio-app:not(.scio-dark) {
+  --scio-page: #f6f5f3;
+  --color-blue-50: #fff8ec;
+  --color-blue-100: #fdedcc;
+  --color-blue-200: #fbdb9c;
+  --color-blue-300: #f8c76a;
+  --color-blue-400: #f5b549;
+  --color-blue-500: #f2a93b;
+  --color-blue-600: #d98b16;
+  --color-blue-700: #b06d0f;
+  --color-blue-800: #8a5410;
+  --color-blue-900: #6b4112;
+  --color-blue-950: #3d250b;
+  --color-indigo-50: #fff8ec;
+  --color-indigo-100: #fdedcc;
+  --color-indigo-200: #fbdb9c;
+  --color-indigo-300: #f8c76a;
+  --color-indigo-400: #f5b549;
+  --color-indigo-500: #f2a93b;
+  --color-indigo-600: #d98b16;
+  --color-indigo-700: #b06d0f;
+  --color-indigo-800: #8a5410;
+  --color-indigo-900: #6b4112;
+}
+html.scio-app:not(.scio-dark) body {
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 0%, rgba(242, 169, 59, 0.06), transparent 70%),
+    var(--scio-page);
+}

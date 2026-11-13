@@ -154,7 +154,7 @@ export default function HomePage() {
               {site ?? "All sites"} · availability <b className="text-[#fff]">{pctDp(pk.availability)}</b> over 90 days, <b className="text-[#fff]">{pk.bd30}</b> breakdown{pk.bd30 === 1 ? "" : "s"} in the last 30 days and <b className="text-[#fff]">{queue.length}</b> item{queue.length === 1 ? "" : "s"} needing a decision.
             </p>
             <div className="mt-auto flex flex-wrap items-center gap-2 pt-5">
-              <Link to="/app/ask" className="inline-flex items-center gap-2 rounded-xl bg-[#fff] px-4 py-2.5 text-sm font-semibold text-[#1d4ed8] shadow-lg shadow-[#0b1a3a]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+              <Link to="/app/ask" className="inline-flex items-center gap-2 rounded-xl bg-[#fff] px-4 py-2.5 text-sm font-semibold text-[#b06d0f] shadow-lg shadow-[#0b1a3a]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
                 <Sparkles className="h-4 w-4" /> Ask SCIO
               </Link>
               <label className="inline-flex items-center gap-2 rounded-xl bg-[#fff]/10 px-3 py-2 text-sm font-semibold text-[#fff] ring-1 ring-[#fff]/25">
@@ -210,7 +210,7 @@ export default function HomePage() {
                       <div className="text-[13px] font-bold tabular-nums text-[#fff]">{money(q.impact, true)}</div>
                       <div className="text-[10.5px] text-[#94a3b8]">{q.impactLabel}</div>
                     </div>
-                    <button onClick={() => navigate(q.to, { state: q.state })} className="shrink-0 rounded-lg bg-[#fff] px-2.5 py-1.5 text-[12px] font-semibold text-[#1d4ed8] transition hover:bg-[#dbeafe]">
+                    <button onClick={() => navigate(q.to, { state: q.state })} className="shrink-0 rounded-lg bg-[#fff] px-2.5 py-1.5 text-[12px] font-semibold text-[#b06d0f] transition hover:bg-[#dbeafe]">
                       {q.action}
                     </button>
                   </li>
@@ -252,7 +252,7 @@ export default function HomePage() {
                   <button
                     key={r}
                     onClick={() => setRange(r)}
-                    className={cx("rounded-lg border px-3 py-1 text-xs font-semibold", range === r ? "border-blue-600 bg-[#2563eb] text-[#fff]" : "border-slate-200 text-slate-600 hover:bg-slate-50")}
+                    className={cx("rounded-lg border px-3 py-1 text-xs font-semibold", range === r ? "border-blue-600 bg-[#111113] text-[#fff]" : "border-slate-200 text-slate-600 hover:bg-slate-50")}
                   >
                     {r}D
                   </button>

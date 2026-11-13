@@ -32,7 +32,7 @@ export default function SettingsPage() {
         <Card>
           <Section icon={User} title="Profile" />
           <div className="flex items-center gap-4">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2563eb] text-lg font-bold text-[#fff]">{user?.name.split(" ").map((p) => p[0]).join("")}</span>
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#111113] text-lg font-bold text-[#fff]">{user?.name.split(" ").map((p) => p[0]).join("")}</span>
             <div>
               <div className="font-semibold text-slate-900">{user?.name}</div>
               <div className="text-sm text-slate-500">{user?.role}</div>

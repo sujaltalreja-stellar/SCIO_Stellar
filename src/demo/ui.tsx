@@ -17,7 +17,7 @@ export const num = (n: number) => Math.round(n).toLocaleString("en-US");
 
 // Chart palette tuned for white surfaces
 export const C = {
-  indigo: "#3b82f6", // primary blue
+  indigo: "#f2a93b", // primary (SCIO gold)
   cyan: "#14b8a6", // teal
   violet: "#8b5cf6",
   emerald: "#22c55e",
@@ -26,7 +26,7 @@ export const C = {
   slate: "#94a3b8",
   grid: "rgba(148,163,184,0.18)",
 };
-export const CATEGORY_COLORS = ["#3b82f6", "#8b5cf6", "#14b8a6", "#f59e0b", "#ec4899", "#22c55e", "#06b6d4", "#f97316", "#6366f1", "#94a3b8"];
+export const CATEGORY_COLORS = ["#f2a93b", "#8b5cf6", "#14b8a6", "#f59e0b", "#ec4899", "#22c55e", "#06b6d4", "#f97316", "#334155", "#94a3b8"];
 
 export const axisProps = { stroke: "#94a3b8", fontSize: 11, tickLine: false, axisLine: false } as const;
 
@@ -232,7 +232,7 @@ export function ChartTooltip({
       {label && <div className="mb-1.5 font-semibold text-slate-700">{label}</div>}
       {payload.map((p) => (
         <div key={String(p.dataKey ?? p.name)} className="flex items-center gap-2 py-0.5">
-          <span className="h-2 w-2 rounded-full" style={{ background: p.color || p.stroke || (typeof p.fill === "string" && !p.fill.startsWith("url") ? p.fill : "#3b82f6") }} />
+          <span className="h-2 w-2 rounded-full" style={{ background: p.color || p.stroke || (typeof p.fill === "string" && !p.fill.startsWith("url") ? p.fill : "#f2a93b") }} />
           <span className="text-slate-500">{p.name}</span>
           <span className="ml-auto pl-4 font-semibold tabular-nums text-slate-900">{format(Number(p.value), p.dataKey)}</span>
         </div>
@@ -248,7 +248,7 @@ export function Aurora() {
 
 /** Primary button classes. */
 export const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 transition hover:bg-[#1d4ed8] disabled:opacity-40";
+  "inline-flex items-center justify-center gap-2 rounded-xl bg-[#111113] px-4 py-2 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 transition hover:bg-[#2a2a30] disabled:opacity-40";
 export const btnSecondary = "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50";
 
 /** Pulsing "Live" chip for use on dark hero surfaces. */

@@ -185,7 +185,7 @@ export default function InventoryPage({ mode = "inventory" }: { mode?: "inventor
                 ) : sel.recommendedQty > 0 ? (
                   <button
                     onClick={() => createPR(sel)}
-                    className="inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 hover:bg-[#1d4ed8]"
+                    className="inline-flex items-center gap-2 rounded-xl bg-[#111113] px-4 py-2 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 hover:bg-[#2a2a30]"
                   >
                     <ShoppingCart className="h-4 w-4" /> Create purchase request
                   </button>

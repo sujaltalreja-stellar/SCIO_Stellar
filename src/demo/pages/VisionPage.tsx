@@ -289,7 +289,7 @@ export default function VisionPage({ targets, title = "Vision Inspection", subti
               <button
                 onClick={run}
                 disabled={!canRun}
-                className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] py-3 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 transition enabled:hover:bg-[#1d4ed8] disabled:opacity-40"
+                className="mt-auto flex items-center justify-center gap-2 rounded-xl bg-[#111113] py-3 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 transition enabled:hover:bg-[#2a2a30] disabled:opacity-40"
               >
                 {busy ? (
                   <>

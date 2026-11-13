@@ -19,7 +19,7 @@ async function persistChatToConvex(
   try {
     const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
     if (!convexUrl) return;
-    const client = new ConvexHttpClient(convexUrl);
+    const client = new ConvexHttpClient(convexUrl.replace(/\/+$/, ""));
     const timeStr = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
     let formattedAction: { type: string; label: string; payload?: Record<string, string> } | undefined = undefined;

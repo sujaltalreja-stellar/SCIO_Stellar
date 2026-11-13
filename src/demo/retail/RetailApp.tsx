@@ -6,6 +6,9 @@ import DemoShell from "../layout/DemoShell";
 import AskPage from "../pages/AskPage";
 import DocumentsPage from "../pages/DocumentsPage";
 import RetailDashboard from "./pages/RetailDashboard";
+import RetailHome from "./pages/RetailHome";
+import ActionsPage from "./pages/ActionsPage";
+import OperatePage from "./pages/OperatePage";
 import StoresPage from "./pages/StoresPage";
 import SkuPage from "./pages/SkuPage";
 import ReplenishmentPage from "./pages/ReplenishmentPage";
@@ -56,10 +59,14 @@ export default function RetailApp() {
     <RetailProvider>
       <Routes>
         <Route element={<DemoShell />}>
-          <Route index element={<RetailDashboard />} />
+          <Route index element={<RetailHome />} />
+          <Route path="actions" element={<ActionsPage />} />
+          <Route path="operate" element={<Navigate to="/app/retail/ask" replace />} />
+          <Route path="command-center" element={<RetailDashboard />} />
           <Route path="master" element={<MasterDashboard />} />
           <Route path="insights/:metric" element={<MetricDashboard />} />
-          <Route path="ask" element={<RetailAsk />} />
+          <Route path="ask" element={<OperatePage />} />
+          <Route path="ask/classic" element={<RetailAsk />} />
           <Route path="stores" element={<StoresPage />} />
           <Route path="stores/:id" element={<StoresPage />} />
           <Route path="skus" element={<SkuPage />} />

@@ -270,7 +270,7 @@ export default function DocumentsPage({ docs, sector = "industrial" }: { docs?: 
                   (sel.stage === "idle" || sel.stage === "error" || sel.stage === "done") && (
                     <button
                       onClick={() => process(sel)}
-                      className="inline-flex items-center gap-2 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 hover:bg-[#1d4ed8]"
+                      className="inline-flex items-center gap-2 rounded-xl bg-[#111113] px-3.5 py-1.5 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 hover:bg-[#2a2a30]"
                     >
                       <Sparkles className="h-4 w-4" /> {sel.stage === "idle" ? "Process document" : "Re-process"}
                     </button>
@@ -357,7 +357,7 @@ export default function DocumentsPage({ docs, sector = "industrial" }: { docs?: 
                 ) : (
                   <div className="mt-4 flex flex-wrap gap-2">
                     {sel.result.decision !== "reject" && (
-                      <button onClick={() => act("approve")} className="rounded-xl bg-[#2563eb] px-4 py-2 text-sm font-semibold text-[#fff] hover:bg-[#1d4ed8]">
+                      <button onClick={() => act("approve")} className="rounded-xl bg-[#111113] px-4 py-2 text-sm font-semibold text-[#fff] hover:bg-[#2a2a30]">
                         Approve for payment
                       </button>
                     )}

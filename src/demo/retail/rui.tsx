@@ -59,7 +59,7 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: Array<
         <button
           key={k}
           onClick={() => onChange(k)}
-          className={cx("inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition", value === k ? "bg-[#2563eb] text-[#fff] shadow-sm" : "text-slate-700 hover:bg-slate-50")}
+          className={cx("inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition", value === k ? "bg-[#111113] text-[#fff] shadow-sm" : "text-slate-700 hover:bg-slate-50")}
         >
           {label}
           {count !== undefined && (
@@ -104,7 +104,7 @@ export function ActButton({
   const { can, role } = useRetail();
   const allowed = !perm || can(perm);
   const cls = {
-    primary: "bg-[#2563eb] text-[#fff] hover:bg-[#1d4ed8] shadow-sm shadow-blue-600/20",
+    primary: "bg-[#111113] text-[#fff] hover:bg-[#2a2a30] shadow-sm shadow-blue-600/20",
     secondary: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
     danger: "border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100",
     ghost: "text-blue-700 hover:bg-blue-50",

@@ -75,7 +75,7 @@ export default function MasterDashboard() {
     {
       title: "Sales & margin",
       icon: ShoppingCart,
-      color: "from-[#2563eb] to-[#06b6d4]",
+      color: "from-[#f7bd5c] to-[#efa232]",
       tiles: [
         { label: `Net sales · ${days}d`, value: aed(d.t.net), sub: delta(d.t.net, d.prev.net), to: "sales" },
         { label: "Gross margin", value: pctf(d.t.gmPct), sub: delta(d.t.gmPct, d.prev.gmPct, true), tone: d.t.gmPct >= d.prev.gmPct ? "good" : "bad", to: "sales" },
@@ -101,7 +101,7 @@ export default function MasterDashboard() {
     {
       title: "Supply chain",
       icon: Truck,
-      color: "from-[#7c3aed] to-[#6366f1]",
+      color: "from-[#7c3aed] to-[#f2a93b]",
       tiles: [
         { label: "OTIF", value: pctf(d.otif), tone: d.otif > 0.85 ? "good" : "warn", to: "suppliers" },
         { label: "Fill rate", value: pctf(d.fill), to: "suppliers" },
@@ -131,20 +131,20 @@ export default function MasterDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-        <Link to={P} className="inline-flex items-center gap-1 hover:text-slate-800"><ArrowLeft className="h-4 w-4" /> Command Center</Link>
+        <Link to={P} className="inline-flex items-center gap-1 hover:text-slate-800"><ArrowLeft className="h-4 w-4" /> Home</Link>
       </div>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-4">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#0f172a] to-[#1e40af] text-[#fff] shadow-lg"><LayoutDashboard className="h-6 w-6" /></span>
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#111113] to-[#2a2a30] text-[#fff] shadow-lg"><LayoutDashboard className="h-6 w-6" /></span>
           <div>
-            <h1 className="text-[28px] font-bold tracking-tight text-slate-900">Master dashboard</h1>
+            <h1 className="text-[28px] font-bold tracking-tight text-slate-900">Insights</h1>
             <p className="mt-1 text-[14px] text-slate-600">Sales, inventory, supply chain and risk in one view · click any figure to open its dashboard.</p>
             <p className="mt-1 text-xs text-slate-400">{scopeLabel} · as of {st.base.anchorDate}</p>
           </div>
         </div>
         <div className="flex rounded-xl border border-slate-200 bg-white p-1 text-xs font-semibold">
           {[7, 30, 90].map((n) => (
-            <button key={n} onClick={() => setDays(n)} className={cx("rounded-lg px-3 py-1.5 transition", days === n ? "bg-[#2563eb] text-[#fff]" : "text-slate-600 hover:bg-slate-50")}>{n}D</button>
+            <button key={n} onClick={() => setDays(n)} className={cx("rounded-lg px-3 py-1.5 transition", days === n ? "bg-[#111113] text-[#fff]" : "text-slate-600 hover:bg-slate-50")}>{n}D</button>
           ))}
         </div>
       </div>

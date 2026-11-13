@@ -108,7 +108,7 @@ export function ApprovalProvider({ children }: { children: React.ReactNode }) {
               </button>
               <button
                 onClick={() => close(true)}
-                className="flex-1 rounded-xl bg-[#2563eb] py-2.5 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 hover:bg-[#1d4ed8]"
+                className="flex-1 rounded-xl bg-[#111113] py-2.5 text-sm font-semibold text-[#fff] shadow-sm shadow-blue-600/20 hover:bg-[#2a2a30]"
               >
                 {pending.req.confirmLabel ?? "Approve"}
               </button>

@@ -17,7 +17,7 @@ let client: ConvexHttpClient | null = null;
 function convex() {
   const url = process.env.NEXT_PUBLIC_CONVEX_URL;
   if (!url) throw new Error("NEXT_PUBLIC_CONVEX_URL is not configured");
-  client ??= new ConvexHttpClient(url);
+  client ??= new ConvexHttpClient(url.replace(/\/+$/, ""));
   return client;
 }
 

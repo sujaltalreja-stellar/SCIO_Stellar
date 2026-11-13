@@ -8,8 +8,10 @@ import { DEFAULT_THRESHOLDS, type Thresholds } from "../state";
 import { describeEvent } from "./RetailDashboard";
 import { Card } from "../../ui";
 import { ActButton, DataGrid, PageTitle, Pill, Tabs } from "../rui";
+import ConnectedSystems from "./ConnectedSystems";
+import { SOURCES } from "../sources";
 
-type Tab = "thresholds" | "roles" | "currency" | "audit";
+type Tab = "systems" | "thresholds" | "roles" | "currency" | "audit";
 
 const FIELDS: Array<{ key: keyof Thresholds; label: string; help: string; min: number; max: number; unit: string }> = [
   { key: "stockoutDays", label: "Stockout risk", help: "Flag when available stock covers fewer days than this", min: 1, max: 14, unit: "days of supply" },
@@ -23,7 +25,7 @@ const FIELDS: Array<{ key: keyof Thresholds; label: string; help: string; min: n
 export default function RetailSettings() {
   const { state, dispatch, can, reset, role } = useRetail();
   const [params, setParams] = useSearchParams();
-  const tab = (params.get("tab") as Tab) || "thresholds";
+  const tab = (params.get("tab") as Tab) || "systems";
   const [draft, setDraft] = useState<Thresholds>(state.thresholds);
   const { base } = state;
   const errors = FIELDS.filter((f) => !(draft[f.key] >= f.min && draft[f.key] <= f.max)).map((f) => f.key);
@@ -31,17 +33,20 @@ export default function RetailSettings() {
 
   return (
     <div className="space-y-6">
-      <PageTitle title="Settings" sub="Thresholds, roles & permissions, currencies and the audit trail" />
+      <PageTitle title="Settings" sub="Connected systems, thresholds, roles & permissions, currencies and the audit trail" />
       <Tabs<Tab>
         value={tab}
         onChange={(t) => setParams({ tab: t })}
         tabs={[
+          ["systems", "Connected Systems", SOURCES.length],
           ["thresholds", "Thresholds"],
           ["roles", "Roles & access"],
           ["currency", "Currency & VAT"],
           ["audit", "Audit trail", state.events.length],
         ]}
       />
+
+      {tab === "systems" && <ConnectedSystems />}
 
       {tab === "thresholds" && (
         <Card>

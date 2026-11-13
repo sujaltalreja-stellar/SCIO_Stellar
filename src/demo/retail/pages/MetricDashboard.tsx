@@ -566,7 +566,7 @@ export default function MetricDashboard() {
     return (
       <div className="py-16 text-center">
         <p className="text-slate-600">Unknown dashboard.</p>
-        <Link to={P} className="mt-3 inline-block text-sm font-semibold text-blue-700">Back to Command Center</Link>
+        <Link to={`${P}/master`} className="mt-3 inline-block text-sm font-semibold text-blue-700">Back to Insights</Link>
       </div>
     );
   }
@@ -575,7 +575,7 @@ export default function MetricDashboard() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-        <Link to={P} className="inline-flex items-center gap-1 hover:text-slate-800"><ArrowLeft className="h-4 w-4" /> Command Center</Link>
+        <Link to={`${P}/master`} className="inline-flex items-center gap-1 hover:text-slate-800"><ArrowLeft className="h-4 w-4" /> Insights</Link>
         <ChevronRight className="h-4 w-4 text-slate-300" />
         <Link to={`${P}/master`} className="inline-flex items-center gap-1 hover:text-slate-800"><LayoutDashboard className="h-4 w-4" /> Master dashboard</Link>
         <ChevronRight className="h-4 w-4 text-slate-300" />
@@ -584,7 +584,7 @@ export default function MetricDashboard() {
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-4">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#2563eb] to-[#06b6d4] text-[#fff] shadow-lg shadow-blue-500/20"><Icon className="h-6 w-6" /></span>
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-[#f7bd5c] to-[#efa232] text-[#fff] shadow-lg shadow-blue-500/20"><Icon className="h-6 w-6" /></span>
           <div>
             <h1 className="text-[28px] font-bold tracking-tight text-slate-900">{view.title}</h1>
             <p className="mt-1 max-w-3xl text-[14px] text-slate-600">{view.definition}</p>
@@ -595,7 +595,7 @@ export default function MetricDashboard() {
           {view.period && (
             <div className="flex rounded-xl border border-slate-200 bg-white p-1 text-xs font-semibold">
               {[7, 30, 90].map((d) => (
-                <button key={d} onClick={() => setDays(d)} className={cx("rounded-lg px-3 py-1.5 transition", days === d ? "bg-[#2563eb] text-[#fff]" : "text-slate-600 hover:bg-slate-50")}>{d}D</button>
+                <button key={d} onClick={() => setDays(d)} className={cx("rounded-lg px-3 py-1.5 transition", days === d ? "bg-[#111113] text-[#fff]" : "text-slate-600 hover:bg-slate-50")}>{d}D</button>
               ))}
             </div>
           )}
@@ -646,7 +646,7 @@ export default function MetricDashboard() {
           <CardTitle hint="Act on this metric">Next steps</CardTitle>
           <div className="space-y-2">
             {view.actions.map((a) => (
-              <Link key={a.label} to={a.to} className={cx("flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold transition", a.primary ? "bg-[#2563eb] text-[#fff] hover:bg-[#1d4ed8]" : "border border-slate-200 text-slate-700 hover:bg-slate-50")}>
+              <Link key={a.label} to={a.to} className={cx("flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm font-semibold transition", a.primary ? "bg-[#111113] text-[#fff] hover:bg-[#2a2a30]" : "border border-slate-200 text-slate-700 hover:bg-slate-50")}>
                 {a.label} <ChevronRight className="h-4 w-4" />
               </Link>
             ))}

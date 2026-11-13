@@ -5,6 +5,7 @@ import { DEMO_ACCOUNTS, useDemoAuth } from "../auth";
 import { ScioLogo } from "../layout/ScioLogo";
 import { Aurora, cx } from "../ui";
 import { ThemeToggle } from "../theme";
+import ConnectLoginPage from "./ConnectLoginPage";
 
 const FEATURES = [
   { icon: Sparkles, title: "AI Operations Copilot", text: "Ask in plain language, get answers with evidence and next actions." },
@@ -30,10 +31,10 @@ const DarkField = ({ label, icon: Icon, children }: { label: string; icon: typeo
  * LegacyLoginPage. The previous UI is intentionally retained in this file.
  */
 export default function LoginPage() {
-  return <HomeStyleLoginPage />;
+  return <ConnectLoginPage />;
 }
 
-function HomeStyleLoginPage() {
+export function HomeStyleLoginPage() {
   const { user, login } = useDemoAuth();
   const navigate = useNavigate();
   const location = useLocation();

@@ -157,7 +157,7 @@ export default function RetailDashboard() {
               {scopeLabel} · <b className="text-[#fff]">{critical}</b> critical issue{critical === 1 ? "" : "s"} and <b className="text-[#fff]">{aed(k.lostSalesPerDay)}</b>/day in lost sales need attention.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
-              <Link to={`${P}/ask`} className="inline-flex items-center gap-2 rounded-xl bg-[#fff] px-4 py-2.5 text-sm font-semibold text-[#1d4ed8] shadow-lg shadow-[#172554]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
+              <Link to={`${P}/ask`} className="inline-flex items-center gap-2 rounded-xl bg-[#fff] px-4 py-2.5 text-sm font-semibold text-[#b06d0f] shadow-lg shadow-[#172554]/20 transition hover:-translate-y-0.5 hover:shadow-xl">
                 <Sparkles className="h-4 w-4" /> Ask SCIO
               </Link>
               <Link to={`${P}/replenishment`} className="inline-flex items-center gap-2 rounded-xl bg-[#fff]/10 px-4 py-2.5 text-sm font-semibold text-[#fff] ring-1 ring-[#fff]/25 backdrop-blur transition hover:bg-[#fff]/20">
@@ -436,7 +436,7 @@ export default function RetailDashboard() {
               <BarChart data={byDept} layout="vertical" margin={{ top: 0, right: 12, left: 0, bottom: 0 }} barCategoryGap={8}>
                 <defs>
                   <linearGradient id="dept-g" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#6366f1" />
+                    <stop offset="0%" stopColor="#f2a93b" />
                     <stop offset="100%" stopColor="#06b6d4" />
                   </linearGradient>
                 </defs>

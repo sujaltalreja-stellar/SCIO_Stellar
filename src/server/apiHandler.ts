@@ -90,7 +90,7 @@ export async function handleApiRequest(
         }
         const history = Array.isArray(body?.history) ? body.history.filter((t: any) => (t?.role === "user" || t?.role === "assistant") && typeof t?.content === "string").slice(-8) : [];
         const scopeStores = Array.isArray(body?.scope) ? body.scope.filter((n: unknown) => Number.isInteger(n)).slice(0, 60) : null;
-        sendJson(res, 200, await runRetailCopilot(question, history, Array.isArray(body?.events) ? body.events : [], scopeStores, scioToken));
+        sendJson(res, 200, await runRetailCopilot(question, history, Array.isArray(body?.events) ? body.events : [], scopeStores, scioToken, body?.mode === "card" ? "card" : "text"));
         return true;
       }
       if (pathname === "/api/scio/vision") {
@@ -153,7 +153,7 @@ export async function handleApiRequest(
           return true;
         }
 
-        const client = new ConvexHttpClient(convexUrl);
+        const client = new ConvexHttpClient(convexUrl.replace(/\/+$/, ""));
         const history = await client.query(api.queries.getChatHistory, { industry });
 
         const formattedMessages = history.map((record: any) => ({
@@ -180,7 +180,7 @@ export async function handleApiRequest(
           return true;
         }
 
-        const client = new ConvexHttpClient(convexUrl);
+        const client = new ConvexHttpClient(convexUrl.replace(/\/+$/, ""));
         await client.mutation(api.mutations.clearChatHistory, { industry });
 
         sendJson(res, 200, { success: true });

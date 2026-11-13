@@ -32,7 +32,7 @@ function openReport(title: string, body: string, user: string) {
 h1{font-size:24px;margin:4px 0 0}h2{font-size:15px;margin:26px 0 8px;color:#1e3a8a}.muted{color:#64748b;font-size:12px}
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.kpi{border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px}
 .kpi b{display:block;font-size:20px;margin-top:4px}table{width:100%;border-collapse:collapse;font-size:12.5px}th{text-align:left;background:#f1f5f9;padding:7px 8px}
-td{padding:6px 8px;border-bottom:1px solid #e2e8f0}ul{padding-left:18px;font-size:13px}.bar{height:4px;background:linear-gradient(90deg,#2563eb,#38bdf8);border-radius:4px;margin-bottom:18px}</style></head>
+td{padding:6px 8px;border-bottom:1px solid #e2e8f0}ul{padding-left:18px;font-size:13px}.bar{height:4px;background:linear-gradient(90deg,#e8901a,#38bdf8);border-radius:4px;margin-bottom:18px}</style></head>
 <body><div class="bar"></div><div class="muted">SCIO · Business OS</div><h1>${esc(title)}</h1>
 <div class="muted">Generated ${new Date().toLocaleString("en-GB", { timeZone: "Asia/Dubai" })} for ${esc(user)}</div>${body}
 <script>setTimeout(()=>window.print(),400)</script></body></html>`);

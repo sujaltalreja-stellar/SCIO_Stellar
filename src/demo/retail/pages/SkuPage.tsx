@@ -7,8 +7,9 @@ import { NSKU, SALES_DAYS, batchesFor, skuDailySales } from "../generate";
 import { available, expiryRisks, movementHistory, overstock, phantomInventory, replenParams, stockoutRisks, supplierScorecards } from "../analytics";
 import { useWorkflows } from "../workflows";
 import type { Sku } from "../model";
+import { SkuChat, SkuInsightStrip } from "./SkuInsights";
 import { axisProps, C, ChartTooltip, Card, cx } from "../../ui";
-import { ActButton, aed, DataGrid, Drawer, localPrice, nf, PageTitle, pctf, Pill, Situation, Stat, Tabs, type Column } from "../rui";
+import { ActButton, aed, DataGrid, Drawer, localPrice, nf, PageTitle, pctf, Pill, Stat, Tabs, type Column } from "../rui";
 
 interface SkuRow {
   sku: Sku;
@@ -27,6 +28,7 @@ export default function SkuPage() {
   const { base } = state;
   const [dept, setDept] = useState("All");
   const [status, setStatus] = useState("All");
+  const [quick, setQuick] = useState<"all" | "oos" | "low" | "over">("all");
 
   const rows = useMemo<SkuRow[]>(() => {
     const out: SkuRow[] = [];
@@ -50,7 +52,8 @@ export default function SkuPage() {
     return out;
   }, [state, scope, base]);
 
-  const filtered = rows.filter((r) => (dept === "All" || r.sku.department === dept) && (status === "All" || r.sku.status === status) && r.stores > 0);
+  const base_ = rows.filter((r) => (dept === "All" || r.sku.department === dept) && (status === "All" || r.sku.status === status) && r.stores > 0);
+  const filtered = base_.filter((r) => (quick === "oos" ? r.oosStores > 0 : quick === "low" ? r.dos < 5 && r.oosStores === 0 : quick === "over" ? r.dos > state.thresholds.overstockDays && r.dos < 900 : true));
   const selected = params.get("sku");
   const storeParam = params.get("store");
   const open = selected ? base.skus.find((s) => s.id === selected) : undefined;
@@ -67,16 +70,15 @@ export default function SkuPage() {
     { key: "value", label: "Stock value", align: "right", sort: (r) => r.value, render: (r) => aed(r.value) },
   ];
 
-  const oosSkus = filtered.filter((r) => r.oosStores > 0).length;
   return (
     <div className="space-y-6">
-      <PageTitle title="SKU Intelligence" sub={`${nf(base.skus.length)} SKUs with barcodes, units of measure, pricing, store stock, batches, forecasts and AI recommendations`} />
-      <Situation
-        what={<>{nf(oosSkus)} SKUs are out of stock in at least one store</>}
-        why={<>Sales velocity exceeds replenishment; some suppliers are late</>}
-        where={<>Sort by “OOS stores” or open a SKU to see every store</>}
-        action={<>Open a SKU → Inventory by Store → transfer or reorder</>}
-      />
+      <PageTitle title="SKU Intelligence" sub={`${nf(base.skus.length)} products · stock, sales and supply in one place`} />
+      <SkuInsightStrip rows={base_} overstockDays={state.thresholds.overstockDays} onFilter={(k) => setQuick((cur) => (k === "value" || cur === k ? "all" : k))} />
+      {quick !== "all" && (
+        <button onClick={() => setQuick("all")} className="rounded-full bg-blue-50 px-3 py-1.5 text-[12.5px] font-semibold text-blue-700 hover:bg-blue-100">
+          Showing: {quick === "oos" ? "Out of stock" : quick === "low" ? "Running low" : "Overstocked"} · clear ✕
+        </button>
+      )}
       <DataGrid
         rows={filtered}
         columns={cols}
@@ -101,6 +103,7 @@ export default function SkuPage() {
           </>
         }
       />
+      <SkuChat />
       {open && <SkuDrawer sku={open} initialStore={storeParam} onClose={() => setParams({})} />}
     </div>
   );

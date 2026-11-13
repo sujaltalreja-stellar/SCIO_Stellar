@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import StoresOverview from "./StoresOverview";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin, User, Ruler, Calendar, Wrench, Tag, ClipboardCheck, Megaphone, PackageX, ShieldAlert } from "lucide-react";
 import { useRetail } from "../RetailContext";
@@ -10,7 +11,7 @@ import { NSKU } from "../generate";
 
 export default function StoresPage() {
   const { id } = useParams();
-  return id ? <StoreDetail id={id} /> : <StoreList />;
+  return id ? <StoreDetail id={id} /> : <StoresOverview />;
 }
 
 function StoreList() {
