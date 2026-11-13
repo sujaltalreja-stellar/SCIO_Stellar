@@ -9,6 +9,7 @@ import RetailDashboard from "./pages/RetailDashboard";
 import RetailHome from "./pages/RetailHome";
 import ActionsPage from "./pages/ActionsPage";
 import OperatePage from "./pages/OperatePage";
+import IntelligencePage from "./pages/IntelligencePage";
 import StoresPage from "./pages/StoresPage";
 import SkuPage from "./pages/SkuPage";
 import ReplenishmentPage from "./pages/ReplenishmentPage";
@@ -66,6 +67,7 @@ export default function RetailApp() {
           <Route path="master" element={<MasterDashboard />} />
           <Route path="insights/:metric" element={<MetricDashboard />} />
           <Route path="ask" element={<OperatePage />} />
+          <Route path="intelligence" element={<IntelligencePage />} />
           <Route path="ask/classic" element={<RetailAsk />} />
           <Route path="stores" element={<StoresPage />} />
           <Route path="stores/:id" element={<StoresPage />} />

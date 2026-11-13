@@ -23,6 +23,7 @@ import {
   Refrigerator,
   LayoutDashboard,
   ListChecks,
+  Brain,
 } from "lucide-react";
 import { useRetailOptional } from "../retail/RetailContext";
 import { useDemoAuth } from "../auth";
@@ -31,6 +32,7 @@ import { useDataset } from "../useDataset";
 import { todaysIssues } from "../data/analytics";
 import { Aurora, cx } from "../ui";
 import { ThemeToggle } from "../theme";
+import ExplainButton from "./ExplainPanel";
 
 const OPERATIONS = [
   { to: "/app/inventory", label: "Inventory", icon: Boxes },
@@ -206,6 +208,7 @@ export default function DemoShell() {
 
         <nav className="mt-6 flex flex-1 flex-col gap-0.5 overflow-y-auto">
           {retail && <NavItem to={`${P}/ask`} label="Ask SCIO" icon={MessageSquareText} badge="AI" />}
+          {retail && <NavItem to={`${P}/intelligence`} label="Intelligence" icon={Brain} />}
           <NavItem to={P} label={retail ? "Home" : "Dashboard"} icon={Home} end />
           {retail && <NavItem to={`${P}/actions`} label="Actions" icon={ListChecks} badge={retailCtx ? String(retailCtx.problems.filter((p) => p.severity !== "medium").length || "") || undefined : undefined} />}
           {!retail && <NavItem to={`${P}/ask`} label="Ask SCIO" icon={MessageSquareText} badge="AI" />}
@@ -237,9 +240,25 @@ export default function DemoShell() {
           <NavItem to={`${P}/reports`} label="Reports" icon={BarChart3} />
         </nav>
 
-        <NavLink to={retail ? "/app/retail/settings?tab=systems" : `${P}/settings`} className="mt-4 flex items-center gap-2 rounded-lg px-3.5 py-2 text-[12.5px] text-[#94a3b8] transition hover:bg-[#fff]/[0.05] hover:text-[#e2e8f0]">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          {retail ? "12 sources connected" : "All systems connected"}
+        <NavLink
+          to={retail ? "/app/retail/settings?tab=systems" : `${P}/settings`}
+          className="group mt-4 block rounded-xl border border-emerald-400/25 bg-gradient-to-br from-emerald-400/[0.10] to-transparent p-3 transition hover:border-emerald-400/50 hover:from-emerald-400/[0.16]"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            </span>
+            <span className="flex-1 text-[13px] font-semibold text-[#fff]">{retail ? "12 sources connected" : "All systems connected"}</span>
+            <ChevronDown className="h-4 w-4 -rotate-90 text-[#94a3b8] transition group-hover:translate-x-0.5 group-hover:text-[#fff]" />
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1">
+            {(retail ? ["ERP", "POS", "WMS", "IoT", "CRM"] : ["ERP", "WMS", "IoT", "GIS"]).map((x) => (
+              <span key={x} className="rounded-md bg-[#fff]/[0.07] px-1.5 py-0.5 text-[10.5px] font-medium text-[#cbd5e1]">{x}</span>
+            ))}
+            {retail && <span className="rounded-md bg-[#f2a93b]/15 px-1.5 py-0.5 text-[10.5px] font-semibold text-[#f2a93b]">+7</span>}
+          </div>
+          <div className="mt-2 text-[11px] text-emerald-300/80">All live · synced just now</div>
         </NavLink>
         <div className="mt-3">
           <NavItem to={`${P}/settings`} label="Settings" icon={Settings} />
@@ -265,6 +284,7 @@ export default function DemoShell() {
           </form>
 
           <div className="ml-auto flex items-center gap-3">
+            <ExplainButton />
 
             <ThemeToggle />
             <div className="relative">
