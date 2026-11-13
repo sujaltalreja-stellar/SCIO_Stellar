@@ -7,7 +7,7 @@ import { cx } from "./ui";
 // set aside while the app is mounted and restored when leaving.
 
 type Theme = "light" | "dark";
-const KEY = "scio_theme_v2";
+const KEY = "scio_theme_v3"; // v3: light is the default for everyone
 
 function initial(): Theme {
   try {
@@ -16,7 +16,7 @@ function initial(): Theme {
   } catch {
     /* ignore */
   }
-  return "dark";
+  return "light";
 }
 
 const Ctx = createContext<{ theme: Theme; toggle: () => void }>({ theme: "light", toggle: () => {} });
