@@ -3,17 +3,18 @@ import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { DemoAuthProvider, RequireDemoAuth } from "./auth";
 import { ApprovalProvider } from "./components/Approval";
-import DemoShell from "./layout/DemoShell";
+// import DemoShell from "./layout/DemoShell"; // INDUSTRIAL (disabled)
 import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
-import AskPage from "./pages/AskPage";
-import InventoryPage from "./pages/InventoryPage";
-import MaintenancePage from "./pages/MaintenancePage";
-import VisionPage from "./pages/VisionPage";
-import DocumentsPage from "./pages/DocumentsPage";
-import AssetsPage from "./pages/AssetsPage";
-import ReportsPage from "./pages/ReportsPage";
-import SettingsPage from "./pages/SettingsPage";
+// INDUSTRIAL (disabled for now — kept, not deleted). Uncomment to restore.
+// import HomePage from "./pages/HomePage";
+// import AskPage from "./pages/AskPage";
+// import InventoryPage from "./pages/InventoryPage";
+// import MaintenancePage from "./pages/MaintenancePage";
+// import VisionPage from "./pages/VisionPage";
+// import DocumentsPage from "./pages/DocumentsPage";
+// import AssetsPage from "./pages/AssetsPage";
+// import ReportsPage from "./pages/ReportsPage";
+// import SettingsPage from "./pages/SettingsPage";
 import { ThemeProvider } from "./theme";
 import { ConvexProvider } from "convex/react";
 import { convex } from "./convexClient";
@@ -51,6 +52,7 @@ export default function DemoApp() {
                 </RequireDemoAuth>
               }
             />
+            {/* INDUSTRIAL routes (disabled for now — kept, not deleted). Uncomment to restore.
             <Route
               element={
                 <RequireDemoAuth>
@@ -79,7 +81,9 @@ export default function DemoApp() {
               <Route path="reports" element={<ReportsPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
-            <Route path="*" element={<Navigate to="/app" replace />} />
+            */}
+            <Route index element={<Navigate to="/app/retail/ask" replace />} />
+            <Route path="*" element={<Navigate to="/app/retail/ask" replace />} />
           </Routes>
         </DemoAuthProvider>
       </ThemeProvider>

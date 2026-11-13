@@ -106,7 +106,7 @@ export function IndustrySwitch({ retail }: { retail: boolean }) {
   );
 }
 
-function WorkspaceSwitch({ retail }: { retail: boolean }) {
+export function WorkspaceSwitch({ retail }: { retail: boolean }) {
   const navigate = useNavigate();
   return (
     <div className="mx-3 mt-5 grid grid-cols-2 rounded-lg bg-[#fff]/[0.06] p-0.5 text-[12.5px]">
@@ -204,7 +204,9 @@ export default function DemoShell() {
         <div className="px-3">
           <ScioLogo size={40} withText />
         </div>
+        {/* INDUSTRIAL switch (disabled for now — kept, not deleted). Uncomment to restore.
         <WorkspaceSwitch retail={retail} />
+        */}
 
         <nav className="mt-6 flex flex-1 flex-col gap-0.5 overflow-y-auto">
           {retail && <NavItem to={`${P}/ask`} label="Ask SCIO" icon={MessageSquareText} badge="AI" />}
