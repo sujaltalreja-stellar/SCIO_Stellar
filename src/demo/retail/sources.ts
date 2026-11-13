@@ -67,6 +67,7 @@ export const TOOL_SOURCES: Record<string, SourceId[]> = {
   get_sku_analysis: ["POS", "WMS", "ERP"],
   get_sales_growth_levers: ["POS", "ERP", "CRM", "OMS"],
   draft_actions: ["ERP", "WMS"],
+  get_top_products: ["POS", "ERP"],
 };
 
 export const syncLabel = (min: number) => (min === 0 ? "Live" : min < 60 ? `${min} min ago` : `${Math.round(min / 60)} h ago`);

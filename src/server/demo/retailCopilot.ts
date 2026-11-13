@@ -57,6 +57,99 @@ function tools(st: RetailState, scope: Scope, proposals: ActionProposal[] = []):
     {
       type: "function",
       function: {
+        name: "calculate",
+        description:
+          "Exact arithmetic. ALWAYS use this for any calculation (stock reconciliation, totals, differences, percentages, averages). Pass a list of labelled steps; each step is a number or an expression that may use earlier step labels, e.g. [{label:'opening',expr:'100'},{label:'after_purchase',expr:'opening+200'}].",
+        parameters: {
+          type: "object",
+          properties: {
+            steps: {
+              type: "array",
+              items: { type: "object", properties: { label: { type: "string" }, expr: { type: "string" } }, required: ["label", "expr"] },
+            },
+          },
+          required: ["steps"],
+        },
+      },
+      run: (a) => {
+        const vars: Record<string, number> = {};
+        const out: Array<{ step: string; expression: string; result: number | string }> = [];
+        const steps = Array.isArray(a.steps) ? (a.steps as Array<{ label?: unknown; expr?: unknown }>).slice(0, 40) : [];
+        for (const st0 of steps) {
+          const label = String(st0.label ?? "").trim().replace(/[^A-Za-z0-9_]/g, "_") || `step${out.length + 1}`;
+          let expr = String(st0.expr ?? "");
+          // substitute earlier labels (longest first so 'a1' doesn't clobber 'a10')
+          for (const k of Object.keys(vars).sort((x, y) => y.length - x.length)) expr = expr.replace(new RegExp(`\\b${k}\\b`, "g"), `(${vars[k]})`);
+          const clean = expr.replace(/,/g, "").replace(/%/g, "/100");
+          if (!/^[0-9+\-*/().\s]+$/.test(clean)) {
+            out.push({ step: label, expression: String(st0.expr ?? ""), result: "invalid expression" });
+            continue;
+          }
+          let v: number;
+          try {
+            v = Function(`"use strict"; return (${clean});`)() as number;
+          } catch {
+            out.push({ step: label, expression: String(st0.expr ?? ""), result: "invalid expression" });
+            continue;
+          }
+          v = Math.round(v * 1e6) / 1e6;
+          vars[label] = v;
+          out.push({ step: label, expression: String(st0.expr ?? ""), result: v });
+        }
+        return {
+          data: { steps: out },
+          visuals: out.length ? [{ kind: "table", title: "Calculation", columns: [{ key: "step", label: "Step" }, { key: "expression", label: "Expression" }, { key: "result", label: "Result" }], rows: out }] : [],
+        };
+      },
+    },
+    {
+      type: "function",
+      function: {
+        name: "get_top_products",
+        description: "Best (or worst) selling products by sales value per day, optionally for one store, country or category. Use for 'top sellers', 'best product', 'slowest products', 'what sells most in X'.",
+        parameters: {
+          type: "object",
+          properties: {
+            store: { type: "string", description: "Store id or name, optional" },
+            country: { type: "string", description: "Country, optional" },
+            category: { type: "string", description: "Category or department, optional" },
+            order: { type: "string", enum: ["best", "worst"], description: "default best" },
+            limit: { type: "number", description: "default 10" },
+          },
+        },
+      },
+      run: (a) => {
+        const one = findStore(st, a.store);
+        const sc: Scope = one !== null ? new Set([one]) : countryScope(st, a.country, scope);
+        const cat = typeof a.category === "string" ? a.category.toLowerCase().trim() : "";
+        const totals = new Map<number, { units: number; value: number }>();
+        for (const s of base.stores) {
+          if (sc && !sc.has(s.idx)) continue;
+          for (let k = 0; k < base.skus.length; k++) {
+            const v = base.velocity[s.idx * NSKU + k];
+            if (!v) continue;
+            const t = totals.get(k) ?? { units: 0, value: 0 };
+            t.units += v;
+            t.value += v * base.skus[k].price;
+            totals.set(k, t);
+          }
+        }
+        let rows = [...totals]
+          .filter(([k]) => !cat || base.skus[k].category.toLowerCase().includes(cat) || base.skus[k].department.toLowerCase().includes(cat))
+          .map(([k, t]) => ({ product: base.skus[k].name, sku: base.skus[k].id, category: base.skus[k].category, unitsPerDay: r1(t.units), salesPerDay: r0(t.value) }));
+        rows.sort((x, y) => (a.order === "worst" ? x.salesPerDay - y.salesPerDay : y.salesPerDay - x.salesPerDay));
+        rows = rows.slice(0, lim(a, 10, 25));
+        return {
+          data: { scope: one !== null ? sname(st, one) : a.country ?? "all stores", order: a.order === "worst" ? "worst" : "best", products: rows },
+          visuals: rows.length
+            ? [{ kind: "table", title: `${a.order === "worst" ? "Slowest" : "Top"} products by sales per day`, columns: [{ key: "product", label: "Product" }, { key: "category", label: "Category" }, { key: "unitsPerDay", label: "Units / day", format: "number" }, { key: "salesPerDay", label: "Sales / day", format: "money" }], rows }]
+            : [],
+        };
+      },
+    },
+    {
+      type: "function",
+      function: {
         name: "draft_actions",
         description:
           "AGENT ACTION. Draft concrete operations for the user to approve: 'transfer' (move stock from donor stores/DCs to stores running out), 'reorder' (purchase orders for stockouts with no internal stock), 'technician' (open maintenance tickets and dispatch technicians for equipment faults), 'markdown' (discount batches about to expire). Optionally limit to a store or country. Call this whenever the user asks you to fix, do, act, approve, send, reorder, transfer, dispatch or mark down.",
@@ -381,6 +474,8 @@ const FOLLOW: Record<string, string[]> = {
 /** What SCIO did for each tool, shown to the user as a step. */
 const STEP: Record<string, (a: Args) => string> = {
   draft_actions: (a) => `Drafted ${String(a.kind ?? "")} actions for your approval`,
+  calculate: () => "Calculated step by step",
+  get_top_products: (a) => `Ranked products by daily sales${a.store ? ` at ${String(a.store)}` : a.country ? ` in ${String(a.country)}` : ""}`,
   get_retail_overview: () => "Read chain KPIs across stores, stock, suppliers and expiry",
   get_stockout_forecast: () => "Forecast days of supply for every store-SKU",
   get_overstock: () => "Scanned store-SKUs above the overstock threshold",
@@ -436,15 +531,20 @@ export async function runRetailCopilot(question: string, history: CopilotTurn[],
 ${scope ? `The user can only see these stores: ${[...scope].map((s) => base.stores[s].id).join(", ")}.` : "The user sees all stores."}
 Store ids look like S101-S150 ("Store 118" = S118).
 Rules:
-- ALWAYS call tools before answering. Never invent numbers; use only tool figures.
-- Never refuse or say you lack data. For growth, revenue, sales or margin questions call get_sales_growth_levers (plus other tools as useful) and give a prioritised action plan: the biggest levers first, each with its AED size and who should act.
-- Format: one-sentence direct answer, then 2-5 short bullets with key figures (**bold** numbers), then a line starting "Recommendation:" with concrete actions (who should do what).
-- Mention that tables/charts below show the evidence. Never write markdown tables (the evidence tables are rendered separately). Under 180 words.
+- ANSWER WHAT WAS ASKED. Read the user's actual question and answer it directly in the first sentence. Do not swap in a different, pre-planned answer.
+- Match the length and shape to the question: a quick question gets 1-3 sentences; a 'why' or 'what's happening' question gets a short explanation with key figures; only analysis requests get bullets and a recommendation. Greetings and small talk get a friendly one-liner and an offer to help.
+- Use tools whenever the answer depends on business figures (sales, stock, stores, suppliers, equipment, expiry, actions). Call as many as you need, in any order, and combine them. For greetings, definitions, how SCIO works, or general retail know-how, answer without tools.
+- ARITHMETIC: never do sums in your head. For ANY calculation (stock reconciliation, totals, gaps, percentages) call calculate with one labelled step per movement, then quote its results exactly and show the running total in your answer. For reconciliation questions also list what must be verified (same item/unit of measure, double counting, unposted or back-dated transactions, separate locations such as quarantine, physical count).
+- Never invent business numbers: every store, SKU, supplier or AED figure must come from a tool result. General knowledge (what OTIF means, retail best practice) is fine to explain in your own words.
+- If something truly isn't in the data, say so in one line and give the closest useful answer you can from the tools. For growth, revenue, sales or margin questions, get_sales_growth_levers is usually the best starting point.
+- Use **bold** for key figures. Never write markdown tables (evidence tables are rendered separately). Keep it under 180 words unless the user asks for detail.
+- Follow the user's language and tone. If they ask for simpler words, a shorter answer, a different format or a translation, do exactly that.
 - You are an AGENT: when the user asks you to fix, do, handle, approve, reorder, transfer, dispatch or mark down anything, call draft_actions (one call per kind needed) and say the drafted actions are shown below, ready for their approval. Never claim an action has already been executed.
-${mode === "card" ? `- CONVERSATION: if the user asks you to explain, simplify, clarify, rephrase, or says something conversational, or asks a follow-up about your previous answer, do NOT repeat the dashboard. Reply ONLY with {"plain":"..."} — plain everyday words a shop owner understands, 3-6 short sentences or bullets, no jargon (say "arrives late" not "OTIF"), focus on what it means and what to do. No tool calls needed for this.
-- OTHERWISE (a new data question), your final reply must be ONLY a JSON object (no prose, no code fences) shaped:
+${mode === "card" ? `- OUTPUT FORMAT. Decide per message. Use {"plain":"..."} (answer in natural words, markdown bullets allowed) for: greetings, small talk, explanations, simplify/clarify/rephrase/translate requests, follow-ups about a previous answer, definitions, how-to or 'how does SCIO work', opinions, value questions, yes/no or single-number questions, and anything that is not a multi-figure business analysis. Reply ONLY with that JSON object.
+- ONLY when the user asks for an analysis or diagnosis that needs several figures (e.g. 'why are my Kuwait stores underperforming', 'how is the business doing', 'action plan for today'), your final reply must be ONLY a JSON object (no prose, no code fences) shaped:
 {"headline":"Here's what I found.","summary":"one sentence direct answer","kpis":[{"label":"Stores affected","value":"2 of 6","note":"optional short note","tone":"bad|good|neutral"}],"drivers":[{"title":"Stockouts","detail":"short cause with figure","impact":"~AED 142.3K impact"}],"next":["Transfer 2,000 units to the affected stores","Expedite the pending purchase order"]}
 headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g. "AED 871.9K", "4 of 6") and notes under 6 words; 1-3 drivers with detail under 15 words and impact like "AED 222K"; 2-3 next steps as short imperative actions that are NOT already drafted with draft_actions. All figures from tools.` : ""}
+- VALUE / OBJECTION QUESTIONS (e.g. "why should I get SCIO", "I already have SKUs/an ERP/reports", "what's different", "is it worth it"): never say they don't need SCIO and never recommend staying as they are. First call get_retail_overview (and get_stockout_forecast or get_equipment_issues if useful) so you can quote THEIR live numbers. Then answer confidently in plain words: (1) their ERP/POS each hold one piece and record what happened; SCIO joins all 12 systems and explains WHY across them (e.g. empty shelf -> late supplier -> stock sitting in another store); (2) it shows money being lost right now in AED, which no single system shows; (3) it predicts what runs out next instead of reporting yesterday; (4) it drafts the fix (transfer, order, technician) and they approve in one click, nothing re-entered; (5) it works on top of their existing systems, no replacement. Back points with 2-3 of their actual figures, then offer one concrete next step (e.g. "Want me to fix today's stockouts now?"). Stay honest: no invented customers, guarantees or ROI promises.
 - Data sources: SCIO unifies the connected systems ERP (finance, costs, inventory), POS (sales, returns), CRM (customers, loyalty), WMS (warehouse stock), SCM (forecasts, deliveries), P2P (POs, suppliers, invoices), HRMS (employees), WFM (shifts), CMMS (equipment work orders), OMS (online orders), IoT (sensors) and SOTM (store tasks, inspections). If asked where data comes from, name the relevant systems and note this workspace uses sample data; never present it as a real customer's data.`;
   const messages: ChatMessage[] = [{ role: "system", content: system }, ...history.slice(-8).map((t) => ({ role: t.role, content: t.content.slice(0, 2000) }) as ChatMessage), { role: "user", content: question.slice(0, 1000) }];
   const visuals: Visual[] = [];
@@ -504,7 +604,7 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
     proposals,
   };
   };
-  for (let step = 0; step < 4; step++) {
+  for (let step = 0; step < 6; step++) {
     const { message } = await sarvamChat({ messages, tools: defs, maxTokens: 900 });
     const calls = message.tool_calls ?? [];
     if (!calls.length) {

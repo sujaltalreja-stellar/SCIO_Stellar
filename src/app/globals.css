@@ -308,3 +308,22 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb:hover,
 html.light ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* ---------------------------------------------------------------------------
+   SCIO brand on the public site: black + gold + warm white (matches the app,
+   sign-in page and share thumbnail). Cool accent ramps become SCIO gold and
+   blue-greys become warm greys, so every section follows one palette.
+   --------------------------------------------------------------------------- */
+.scio-brand {
+  --gold-50: #fff8ec; --gold-100: #fdedcc; --gold-200: #fbdb9c; --gold-300: #f8c76a; --gold-400: #f5b549;
+  --gold-500: #f2a93b; --gold-600: #d98b16; --gold-700: #b06d0f; --gold-800: #8a5410; --gold-900: #6b4112; --gold-950: #3d250b;
+  --color-blue-50: var(--gold-50); --color-blue-100: var(--gold-100); --color-blue-200: var(--gold-200); --color-blue-300: var(--gold-300); --color-blue-400: var(--gold-400); --color-blue-500: var(--gold-500); --color-blue-600: var(--gold-600); --color-blue-700: var(--gold-700); --color-blue-800: var(--gold-800); --color-blue-900: var(--gold-900); --color-blue-950: var(--gold-950);
+  --color-indigo-50: var(--gold-50); --color-indigo-100: var(--gold-100); --color-indigo-200: var(--gold-200); --color-indigo-300: var(--gold-300); --color-indigo-400: var(--gold-400); --color-indigo-500: var(--gold-500); --color-indigo-600: var(--gold-600); --color-indigo-700: var(--gold-700); --color-indigo-800: var(--gold-800); --color-indigo-900: var(--gold-900); --color-indigo-950: var(--gold-950);
+  --color-violet-50: var(--gold-50); --color-violet-100: var(--gold-100); --color-violet-200: var(--gold-200); --color-violet-300: var(--gold-300); --color-violet-400: var(--gold-400); --color-violet-500: var(--gold-500); --color-violet-600: var(--gold-600); --color-violet-700: var(--gold-700); --color-violet-800: var(--gold-800); --color-violet-900: var(--gold-900); --color-violet-950: var(--gold-950);
+  --color-purple-50: var(--gold-50); --color-purple-100: var(--gold-100); --color-purple-200: var(--gold-200); --color-purple-300: var(--gold-300); --color-purple-400: var(--gold-400); --color-purple-500: var(--gold-500); --color-purple-600: var(--gold-600); --color-purple-700: var(--gold-700); --color-purple-800: var(--gold-800); --color-purple-900: var(--gold-900); --color-purple-950: var(--gold-950);
+  --color-cyan-50: var(--gold-50); --color-cyan-100: var(--gold-100); --color-cyan-200: var(--gold-200); --color-cyan-300: var(--gold-300); --color-cyan-400: var(--gold-400); --color-cyan-500: var(--gold-500); --color-cyan-600: var(--gold-600); --color-cyan-700: var(--gold-700); --color-cyan-800: var(--gold-800); --color-cyan-900: var(--gold-900); --color-cyan-950: var(--gold-950);
+  --color-sky-50: var(--gold-50); --color-sky-100: var(--gold-100); --color-sky-200: var(--gold-200); --color-sky-300: var(--gold-300); --color-sky-400: var(--gold-400); --color-sky-500: var(--gold-500); --color-sky-600: var(--gold-600); --color-sky-700: var(--gold-700); --color-sky-800: var(--gold-800); --color-sky-900: var(--gold-900); --color-sky-950: var(--gold-950);
+  --color-teal-50: var(--gold-50); --color-teal-100: var(--gold-100); --color-teal-200: var(--gold-200); --color-teal-300: var(--gold-300); --color-teal-400: var(--gold-400); --color-teal-500: var(--gold-500); --color-teal-600: var(--gold-600); --color-teal-700: var(--gold-700); --color-teal-800: var(--gold-800); --color-teal-900: var(--gold-900); --color-teal-950: var(--gold-950);
+  /* warm greys instead of blue-greys */
+  --color-slate-50: #f7f6f4; --color-slate-100: #efeeeb; --color-slate-200: #e5e3df; --color-slate-300: #d4d1cb; --color-slate-400: #a8a49d; --color-slate-500: #7c7871; --color-slate-600: #5d5a54; --color-slate-700: #44423e; --color-slate-800: #2b2a27; --color-slate-900: #1a1918; --color-slate-950: #111113;
+}

@@ -58,7 +58,7 @@ export default function IntelligencePage() {
       const r = await fetch("/api/scio/retail-copilot", {
         method: "POST",
         headers: scioHeaders(),
-        body: JSON.stringify({ question: `${question}\n(Answer in simple everyday words, max 5 short bullets.)`, history, events: st.events, scope: scope ? [...scope] : null }),
+        body: JSON.stringify({ question, history, events: st.events, scope: scope ? [...scope] : null }),
       });
       const data = await readApi<CopilotResponse>(r);
       if (!r.ok || data.error) throw new Error(data.error || `Request failed (${r.status})`);

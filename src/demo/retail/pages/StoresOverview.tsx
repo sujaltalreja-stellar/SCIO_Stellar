@@ -90,7 +90,7 @@ export default function StoresOverview() {
         {stat("Est. lost sales · 30d", aed(lost), "text-slate-900", () => navigate(`${P}/insights/stockouts`), "from stockouts")}
       </div>
 
-      <div className="grid gap-6 2xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.5fr)]">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(300px,0.75fr)_minmax(0,1.6fr)]">
         {/* Map / regions */}
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <div className="mb-3 flex items-center justify-between">
@@ -253,7 +253,7 @@ function StoreMap({ stores, onPick }: { stores: Array<{ p: StorePerf; health: He
         <span className="text-[14px] font-bold text-slate-900">Kuwait</span>
         <span className="text-[12px] text-slate-500">{kwStores.length} stores · click a pin</span>
       </div>
-      <svg viewBox="0 0 100 86" className="h-auto w-full rounded-2xl bg-gradient-to-b from-[#eff6ff] to-[#f8fafc]">
+      <svg viewBox="0 0 100 86" className="mx-auto block h-auto max-h-[460px] w-full max-w-[560px] rounded-2xl bg-gradient-to-b from-[#fff8ec] to-[#f8f7f5]">
         <defs>
           <linearGradient id="kw-land" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#ffffff" />
@@ -267,7 +267,7 @@ function StoreMap({ stores, onPick }: { stores: Array<{ p: StorePerf; health: He
           </filter>
         </defs>
         <rect width="100" height="86" fill="url(#kw-grid)" />
-        <text x="90" y="62" fontSize="2.6" fill="#93c5fd" fontStyle="italic" textAnchor="middle">Arabian Gulf</text>
+        <text x="84" y="70" fontSize="2.4" fill="#c9a46a" fontStyle="italic" textAnchor="middle">Arabian Gulf</text>
         <polygon points={poly(KW_LAND)} fill="url(#kw-land)" stroke="#93c5fd" strokeWidth="0.45" strokeLinejoin="round" filter="url(#kw-shadow)" />
         <polygon points={poly(KW_BUBIYAN)} fill="url(#kw-land)" stroke="#93c5fd" strokeWidth="0.4" />
         {KW_LABELS.map(([t, la, ln]) => {

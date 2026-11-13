@@ -68,39 +68,39 @@ interface StellarHomePageProps {
 const C = {
   // Pure White & Clean Surfaces
   white: "#FFFFFF",
-  whiteSurface: "#F8FAFC",
-  whiteSunk: "#F1F5F9",
-  lineLight: "#E2E8F0",
-  lineLightSoft: "#EDF2F7",
+  whiteSurface: "#F6F5F3",
+  whiteSunk: "#EFEEEB",
+  lineLight: "#E5E3DF",
+  lineLightSoft: "#EFEEEB",
 
   // Crisp High-Contrast Typography
-  ink: "#090D16",
-  inkBody: "#1E293B",
-  inkMuted: "#475569",
-  inkFaint: "#64748B",
-  inkDim: "#94A3B8",
+  ink: "#111113",
+  inkBody: "#2B2A27",
+  inkMuted: "#5D5A54",
+  inkFaint: "#7C7871",
+  inkDim: "#A8A49D",
 
   // Obsidian Deep Black Surfaces
-  night: "#06080D",
-  nightRaised: "#0D111A",
-  nightCard: "#131824",
-  nightPanel: "#080B11",
+  night: "#0F0F11",
+  nightRaised: "#17171A",
+  nightCard: "#1D1D21",
+  nightPanel: "#121214",
   lineDark: "rgba(255,255,255,0.08)",
   lineDarkSoft: "rgba(255,255,255,0.05)",
 
-  chalk: "#F8FAFC",
+  chalk: "#F6F5F3",
   chalkBright: "#FFFFFF",
   slate400: "#94A3B8",
   slate600: "#64748B",
 
   // Vivid Precision Accents
-  indigo: "#4F46E5",
-  violet: "#7C3AED",
+  indigo: "#D98B16",
+  violet: "#B06D0F",
   green: "#10B981",
-  cyan: "#06B6D4",
+  cyan: "#F2A93B",
   red: "#EF4444",
   amber: "#F59E0B",
-  blue: "#2563EB",
+  blue: "#D98B16",
 };
 
 const ENTRANCE = [0.22, 1, 0.36, 1] as const;
@@ -1329,7 +1329,7 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
 
   return (
     <div
-      className="min-h-screen font-sans selection:bg-black selection:text-white overflow-x-hidden"
+      className="scio-brand min-h-screen font-sans selection:bg-black selection:text-white overflow-x-hidden"
       style={{ background: C.white, color: C.ink }}
     >
       {/* ==================== 0. BOOT SEQUENCE ==================== */}
@@ -1426,19 +1426,19 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
             <div
-              className="h-8 w-8 rounded-xl shadow-xs flex items-center justify-center font-mono font-black text-xs bg-black text-white group-hover:scale-105 transition-transform shrink-0"
+              className="relative h-9 w-9 rounded-[10px] shadow-xs flex items-center justify-center font-black text-[15px] bg-[#111113] text-white group-hover:scale-105 transition-transform shrink-0"
             >
               S
+              <span className="absolute right-[5px] top-[5px] h-2 w-2 rounded-full bg-[#f2a93b]" />
             </div>
             <div className="flex flex-col whitespace-nowrap">
               <div className="flex items-center gap-1">
-                <span className="font-extrabold text-xs sm:text-sm tracking-tight text-slate-950 group-hover:text-blue-600 transition-colors">
-                  STELLAR SCIO
+                <span className="font-extrabold text-sm sm:text-[15px] tracking-tight text-slate-950">
+                  Stellar <span className="text-[#f2a93b]">SCIO</span>
                 </span>
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               </div>
-              <span className="text-[8.5px] sm:text-[9px] font-mono tracking-wider font-bold text-slate-500">
-                OPERATIONAL AI PLATFORM
+              <span className="text-[10px] sm:text-[11px] font-medium text-slate-500">
+                Business Operating System
               </span>
             </div>
           </div>
@@ -1497,9 +1497,9 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
 
           <button
             onClick={() => setBetaModalOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-emerald-500/50 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 font-sans text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#f2a93b]/60 bg-[#fff8ec] text-[#8a5410] hover:bg-[#fdedcc] font-sans text-xs font-bold transition-all shadow-2xs shrink-0 cursor-pointer"
           >
-            <Sparkles className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <Sparkles className="h-3.5 w-3.5 text-[#d98b16] shrink-0" />
             <span>Join Beta</span>
           </button>
 
@@ -1511,11 +1511,10 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
           </button>
           
           <a
-            href="/?launch=1&industry=energy&tab=energy-dashboard"
-            onClick={(e) => handleNavClick(e, "energy", "energy-dashboard")}
-            className="px-3 sm:px-3.5 py-1.5 rounded-full font-sans text-[11px] sm:text-xs font-bold shadow-sm flex items-center gap-1 sm:gap-1.5 transition-all hover:scale-[1.02] bg-[#090D16] text-white hover:bg-slate-900 whitespace-nowrap shrink-0 cursor-pointer"
+            href="/app"
+            className="px-3 sm:px-3.5 py-1.5 rounded-full font-sans text-[11px] sm:text-xs font-bold shadow-sm flex items-center gap-1 sm:gap-1.5 transition-all hover:scale-[1.02] bg-[#111113] text-white hover:bg-[#2a2a30] whitespace-nowrap shrink-0 cursor-pointer"
           >
-            <span>Launch Platform</span>
+            <span>Open SCIO</span>
             <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 opacity-80 shrink-0" />
           </a>
         </div>
@@ -1525,117 +1524,129 @@ export default function StellarHomePage({ onLaunchPlatform, onOpenResources, onO
       <section id="top" className="relative pt-12 pb-10 sm:pt-20 sm:pb-16" style={{ background: C.white }}>
         <div className={`${SHELL} flex flex-col items-start gap-5 sm:gap-[24px]`}>
           
-          {/* Eyebrow */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: EASE }}
-            className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 max-w-full"
-          >
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full shrink-0 bg-blue-600 animate-pulse" />
-              <span className="uppercase font-mono font-bold text-[10px] sm:text-[13px] tracking-[1.5px] sm:tracking-[2px] text-blue-600">
-                SCIO PLATFORM — ENTERPRISE OPERATIONS OS
-              </span>
+          {/* ===== Hero: Business Operating System ===== */}
+          <div className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-14">
+            <div className="flex flex-col items-start gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: EASE }}
+                className="inline-flex items-center gap-2 rounded-full border border-[#e5e3df] bg-white px-3 py-1.5 text-[12.5px] font-medium text-[#5d5a54] shadow-2xs"
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-[#f2a93b]" />
+                Stellar SCIO · Business Operating System
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, ease: EASE, delay: 0.08 }}
+                className="font-extrabold text-balance"
+                style={{ fontSize: "clamp(38px, 5.2vw, 76px)", lineHeight: 1.02, letterSpacing: "-.035em", color: C.ink }}
+              >
+                Skip the dashboards.
+                <br />
+                <span className="mt-2 inline-block rounded-2xl bg-[#fde7c3] px-4 pb-1 italic">Just ask.</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, ease: EASE, delay: 0.16 }}
+                className="max-w-[560px] text-pretty text-[17px] leading-relaxed text-[#44423e] sm:text-[19px]"
+              >
+                SCIO connects every system you already run &mdash; ERP, POS, WMS, CRM and more &mdash; and turns any question into an answer and an approved action.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, ease: EASE, delay: 0.22 }}
+                className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center"
+              >
+                <a
+                  href="/app"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#111113] px-6 py-3.5 text-[15px] font-semibold text-white shadow-md transition hover:bg-[#2a2a30]"
+                >
+                  Open SCIO <ArrowRight className="h-4 w-4" />
+                </a>
+                <button
+                  onClick={() => setDemoModalOpen(true)}
+                  className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-[#d4d1cb] bg-white px-6 py-3.5 text-[15px] font-semibold text-[#111113] transition hover:border-[#a8a49d]"
+                >
+                  Request a demo
+                </button>
+                <button
+                  onClick={() => setBetaModalOpen(true)}
+                  className="inline-flex cursor-pointer items-center justify-center gap-1.5 px-2 py-3 text-[14px] font-semibold text-[#b06d0f] hover:underline"
+                >
+                  <Sparkles className="h-4 w-4" /> Join the beta
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, ease: EASE, delay: 0.3 }}
+                className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-[13px] text-[#5d5a54]"
+              >
+                <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[#15803d]" /> Runs on your own servers</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#15803d]" /> 12 systems connected</span>
+                <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-[#15803d]" /> Nothing re-entered</span>
+              </motion.div>
             </div>
 
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-full font-mono text-[9.5px] sm:text-xs font-bold bg-slate-900 text-white border border-emerald-500/50 shadow-md max-w-full">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-              <span className="truncate">100% Data Sovereignty: Deployed On Your Own Servers</span>
-            </div>
-          </motion.div>
-
-          {/* Main Display Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: EASE, delay: 0.1 }}
-            className="max-w-[1020px] font-black text-balance"
-            style={{
-              fontSize: "clamp(26px, 5vw + 4px, 72px)",
-              lineHeight: 1.08,
-              letterSpacing: "-.035em",
-              color: C.ink,
-            }}
-          >
-            Unify Supply Chain Intelligence &amp; Multi-Sector Field Operations in One Platform
-          </motion.h1>
-
-          {/* Special Highlighted Tagline Callout Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, ease: EASE, delay: 0.15 }}
-            className="w-full max-w-[1020px] p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-blue-950 text-white border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row items-start sm:items-center gap-2.5 sm:gap-3.5"
-          >
-            <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center shrink-0 text-emerald-400">
-              <ShieldCheck className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
-            </div>
-            <div className="font-mono text-xs sm:text-sm font-bold tracking-wide leading-relaxed text-emerald-300">
-              <span className="text-white font-extrabold uppercase mr-2 px-2 py-0.5 rounded bg-emerald-500/30 text-[9.5px] border border-emerald-400/40 inline-block mb-1 sm:mb-0">Data Sovereignty Guarantee</span>
-              100% On-Premise &amp; Private Cloud Deployment — Your operational telemetry &amp; business data stay strictly on your own secure servers.
-            </div>
-          </motion.div>
-
-          {/* Lead & CTAs Row */}
-          <div className="flex w-full flex-col items-start justify-between gap-5 pt-1 lg:flex-row lg:items-end lg:gap-12">
-            <motion.p
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, ease: EASE, delay: 0.2 }}
-              className="max-w-[740px] text-pretty text-sm sm:text-lg leading-relaxed font-semibold text-slate-800"
-            >
-              One intelligent platform to connect your machines, people, inspections, supply chain, and operations &mdash; giving you complete visibility and control across your business.
-            </motion.p>
-
+            {/* Product preview */}
             <motion.div
-              initial={{ opacity: 0, y: 18 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, ease: EASE, delay: 0.25 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0 w-full sm:w-auto"
+              transition={{ duration: 0.75, ease: EASE, delay: 0.2 }}
+              className="relative overflow-hidden rounded-[28px] bg-[#0f0f11] p-6 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.6)] sm:p-8"
             >
-              <button
-                onClick={() => setDemoModalOpen(true)}
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-full px-6 py-3.5 font-mono text-xs sm:text-sm font-bold tracking-wide transition-all hover:scale-[1.02] shadow-md bg-black text-white hover:bg-slate-900 cursor-pointer"
-              >
-                Request Enterprise Demo
-              </button>
-              <button
-                onClick={() => setBetaModalOpen(true)}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 font-mono text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] border-2 border-indigo-600 bg-indigo-50/80 text-indigo-950 shadow-xs hover:bg-indigo-100 cursor-pointer"
-              >
-                <Sparkles className="h-4 w-4 text-indigo-600" />
-                <span>Join Beta Version</span>
-              </button>
-              <a
-                href="/?launch=1&industry=energy&tab=energy-dashboard"
-                onClick={(e) => handleNavClick(e, "energy", "energy-dashboard")}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 font-mono text-xs sm:text-sm font-bold transition-all hover:scale-[1.02] border-2 border-emerald-500 bg-white text-slate-900 shadow-xs hover:bg-emerald-50 cursor-pointer"
-              >
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span>Launch Live OCC</span>
-                <ArrowRight className="h-3.5 w-3.5 opacity-70" />
-              </a>
+              <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-[#f2a93b]/20 blur-3xl" />
+              <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-[3px] bg-[#f2a93b]" />
+              <div className="relative mx-auto max-w-[460px] overflow-hidden rounded-2xl bg-white shadow-2xl">
+                <div className="flex items-center gap-2.5 border-b border-[#efeeeb] px-4 py-3">
+                  <span className="relative grid h-7 w-7 place-items-center rounded-lg bg-[#111113] text-[13px] font-black text-white">
+                    S<span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-[#f2a93b]" />
+                  </span>
+                  <span className="text-[14px] font-semibold text-[#111113]">Ask SCIO</span>
+                  <span className="ml-auto text-[12px] font-medium text-[#15803d]">● 12 sources live</span>
+                </div>
+                <div className="space-y-3 p-4">
+                  <div className="ml-auto w-fit max-w-[88%] rounded-2xl bg-[#efeeeb] px-3.5 py-2 text-[14px] text-[#111113]">Why are my Kuwait stores underperforming?</div>
+                  <div>
+                    <div className="text-[14.5px] font-semibold text-[#111113]">Stockouts and a late supplier.</div>
+                    <div className="mt-0.5 text-[13px] text-[#5d5a54]">4 stores are short on fast sellers; Gulf Dairy is 3 days late.</div>
+                  </div>
+                  <div className="grid grid-cols-3 divide-x divide-[#efeeeb] overflow-hidden rounded-xl border border-[#efeeeb]">
+                    {[
+                      ["Lost sales", "AED 224K", "text-[#c2410c]"],
+                      ["Stores hit", "4 of 4", "text-[#111113]"],
+                      ["Fix time", "1 click", "text-[#111113]"],
+                    ].map(([l, v, t]) => (
+                      <div key={l} className="px-3 py-2">
+                        <div className="text-[11px] text-[#7c7871]">{l}</div>
+                        <div className={`text-[16px] font-semibold ${t}`}>{v}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-3 rounded-xl border border-[#efeeeb] px-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13.5px] font-semibold text-[#111113]">10 stock transfers</div>
+                      <div className="text-[12px] text-[#7c7871]">Protects AED 32.7K</div>
+                    </div>
+                    <span className="rounded-lg bg-[#111113] px-3 py-1.5 text-[12.5px] font-semibold text-white">Approve</span>
+                  </div>
+                  <div className="text-[11.5px] text-[#a8a49d]">Sources: POS · WMS · P2P · IoT</div>
+                </div>
+              </div>
+              <div className="relative mt-5 flex items-center justify-between text-[13px] text-[#a8a49d]">
+                <span>Connect. Operate. <b className="font-semibold text-[#f2a93b]">Resolve.</b></span>
+                <span>Answer → action in seconds</span>
+              </div>
             </motion.div>
           </div>
-
-          {/* Data Sovereignty & Security Trust Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: EASE, delay: 0.3 }}
-            className="w-full pt-2"
-          >
-            <div className="inline-flex flex-wrap items-center gap-2.5 px-4 py-2.5 rounded-2xl border border-emerald-500/50 bg-slate-900 text-white dark:bg-slate-950 dark:text-white font-mono text-xs font-bold shadow-lg">
-              <span className="px-2 py-0.5 rounded bg-emerald-500 text-slate-950 font-extrabold uppercase text-[10px] tracking-wide">
-                Data Sovereignty
-              </span>
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
-              <span className="text-slate-100">
-                Deployed 100% on Your Own On-Premise &amp; Private Cloud Infrastructure — Your Operational Telemetry Never Leaves Your Own Servers.
-              </span>
-            </div>
-          </motion.div>
 
           {/* 4 Industries Quick-Jump Cards (Enlarged, High-Contrast Typography, No Emojis) */}
           <div className="w-full pt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
