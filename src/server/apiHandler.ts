@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../../convex/_generated/api";
 import { generateResponse } from "../lib/ai/chatbotEngine";
+import { answerSiteQuestion } from "./siteAssistant";
 import { runCopilot } from "./demo/copilot";
 import { runRetailCopilot } from "./demo/retailCopilot";
 import { runVision } from "./demo/vision";
@@ -192,7 +193,34 @@ export async function handleApiRequest(
     }
   }
 
-  // 3. SECTOR-SPECIFIC CHATBOT ROUTES
+  // 3. WEBSITE ASSISTANT (public marketing site, Sarvam-backed)
+  if (pathname === "/api/site-assistant" && method === "POST") {
+    const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
+    if (rateLimited(`site:${ip}`, 40)) {
+      sendJson(res, 429, { error: "Too many questions in a short time. Please try again in a few minutes." });
+      return true;
+    }
+    try {
+      const body = await parseJsonBody(req);
+      const query = typeof body?.query === "string" ? body.query.trim().slice(0, 1000) : "";
+      if (!query) {
+        sendJson(res, 400, { error: "Query is required" });
+        return true;
+      }
+      const history = Array.isArray(body?.history)
+        ? body.history
+            .filter((t: any) => (t?.role === "user" || t?.role === "assistant") && typeof t?.content === "string")
+            .slice(-6)
+        : [];
+      const section = typeof body?.section === "string" ? body.section.slice(0, 120) : undefined;
+      sendJson(res, 200, await answerSiteQuestion(query, history, section));
+    } catch (error: any) {
+      sendJson(res, 500, { error: error?.message || "Failed to process question" });
+    }
+    return true;
+  }
+
+  // 4. SECTOR-SPECIFIC CHATBOT ROUTES
   const chatbotMatch = pathname.match(/^\/api\/chatbot\/(energy|maritime|manufacturing|logistics|homepage)$/);
   if (chatbotMatch && method === "POST") {
     const sector = chatbotMatch[1];

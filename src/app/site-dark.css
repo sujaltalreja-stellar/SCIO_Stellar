@@ -1,0 +1,153 @@
+/* =====================================================================
+   Public site dark mode. Enabled by SiteLayout via <html data-site-theme="dark">.
+   Generated colour remap for the light design; ".theme-fixed" opts an element out.
+   ===================================================================== */
+:root[data-site-theme="dark"] {
+  color-scheme: dark;
+}
+:root[data-site-theme="dark"] body,
+:root[data-site-theme="dark"] .scio-brand {
+  background-color: #111113;
+}
+:root[data-site-theme="dark"] .scio-boot {
+  background: #111113;
+  color: #A39F98;
+}
+/* Bordered white cards sit one step above the page so they stay visible (see bg-white rule below). */
+:root[data-site-theme="dark"] .bg-white[class*="border"]:not(.theme-fixed, .theme-fixed *) {
+  background-color: #19191C !important;
+}
+/* Soft hero glows: tone them down on dark. */
+:root[data-site-theme="dark"] .from-\[\#FDE7C7\] {
+  opacity: 0.18;
+}
+:root[data-site-theme="dark"] svg.text-\[\#FBD9A8\] {
+  opacity: 0.22;
+}
+:root[data-site-theme="dark"] .bg-white:not(.theme-fixed, .theme-fixed *) {
+  background-color: #111113;
+}
+
+:root[data-site-theme="dark"] .bg-white\/95:not(.theme-fixed, .theme-fixed *) {
+  background-color: rgba(17, 17, 19, 0.88);
+}
+
+:root[data-site-theme="dark"] .bg-\[\#F6F5F3\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .bg-\[\#F7F6F4\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .bg-\[\#FAFAF9\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .bg-\[\#FBFAF8\]:not(.theme-fixed, .theme-fixed *) {
+  background-color: #19191C;
+}
+
+:root[data-site-theme="dark"] .bg-\[\#EFEEEB\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .bg-\[\#F3F2EF\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .bg-\[\#E7E5E1\]:not(.theme-fixed, .theme-fixed *) {
+  background-color: #2C2C31;
+}
+
+:root[data-site-theme="dark"] .bg-\[\#FFF4E2\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .bg-\[\#FFF5E8\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .bg-\[\#FFF8EC\]:not(.theme-fixed, .theme-fixed *) {
+  background-color: rgba(242, 169, 59, 0.14);
+}
+
+:root[data-site-theme="dark"] .bg-\[\#D6D3CE\]:not(.theme-fixed, .theme-fixed *) {
+  background-color: #3A3A40;
+}
+
+:root[data-site-theme="dark"] .text-\[\#111113\]:not(.theme-fixed, .theme-fixed *) {
+  color: #F5F4F1;
+}
+
+:root[data-site-theme="dark"] .text-\[\#2b2a27\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .text-\[\#3a3936\]:not(.theme-fixed, .theme-fixed *) {
+  color: #C9C5BE;
+}
+
+:root[data-site-theme="dark"] .text-\[\#4a4843\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .text-\[\#5D5A54\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .text-\[\#5d5a54\]:not(.theme-fixed, .theme-fixed *) {
+  color: #A39F98;
+}
+
+:root[data-site-theme="dark"] .text-\[\#6b6862\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .text-\[\#8f8b84\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .text-\[\#a19d96\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .text-\[\#b5b1aa\]:not(.theme-fixed, .theme-fixed *) {
+  color: #7E7A74;
+}
+
+:root[data-site-theme="dark"] .text-\[\#B06D0F\]:not(.theme-fixed, .theme-fixed *) {
+  color: #F2A93B;
+}
+
+:root[data-site-theme="dark"] .border-\[\#E7E5E1\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .border-\[\#EFEEEB\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .border-\[\#EEECE8\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .border-\[\#F1EFEC\]:not(.theme-fixed, .theme-fixed *),
+:root[data-site-theme="dark"] .border-\[\#FCE3BF\]:not(.theme-fixed, .theme-fixed *) {
+  border-color: #2C2C31;
+}
+
+:root[data-site-theme="dark"] .border-\[\#D6D3CE\]:not(.theme-fixed, .theme-fixed *) {
+  border-color: #3A3A40;
+}
+
+:root[data-site-theme="dark"] .divide-\[\#F1EFEC\]:not(.theme-fixed, .theme-fixed *) > * + * {
+  border-color: #2C2C31;
+}
+
+:root[data-site-theme="dark"] .hover\:bg-\[\#F3F2EF\]:not(.theme-fixed, .theme-fixed *):hover,
+:root[data-site-theme="dark"] .hover\:bg-\[\#F6F5F3\]:not(.theme-fixed, .theme-fixed *):hover,
+:root[data-site-theme="dark"] .hover\:bg-\[\#FBFAF8\]:not(.theme-fixed, .theme-fixed *):hover {
+  background-color: #26262B;
+}
+
+:root[data-site-theme="dark"] .hover\:text-\[\#111113\]:not(.theme-fixed, .theme-fixed *):hover {
+  color: #FFFFFF;
+}
+
+:root[data-site-theme="dark"] .hover\:text-\[\#B06D0F\]:not(.theme-fixed, .theme-fixed *):hover {
+  color: #F7C277;
+}
+
+:root[data-site-theme="dark"] .hover\:border-\[\#111113\]:not(.theme-fixed, .theme-fixed *):is(:hover, :focus),
+:root[data-site-theme="dark"] .focus\:border-\[\#111113\]:not(.theme-fixed, .theme-fixed *):is(:hover, :focus) {
+  border-color: #F5F4F1;
+}
+
+:root[data-site-theme="dark"] .focus-within\:border-\[\#111113\]:not(.theme-fixed, .theme-fixed *):focus-within {
+  border-color: #F5F4F1;
+}
+
+:root[data-site-theme="dark"] .placeholder\:text-\[\#a19d96\]:not(.theme-fixed, .theme-fixed *)::placeholder {
+  color: #7E7A74;
+}
+
+:root[data-site-theme="dark"] :is(button, a, [role="tab"]).bg-\[\#111113\]:not(.theme-fixed, .theme-fixed *) {
+  background-color: #F5F4F1;
+  color: #111113;
+}
+:root[data-site-theme="dark"] :is(button, a).bg-\[\#111113\]:not(.theme-fixed, .theme-fixed *):hover,
+:root[data-site-theme="dark"] :is(button, a).hover\:bg-\[\#2a2a30\]:not(.theme-fixed, .theme-fixed *):hover {
+  background-color: #FFFFFF;
+}
+:root[data-site-theme="dark"] :is(button, a).bg-\[\#111113\]:not(.theme-fixed, .theme-fixed *) :is(svg, span) {
+  color: inherit;
+}
+:root[data-site-theme="dark"] :is(button, a).bg-\[\#111113\]:not(.theme-fixed, .theme-fixed *) .text-\[\#F2A93B\] {
+  color: #B06D0F;
+}
+/* Other black blocks (logo tile, chat bubble, callouts) keep their colour but get an edge. */
+:root[data-site-theme="dark"] .bg-\[\#111113\]:not(button, a):not(.theme-fixed, .theme-fixed *) {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+/* Light-on-dark buttons (e.g. on the photo band) stay light. */
+:root[data-site-theme="dark"] :is(button, a, [role="tab"]).bg-white.text-\[\#111113\]:not(.theme-fixed, .theme-fixed *) {
+  background-color: #F5F4F1;
+  color: #111113;
+}
+:root[data-site-theme="dark"] .disabled\:bg-\[\#D6D3CE\]:disabled {
+  background-color: #3A3A40;
+  color: #7E7A74;
+}

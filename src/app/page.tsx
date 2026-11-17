@@ -17,8 +17,6 @@ import PlantDirectory from "../components/energy/plants/PlantDirectory";
 import PlantDetailsView from "../components/energy/plants/PlantDetailsView";
 import AssetRegistry from "../components/energy/assets/AssetRegistry";
 import AlarmConsole from "../components/energy/alarms/AlarmConsole";
-import WeatherMonitor from "../components/energy/weather/WeatherMonitor";
-import ReportingModule from "../components/energy/reports/ReportingModule";
 import AuditTrail from "../components/energy/audit/AuditTrail";
 import AIOpsControl from "../components/energy/ai/AIOpsControl";
 import FieldOpsControl from "../components/energy/field/FieldOpsControl";
@@ -48,6 +46,7 @@ import ResourcesHub from "../components/resources/ResourcesHub";
 import ScioSentinelOrb from "../components/ai/ScioSentinelOrb";
 import ContactHub from "../components/contact/ContactHub";
 import { mockDb } from "../config/energyMockDb";
+import PageLoader from "../components/site/PageLoader";
 
 export default function App() {
   const [viewMode, setViewMode] = useState<"landing" | "platform" | "resources" | "contact">("landing");
@@ -603,7 +602,7 @@ export default function App() {
   const inventoryRiskItems = activeSeeds.inventory.filter(i => i.stock <= i.reorderLevel).length;
 
   if (!mounted) {
-    return <div className="min-h-screen bg-[#06080d]" />;
+    return <PageLoader dark />;
   }
 
   if (viewMode === "landing") {

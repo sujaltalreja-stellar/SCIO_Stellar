@@ -6,8 +6,25 @@ import { ArrowRight, ChevronDown, Menu, X, Mail, Phone, ShieldCheck } from "luci
 import { AnimatePresence, motion } from "framer-motion";
 import { SiteContext, SiteActions, launchHref } from "./SiteContext";
 import { NAV_GROUPS, FOOTER_COLUMNS } from "./nav";
-import { BetaFormModal, DemoFormModal } from "../landing/shared";
-import ScioSentinelOrb from "../ai/ScioSentinelOrb";
+import { LeadModal } from "./ContactForms";
+import { ThemeToggle, useSiteThemeRoot } from "./theme";
+import { lazyWithReload } from "../../lazyWithReload";
+
+// The AI assistant is large (~240 KB); load it after the page is visible, not before.
+const ScioSentinelOrb = lazyWithReload(() => import("../ai/ScioSentinelOrb"));
+
+function useAfterFirstPaint(delayMs = 1200) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number };
+    const t = window.setTimeout(() => {
+      if (w.requestIdleCallback) w.requestIdleCallback(() => setReady(true), { timeout: 2000 });
+      else setReady(true);
+    }, delayMs);
+    return () => window.clearTimeout(t);
+  }, [delayMs]);
+  return ready;
+}
 
 export const SITE_SHELL = "mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10";
 
@@ -130,6 +147,7 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
         </div>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <a
             href="/app"
             className="hidden md:inline-flex px-4 py-2.5 rounded-full text-[14px] font-medium text-[#3a3936] hover:text-[#111113]"
@@ -220,7 +238,7 @@ function SiteFooter({ onTalk, onBeta }: { onTalk: () => void; onBeta: () => void
           <div className="space-y-5">
             <Logo dark />
             <p className="text-[14px] leading-relaxed max-w-xs">
-              Operational intelligence for energy, maritime, manufacturing and logistics. Built on the data your operation already has.
+              The business operating system that connects your ERP, POS, warehouse, HR and finance tools, answers questions in plain language, and turns them into approved actions.
             </p>
             <div className="flex items-center gap-2">
               <a
@@ -321,6 +339,10 @@ export default function SiteLayout({
   const navigate = useNavigate();
   const [demoOpen, setDemoOpen] = useState(false);
   const [betaOpen, setBetaOpen] = useState(false);
+  const showOrb = useAfterFirstPaint();
+  useSiteThemeRoot();
+  const closeDemo = React.useCallback(() => setDemoOpen(false), []);
+  const closeBeta = React.useCallback(() => setBetaOpen(false), []);
 
   const actions = useMemo<SiteActions>(() => {
     const launchPlatform = (industry = "energy", tab?: string) => {
@@ -345,20 +367,24 @@ export default function SiteLayout({
   return (
     <SiteContext.Provider value={actions}>
       <ScrollManager />
-      <div className="scio-brand min-h-screen bg-white text-[#111113] font-sans overflow-x-hidden selection:bg-[#111113] selection:text-white">
+      <div className="scio-brand min-h-screen bg-white text-[#111113] font-sans overflow-x-clip selection:bg-[#111113] selection:text-white">
         <SiteHeader onTalk={actions.openDemo} />
         <main id="main">{children}</main>
         <SiteFooter onTalk={actions.openDemo} onBeta={actions.openBeta} />
       </div>
 
-      <DemoFormModal isOpen={demoOpen} onClose={() => setDemoOpen(false)} onLaunchPlatform={actions.handleNavClick} />
-      <BetaFormModal isOpen={betaOpen} onClose={() => setBetaOpen(false)} onLaunchPlatform={actions.handleNavClick} />
-      <ScioSentinelOrb
-        onOpenBetaModal={actions.openBeta}
-        onOpenDemoModal={actions.openDemo}
-        onLaunchPlatform={(ind, tab) => actions.launchPlatform(ind, tab)}
-        currentIndustry={orbIndustry}
-      />
+      <LeadModal variant="demo" open={demoOpen} onClose={closeDemo} />
+      <LeadModal variant="beta" open={betaOpen} onClose={closeBeta} />
+      {showOrb && (
+        <React.Suspense fallback={null}>
+          <ScioSentinelOrb
+            onOpenBetaModal={actions.openBeta}
+            onOpenDemoModal={actions.openDemo}
+            onLaunchPlatform={(ind, tab) => actions.launchPlatform(ind, tab)}
+            currentIndustry={orbIndustry}
+          />
+        </React.Suspense>
+      )}
     </SiteContext.Provider>
   );
 }

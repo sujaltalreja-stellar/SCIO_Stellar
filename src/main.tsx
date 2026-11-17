@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import AppRouter from "./AppRouter";
 import "./app/globals.css";
+import "./app/site-dark.css";
 
 const rootElement = document.getElementById("root");
 

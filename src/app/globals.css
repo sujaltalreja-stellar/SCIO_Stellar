@@ -1,5 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
-@import "tailwindcss";
+/* Fonts are loaded non-blocking from index.html; don't @import them here (that blocks first paint). */
+/* Only scan src/ for class names, not the whole repo (Renewable Energy/, docs, etc.). */
+@import "tailwindcss" source("../");
 
 @custom-variant dark (&:where(.dark, .dark *, [data-theme="dark"], [data-theme="dark"] *));
 
@@ -335,4 +336,14 @@ html.light ::-webkit-scrollbar-thumb:hover {
 }
 @media (prefers-reduced-motion: reduce) {
   [class*="animate-[scio-marquee"] { animation: none !important; }
+}
+
+/* Homepage systems hub: data pulses flowing from each system into SCIO */
+@keyframes scio-hub-flow {
+  from { stroke-dashoffset: 300; }
+  to { stroke-dashoffset: 0; }
+}
+.scio-hub-flow { animation: scio-hub-flow 2.4s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .scio-hub-flow { animation: none; display: none; }
 }

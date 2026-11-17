@@ -7147,6 +7147,316 @@ User Question: ${query}` }]
   return finalResponse;
 }
 
+// src/server/demo/sarvam.ts
+var SARVAM_URL = "https://api.sarvam.ai/v2/chat/completions";
+function sarvamConfigured() {
+  return Boolean(process.env.SARVAM_API_KEY);
+}
+async function sarvamChat(opts) {
+  const key = process.env.SARVAM_API_KEY;
+  if (!key) throw new Error("SARVAM_API_KEY is not configured");
+  const body = {
+    model: process.env.SARVAM_MODEL || "gemma4",
+    messages: opts.messages,
+    max_tokens: opts.maxTokens ?? 1200,
+    temperature: opts.temperature ?? 0.2
+  };
+  if (opts.tools?.length) {
+    body.tools = opts.tools;
+    body.tool_choice = "auto";
+  }
+  if (opts.json) body.response_format = { type: "json_object" };
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? 55e3);
+  try {
+    const res = await fetch(SARVAM_URL, {
+      method: "POST",
+      headers: { "api-subscription-key": key, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: ctrl.signal
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Sarvam API ${res.status}: ${text.slice(0, 300)}`);
+    }
+    const data = await res.json();
+    const choice = data.choices?.[0];
+    if (!choice) throw new Error("Sarvam API returned no choices");
+    return { message: choice.message, finishReason: choice.finish_reason, tokens: data.usage?.total_tokens ?? 0 };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+function parseJsonLoose(text) {
+  if (!text) return null;
+  const cleaned = text.replace(/```(?:json)?/gi, "").trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch {
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      try {
+        return JSON.parse(cleaned.slice(start, end + 1));
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+var hits = /* @__PURE__ */ new Map();
+function rateLimited(ip, limit = 30, windowMs = 10 * 6e4) {
+  const now = Date.now();
+  const arr2 = (hits.get(ip) ?? []).filter((t) => now - t < windowMs);
+  arr2.push(now);
+  hits.set(ip, arr2);
+  return arr2.length > limit;
+}
+
+// src/components/site/faqData.ts
+var ENTERPRISE_QUESTIONS_DATA = [
+  {
+    id: 1,
+    question: "What is SCIO?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "SCIO is an Enterprise Operational Intelligence platform that connects assets, people, enterprise systems, workflows, operational data and AI into a shared operational context.\n\nIt helps organizations move from fragmented signals to evidence-backed decisions, governed actions and continuous operational learning.",
+    badges: ["Operational Intelligence", "Shared Context", "Governed Action"]
+  },
+  {
+    id: 2,
+    question: "Does SCIO replace our existing ERP?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "No.\n\nSCIO can operate alongside existing ERP/EAM platforms such as SAP, Oracle or IBM Maximo. Existing systems can remain the system of record while SCIO adds operational intelligence, cross-system context, AI-powered decision support and workflow orchestration.",
+    badges: ["ERP Side-by-Side", "System of Record Preserved", "Orchestration Layer"]
+  },
+  {
+    id: 3,
+    question: "Can SCIO integrate with SAP, Oracle and our other business systems?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "Yes, SCIO is designed to integrate with existing enterprise systems through governed integration boundaries.\n\nDepending on the implementation, SCIO can connect your ERP with POS, WMS, HRMS, CRM, procurement, documents, spreadsheets and other business systems.\n\nSpecific connector availability is confirmed during implementation.",
+    badges: ["SAP & Oracle Connectors", "POS / WMS / HRMS / CRM", "Documents & Spreadsheets"]
+  },
+  {
+    id: 4,
+    question: "Can SCIO work without replacing our existing software?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "Yes.\n\nThis is one of SCIO's core architectural principles. SCIO can sit as an intelligence and orchestration layer around the systems an organization already uses.",
+    badges: ["Zero Rip-and-Replace", "Wrapper Layer", "Rapid Value"]
+  },
+  {
+    id: 5,
+    question: "Can SCIO be deployed on our own infrastructure?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "Yes, SCIO supports an on-premises deployment model.\n\nSCIO can be deployed within a customer's controlled infrastructure, allowing deployment architecture and data residency to align with the organization's security, compliance and jurisdictional requirements.",
+    badges: ["On-Premises", "Data Residency", "Full Sovereignty"]
+  },
+  {
+    id: 6,
+    question: "Does SCIO support private cloud or hybrid deployment?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "Yes.\n\nSCIO can be architected for:\n\u2022 On-premises\n\u2022 Private cloud\n\u2022 Hybrid environments\n\nThe appropriate model depends on the customer's infrastructure, security policies, operational requirements and data-residency needs.",
+    badges: ["Private Cloud", "Hybrid Environment", "Multi-Region"]
+  },
+  {
+    id: 7,
+    question: "Can SCIO operate in an offline or air-gapped environment?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "SCIO's architecture supports local operation and an offline/air-gapped licensing approach.\n\nProduction offline capabilities should be validated as part of the specific deployment architecture before being committed as a contractual requirement.",
+    badges: ["Air-Gapped Support", "Offline Licensing", "Local Edge Mode"]
+  },
+  {
+    id: 8,
+    question: "What makes SCIO different from another AI platform?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "SCIO is not positioned as simply an AI chatbot or analytics tool.\n\nIt connects:\nPeople + Data + ERP + POS + Documents + Workflows + AI\n\nand preserves relationships between sales, stock, orders, suppliers, staff, decisions, approvals and outcomes.\n\nThe goal is to turn isolated information into shared operational context.",
+    badges: ["Full Context Mesh", "Connected Graph", "Beyond Chatbots"]
+  },
+  {
+    id: 9,
+    question: "What can SCIO's AI actually do?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "SCIO can assist with operational intelligence such as:\n\u2022 Answering questions about your business in plain language\n\u2022 Root-cause analysis\n\u2022 Demand and stock forecasting\n\u2022 Replenishment and reorder suggestions\n\u2022 Document intelligence (invoices, POs, contracts)\n\u2022 Supplier performance\n\u2022 Workflow assistance\n\u2022 Evidence-based decision support\n\nAI recommendations are connected to available operational context and supporting evidence.",
+    badges: ["Ask in Plain Language", "Forecasting", "Document AI"]
+  },
+  {
+    id: 10,
+    question: "Can SCIO automatically make operational decisions?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "SCIO is designed around governed decision-making rather than unrestricted autonomous action.\n\nDepending on the workflow, recommendations can be reviewed through role-based controls such as:\nApprove \u2192 Edit \u2192 Escalate \u2192 Reject\n\nSensitive operational, financial or safety-related actions can require human approval.",
+    badges: ["Human-in-the-Loop", "Governed Decisions", "Role-Based Approvals"]
+  },
+  {
+    id: 11,
+    question: "Can SCIO act in our systems without someone checking first?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "Only where you allow it.\n\nSCIO's core approach is evidence-backed recommendations, governed permissions and controlled human action. Purchase orders, stock transfers, payments and other sensitive actions can always require a person to approve them first.",
+    badges: ["Approval First", "Evidence-Backed", "Human Oversight"]
+  },
+  {
+    id: 12,
+    question: "What kind of businesses is SCIO for?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "SCIO is built for businesses that run on several systems at once and need one place to see and act on what's happening across them.\n\nTypical starting points:\n\u2022 Multi-store and multi-location businesses\n\u2022 Distribution and wholesale\n\u2022 Companies with separate ERP, POS, warehouse, HR and finance tools\n\nThe platform stays the same; the workflows, data connections and approvals adapt to how your business works.",
+    badges: ["Multi-Location", "Multi-System", "Adapts to Your Workflows"]
+  },
+  {
+    id: 13,
+    question: "Can SCIO include ERP capabilities?",
+    category: "platform",
+    categoryName: "Platform & Architecture",
+    answerText: "Yes.\n\nOrganizations can choose between two approaches:\n\n1. SCIO + Existing ERP\nUse the organization's existing ERP/EAM as the system of record while SCIO provides intelligence and orchestration.\n\n2. SCIO + Built-in Operational Modules\nSCIO can provide selected operational/business capabilities such as:\nAssets | Inventory | Suppliers | Procurement | Work Orders | Maintenance | Inspections | Approvals | Documents | Users/Roles | Analytics\n\nThis allows SCIO to adapt to the customer's existing architecture rather than forcing a single deployment model.",
+    badges: ["Dual Approach", "Modular ERP", "Architectural Flexibility"]
+  },
+  {
+    id: 14,
+    question: "How does SCIO protect AI governance?",
+    category: "ai",
+    categoryName: "AI Capabilities & Governance",
+    answerText: "SCIO's governed AI approach includes controls such as:\n\u2022 Model/version registry\n\u2022 Drift monitoring\n\u2022 Validation\n\u2022 Approval gates\n\u2022 Champion/challenger testing\n\u2022 Rollback capability\n\u2022 Audit trails\n\nThe principle is simple:\nAI recommends. Governance determines what happens.",
+    badges: ["Drift Monitoring", "Audit Trails", "AI Recommends. Governance Determines."]
+  },
+  {
+    id: 15,
+    question: "How does SCIO create measurable business value?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "SCIO does not rely on invented ROI percentages.\n\nThe implementation begins by establishing a baseline and then measuring agreed KPIs. These can include:\n\n\u2022 Operations: Stock availability, fulfilment time, schedule adherence\n\u2022 Cost: Emergency purchasing, excess inventory, stockouts, write-offs\n\u2022 Risk: Evidence completeness, overdue controls, approval compliance\n\u2022 Intelligence: Alert precision, recommendation acceptance, time-to-evidence, model drift\n\nThe baseline, formula, data owner, source and evaluation period can be defined before measuring improvement.",
+    badges: ["No Invented ROI", "Baseline KPIs", "Empirical Evaluation"]
+  },
+  {
+    id: 16,
+    question: "How is SCIO implemented?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "SCIO follows a phased approach:\nAlign \u2192 Connect \u2192 Validate \u2192 Pilot \u2192 Scale\n\nThe initial implementation focuses on one high-value workflow or site. Once KPI, security, integration and adoption requirements are validated, the solution can expand to additional assets, departments, sites and use cases.",
+    badges: ["Phased Rollout", "Align \u2192 Connect \u2192 Validate \u2192 Pilot \u2192 Scale"]
+  },
+  {
+    id: 17,
+    question: "How does SCIO handle enterprise security?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "SCIO's architecture includes enterprise controls such as:\nIdentity & Access Control | Encryption | SSO | Least Privilege | Segregation of Duties | Environment Isolation | Audit | Data Governance\n\nSecurity architecture is aligned with the customer's deployment and governance requirements.",
+    badges: ["SSO & RBAC", "End-to-End Encryption", "Segregation of Duties"]
+  },
+  {
+    id: 18,
+    question: "Who owns the data when SCIO is deployed?",
+    category: "deployment",
+    categoryName: "Deployment & Security",
+    answerText: "For customer-controlled deployments, the customer's infrastructure, systems, data location and security policies remain under the customer's control.\n\nThe specific data ownership, retention and access arrangements should be defined contractually for each implementation.",
+    badges: ["Customer Data Ownership", "Full Data Control", "Contractual Clarity"]
+  },
+  {
+    id: 19,
+    question: "Can we start with only one site or workflow?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "Yes.\n\nSCIO is designed to start with a focused, high-value operational workflow, establish a measurable baseline, validate the integration and demonstrate the operating loop before scaling across additional sites or use cases.",
+    badges: ["Single Site Start", "Low Risk", "Proven Loop"]
+  },
+  {
+    id: 20,
+    question: "How do we get started with SCIO?",
+    category: "roi",
+    categoryName: "Value & Implementation",
+    answerText: "Start with one operational problem worth solving.\n\nA SCIO engagement can begin by identifying:\nThe site \u2192 The workflow \u2192 The decision owner \u2192 The operational problem \u2192 The baseline KPI \u2192 The required systems/data\n\nFrom there, SCIO can be evaluated through a controlled implementation or pilot.",
+    badges: ["One Problem First", "Controlled Pilot", "Guided Onboarding"]
+  }
+];
+
+// src/server/siteAssistant.ts
+var FAQ_TEXT = ENTERPRISE_QUESTIONS_DATA.map((f) => `Q: ${f.question}
+A: ${f.answerText.replace(/\n+/g, " ")}`).join("\n\n");
+var KNOWLEDGE = `
+PRODUCT: Stellar SCIO is an AI business operating system. Tagline: "Your systems are connected. Now connect the decisions."
+SCIO connects a company's ERP, point of sale (POS), warehouse (WMS), HR & payroll, CRM, procurement, accounting, e-commerce, spreadsheets and documents/email.
+It surfaces operational issues, answers questions in plain language with sources, and turns insights into approved actions (purchase orders, stock transfers, tasks) written back to existing systems.
+It does not replace existing systems; they stay the system of record. No rip-and-replace.
+
+HOW IT WORKS (4 steps): 1) Connect: lightweight connectors read from ERP, POS, WMS, HR, CRM, finance tools, spreadsheets and documents. 2) Understand: SCIO links stores, products, stock, orders, suppliers, staff and money into one connected model. 3) Ask: anyone asks questions in plain language and sees the evidence. 4) Act: recommendations become actions that go to the right person to approve and are written back.
+
+CAPABILITIES: ask anything in plain language; live views by store/product/supplier/team; alerts for stockouts, late deliveries and unusual sales; demand and stock forecasts; document AI that reads invoices, POs and delivery notes and matches them; workflows and approvals (approve, edit, escalate, reject) with rules by role, amount and location; full audit trail; roles and permissions down to store level.
+
+PRODUCT SCREENS: Command Center (live sales vs target, one health score, stockout risk, overstock, expiry risk, supplier delays, inventory losses), Intelligence (money leaking today, value protected by SCIO, items running out next, supplier true cost), Ask SCIO (answers with reasons and actions ready to approve), Priority actions, Connected systems map.
+
+USE CASES: inventory & replenishment (what to reorder and where, transfers between locations, slow/excess stock); sales & store performance (compare stores, regions, channels and explain changes); purchasing & suppliers (draft POs from demand, track late/partial deliveries, supplier scorecards); finance & documents (invoice/PO/receipt matching, price and quantity mismatches, spend analysis); approvals & workflows (route actions to the right approver, full history).
+Typical customers: multi-store and multi-location businesses, distribution and wholesale, companies running separate ERP, POS, warehouse, HR and finance tools.
+
+SECURITY & DEPLOYMENT: on-premises, private cloud or hybrid; data stays on the customer's infrastructure; encryption in transit and at rest; SSO; role-based access and least privilege; segregation of duties; environment isolation; AI recommends and people approve; every action is logged.
+
+GETTING STARTED: start with one workflow that costs money (e.g. stockouts or slow purchasing), connect the systems behind it read-only first, validate SCIO's numbers against your own reports, then enable actions with approvals and expand. Live in weeks, not a migration project. No invented ROI: baseline KPIs are agreed first and then measured.
+
+CONTACT: book a demo on the website, email sales@stellarmind.ai or info@stellarmind.ai, phone +91 97230 99765. Pricing is shared on a call; there is no public price list.
+
+PAGES: /platform (how it works, capabilities, security), /platform/integrations, /use-cases, /why-scio, /faq, /contact. The live product is at /app.
+
+FAQ:
+${FAQ_TEXT}
+`.trim();
+var SYSTEM_PROMPT = `You are SCIO, the friendly assistant on the Stellar SCIO website. Help visitors understand the product and decide whether to book a demo.
+
+Rules:
+- Answer ONLY from the KNOWLEDGE below. If something isn't covered (exact pricing, specific customer names, a connector not listed), say you don't have that detail and suggest booking a demo or emailing sales@stellarmind.ai.
+- Never invent numbers, customers, certifications or results.
+- SCIO is not an energy, maritime, manufacturing or logistics product. Don't describe it that way.
+- Be concise: 2\u20135 short sentences or a few bullet points ("- "). Plain, warm language; no jargon. Use **bold** sparingly.
+- Reply as JSON: {"answer": string, "action": "demo" | "none", "followUps": [up to 3 short follow-up questions]}.
+  Use "demo" when the visitor asks about pricing, a pilot, trying it, getting started, or talking to someone.
+
+KNOWLEDGE:
+${KNOWLEDGE}`;
+function fallbackAnswer(query) {
+  const q = query.toLowerCase();
+  const hit = ENTERPRISE_QUESTIONS_DATA.find((f) => q.split(/\W+/).filter((w) => w.length > 3).some((w) => f.question.toLowerCase().includes(w))) ?? ENTERPRISE_QUESTIONS_DATA[0];
+  return {
+    text: `${hit.answerText}
+
+Want to see it on your own data? Book a demo and we'll walk you through it.`,
+    provider: "SCIO Assistant",
+    suggestedAction: { type: "open_demo", label: "Book a demo" },
+    followUps: ["How does SCIO work?", "Which systems does it connect to?", "Can it run on our own infrastructure?"]
+  };
+}
+async function answerSiteQuestion(query, history = [], section) {
+  if (!sarvamConfigured()) return fallbackAnswer(query);
+  const messages = [
+    { role: "system", content: SYSTEM_PROMPT },
+    ...history.slice(-6).map((t) => ({ role: t.role, content: t.content.slice(0, 1500) })),
+    { role: "user", content: section ? `(Visitor is looking at: ${section})
+${query}` : query }
+  ];
+  try {
+    const { message } = await sarvamChat({ messages, json: true, maxTokens: 700, temperature: 0.3, timeoutMs: 3e4 });
+    const raw = typeof message.content === "string" ? message.content : "";
+    const parsed = parseJsonLoose(raw);
+    const text = (parsed?.answer || raw || "").trim();
+    if (!text) return fallbackAnswer(query);
+    return {
+      text,
+      provider: "SCIO Assistant \xB7 Sarvam AI",
+      suggestedAction: parsed?.action === "demo" ? { type: "open_demo", label: "Book a demo" } : null,
+      followUps: Array.isArray(parsed?.followUps) ? parsed.followUps.filter((s) => typeof s === "string").slice(0, 3) : []
+    };
+  } catch (err) {
+    console.warn("Site assistant: Sarvam call failed, using fallback", err);
+    return fallbackAnswer(query);
+  }
+}
+
 // src/demo/data/rng.ts
 function createRng(seed) {
   let a = seed >>> 0;
@@ -8895,73 +9205,6 @@ function assetHealth(ds, asset) {
 }
 function fleetHealth(ds) {
   return ds.assets.map((a) => assetHealth(ds, a)).sort((a, b) => b.riskScore - a.riskScore);
-}
-
-// src/server/demo/sarvam.ts
-var SARVAM_URL = "https://api.sarvam.ai/v2/chat/completions";
-function sarvamConfigured() {
-  return Boolean(process.env.SARVAM_API_KEY);
-}
-async function sarvamChat(opts) {
-  const key = process.env.SARVAM_API_KEY;
-  if (!key) throw new Error("SARVAM_API_KEY is not configured");
-  const body = {
-    model: process.env.SARVAM_MODEL || "gemma4",
-    messages: opts.messages,
-    max_tokens: opts.maxTokens ?? 1200,
-    temperature: opts.temperature ?? 0.2
-  };
-  if (opts.tools?.length) {
-    body.tools = opts.tools;
-    body.tool_choice = "auto";
-  }
-  if (opts.json) body.response_format = { type: "json_object" };
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? 55e3);
-  try {
-    const res = await fetch(SARVAM_URL, {
-      method: "POST",
-      headers: { "api-subscription-key": key, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: ctrl.signal
-    });
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`Sarvam API ${res.status}: ${text.slice(0, 300)}`);
-    }
-    const data = await res.json();
-    const choice = data.choices?.[0];
-    if (!choice) throw new Error("Sarvam API returned no choices");
-    return { message: choice.message, finishReason: choice.finish_reason, tokens: data.usage?.total_tokens ?? 0 };
-  } finally {
-    clearTimeout(timer);
-  }
-}
-function parseJsonLoose(text) {
-  if (!text) return null;
-  const cleaned = text.replace(/```(?:json)?/gi, "").trim();
-  try {
-    return JSON.parse(cleaned);
-  } catch {
-    const start = cleaned.indexOf("{");
-    const end = cleaned.lastIndexOf("}");
-    if (start >= 0 && end > start) {
-      try {
-        return JSON.parse(cleaned.slice(start, end + 1));
-      } catch {
-        return null;
-      }
-    }
-    return null;
-  }
-}
-var hits = /* @__PURE__ */ new Map();
-function rateLimited(ip, limit = 30, windowMs = 10 * 6e4) {
-  const now = Date.now();
-  const arr2 = (hits.get(ip) ?? []).filter((t) => now - t < windowMs);
-  arr2.push(now);
-  hits.set(ip, arr2);
-  return arr2.length > limit;
 }
 
 // src/server/demo/copilot.ts
@@ -11301,6 +11544,27 @@ async function handleApiRequest(req, res) {
       }
       return true;
     }
+  }
+  if (pathname === "/api/site-assistant" && method === "POST") {
+    const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
+    if (rateLimited(`site:${ip}`, 40)) {
+      sendJson(res, 429, { error: "Too many questions in a short time. Please try again in a few minutes." });
+      return true;
+    }
+    try {
+      const body = await parseJsonBody(req);
+      const query = typeof body?.query === "string" ? body.query.trim().slice(0, 1e3) : "";
+      if (!query) {
+        sendJson(res, 400, { error: "Query is required" });
+        return true;
+      }
+      const history = Array.isArray(body?.history) ? body.history.filter((t) => (t?.role === "user" || t?.role === "assistant") && typeof t?.content === "string").slice(-6) : [];
+      const section = typeof body?.section === "string" ? body.section.slice(0, 120) : void 0;
+      sendJson(res, 200, await answerSiteQuestion(query, history, section));
+    } catch (error) {
+      sendJson(res, 500, { error: error?.message || "Failed to process question" });
+    }
+    return true;
   }
   const chatbotMatch = pathname.match(/^\/api\/chatbot\/(energy|maritime|manufacturing|logistics|homepage)$/);
   if (chatbotMatch && method === "POST") {

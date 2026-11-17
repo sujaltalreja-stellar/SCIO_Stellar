@@ -12,39 +12,35 @@ export interface NavGroup {
   footer?: NavLinkItem;
 }
 
+export const USE_CASES = [
+  { id: "inventory", label: "Inventory & replenishment", desc: "Know what to reorder, where, before it runs out" },
+  { id: "sales", label: "Sales & store performance", desc: "See every store, channel and product in one view" },
+  { id: "purchasing", label: "Purchasing & suppliers", desc: "Draft POs and track supplier delivery and quality" },
+  { id: "finance", label: "Finance & documents", desc: "Read invoices and POs, match them, flag the gaps" },
+  { id: "approvals", label: "Approvals & workflows", desc: "Route every action to the right person to sign off" },
+] as const;
+
 export const NAV_GROUPS: NavGroup[] = [
   {
     label: "Platform",
     items: [
-      { label: "How SCIO works", desc: "Connect, understand, predict, act", href: "/platform" },
-      { label: "Control Tower", desc: "One live view across every operation", href: "/platform/control-tower" },
-      { label: "Integrations", desc: "SCADA, ERP and IoT, with no rip-and-replace", href: "/platform/integrations" },
-      { label: "Capabilities", desc: "Root cause, documents, inspections, actions", href: "/platform#capabilities" },
+      { label: "Platform overview", desc: "Connect, understand, ask, act", href: "/platform" },
+      { label: "How it works", desc: "From your systems to approved actions", href: "/platform#how-it-works" },
+      { label: "Integrations", desc: "ERP, POS, WMS, HRMS, CRM and more", href: "/platform/integrations" },
+      { label: "Security & governance", desc: "Your infrastructure, your approvals", href: "/platform#governance" },
     ],
-    footer: { label: "Open the live platform", href: "/app" },
+    footer: { label: "Open SCIO", href: "/app" },
   },
   {
-    label: "Industries",
-    items: [
-      { label: "Renewable Energy & Utilities", desc: "Solar, wind, BESS and grid", href: "/industries/energy" },
-      { label: "Maritime Fleet & Ports", desc: "Vessels, bunkering and safety", href: "/industries/maritime" },
-      { label: "Manufacturing 4.0", desc: "OEE, robotics and quality", href: "/industries/manufacturing" },
-      { label: "Logistics & Cold-Chain", desc: "Freight, demurrage and IoT", href: "/industries/logistics" },
-    ],
-    footer: { label: "All industries", href: "/industries" },
-  },
-  {
-    label: "Customers",
-    items: [
-      { label: "Private beta cohort", desc: "Enterprises running SCIO today", href: "/customers" },
-      { label: "Case studies & blogs", desc: "Field notes and results", href: "/resources" },
-    ],
+    label: "Use cases",
+    items: USE_CASES.map((u) => ({ label: u.label, desc: u.desc, href: `/use-cases#${u.id}` })),
+    footer: { label: "All use cases", href: "/use-cases" },
   },
   {
     label: "Company",
     items: [
-      { label: "Why SCIO", desc: "The problem we solve, and how we compare", href: "/why-scio" },
-      { label: "Enterprise questions", desc: "Deployment, security, AI and ROI", href: "/faq" },
+      { label: "Why SCIO", desc: "The problem we solve, and how we're different", href: "/why-scio" },
+      { label: "FAQ", desc: "Deployment, security, AI and pricing questions", href: "/faq" },
       { label: "Contact", desc: "Start a conversation", href: "/contact" },
     ],
   },
@@ -54,28 +50,22 @@ export const FOOTER_COLUMNS: NavGroup[] = [
   {
     label: "Platform",
     items: [
-      { label: "How SCIO works", href: "/platform" },
-      { label: "Control Tower", href: "/platform/control-tower" },
+      { label: "Overview", href: "/platform" },
+      { label: "How it works", href: "/platform#how-it-works" },
       { label: "Integrations", href: "/platform/integrations" },
+      { label: "Security", href: "/platform#governance" },
       { label: "Open SCIO", href: "/app" },
     ],
   },
   {
-    label: "Industries",
-    items: [
-      { label: "Renewable Energy", href: "/industries/energy" },
-      { label: "Maritime Fleet", href: "/industries/maritime" },
-      { label: "Manufacturing 4.0", href: "/industries/manufacturing" },
-      { label: "Logistics & Cold-Chain", href: "/industries/logistics" },
-    ],
+    label: "Use cases",
+    items: USE_CASES.map((u) => ({ label: u.label, href: `/use-cases#${u.id}` })),
   },
   {
     label: "Company",
     items: [
       { label: "Why SCIO", href: "/why-scio" },
-      { label: "Customers", href: "/customers" },
-      { label: "Case studies", href: "/resources" },
-      { label: "Enterprise questions", href: "/faq" },
+      { label: "FAQ", href: "/faq" },
       { label: "Contact", href: "/contact" },
     ],
   },

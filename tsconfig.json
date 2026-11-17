@@ -21,8 +21,7 @@
       "@/*": ["./src/*"],
       "next/navigation": ["./src/lib/next-compat/navigation.ts"],
       "next/link": ["./src/lib/next-compat/link.tsx"],
-      "next/dynamic": ["./src/lib/next-compat/dynamic.tsx"],
-      "next/image": ["./src/lib/next-compat/image.tsx"]
+      "next/dynamic": ["./src/lib/next-compat/dynamic.tsx"]
     }
   },
   "include": [

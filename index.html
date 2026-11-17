@@ -3,20 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stellar SCIO | Business Operating System</title>
+    <title>Stellar SCIO | The AI Business Operating System for ERP, POS & Inventory</title>
     <meta
       name="description"
       content="Skip the dashboards. Just ask. SCIO connects your ERP, POS, WMS and every system you run, and turns any question into an answer and an approved action."
     />
     <meta
       name="keywords"
-      content="Stellar SCIO, Enterprise AI, Supply Chain Intelligence, Maritime Logistics, Energy Grid Control, Predictive Analytics"
+      content="Stellar SCIO, business operating system, AI for business operations, ERP integration, POS analytics, inventory management, replenishment, purchasing automation, multi-store operations, business intelligence"
     />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.stellarscio.app/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
 
     <!-- OpenGraph & Twitter -->
-    <meta property="og:title" content="Stellar SCIO | Business Operating System" />
+    <meta property="og:site_name" content="Stellar SCIO" />
+    <meta property="og:url" content="https://www.stellarscio.app/" />
+    <meta property="og:title" content="Stellar SCIO | The AI Business Operating System" />
     <meta
       property="og:description"
       content="Skip the dashboards. Just ask. SCIO connects your ERP, POS, WMS and every system you run, and turns any question into an answer and an approved action."
@@ -34,13 +38,86 @@
     />
     <meta name="twitter:image" content="/thumbnail.png?v=2" />
 
+    <!-- Structured data for search engines -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://www.stellarscio.app/#org",
+            "name": "Stellar SCIO",
+            "url": "https://www.stellarscio.app/",
+            "logo": "https://www.stellarscio.app/favicon.svg",
+            "email": "info@stellarmind.ai",
+            "contactPoint": [{ "@type": "ContactPoint", "contactType": "sales", "email": "sales@stellarmind.ai", "telephone": "+91-97230-99765" }]
+          },
+          {
+            "@type": "SoftwareApplication",
+            "name": "Stellar SCIO",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "url": "https://www.stellarscio.app/",
+            "description": "AI business operating system that connects ERP, POS, warehouse, HR and finance systems, answers questions in plain language and turns them into approved actions.",
+            "publisher": { "@id": "https://www.stellarscio.app/#org" }
+          },
+          {
+            "@type": "WebSite",
+            "name": "Stellar SCIO",
+            "url": "https://www.stellarscio.app/",
+            "publisher": { "@id": "https://www.stellarscio.app/#org" }
+          }
+        ]
+      }
+    </script>
+
     <!-- Google Fonts Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fonts load without blocking the first paint (text shows in a system font, then swaps in). -->
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
-      rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      />
+    </noscript>
+
+    <!-- Boot screen theme: dark for the SCIO app and platform dashboards, light for the marketing site. -->
+    <script>
+      (() => {
+        const p = location.pathname;
+        const q = new URLSearchParams(location.search);
+        const dark =
+          /^\/(app|demo)(\/|$)/.test(p) ||
+          /^\/(energy|renewable-energy|maritime|maritime-fleet|manufacturing|logistics|supply-chain|dashboard)\/?$/.test(p) ||
+          q.get("launch") === "1" || q.has("industry");
+        document.documentElement.setAttribute("data-boot", dark ? "dark" : "light");
+        // Public site theme (light/dark), applied before first paint to avoid a flash.
+        if (!dark) {
+          let t = null;
+          try { t = localStorage.getItem("scio_site_theme"); } catch (e) {}
+          if (t !== "light" && t !== "dark") t = window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+          document.documentElement.setAttribute("data-site-theme", t);
+        }
+      })();
+    </script>
+    <style>
+      .scio-boot { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: #0a0d14; color: #cbd5e1; font: 500 14px Inter, system-ui, sans-serif; }
+      html[data-boot="light"] .scio-boot { background: #fff; color: #5d5a54; }
+      .scio-boot i { width: 36px; height: 36px; border-radius: 50%; border: 3px solid currentColor; border-top-color: transparent; opacity: 0.7; animation: scio-boot-spin 0.8s linear infinite; }
+      @keyframes scio-boot-spin { to { transform: rotate(360deg); } }
+    </style>
 
     <script>
       (() => {
@@ -62,11 +139,7 @@
   <body class="antialiased min-h-screen">
     <div id="root">
       <!-- Shown until the app's first render replaces it, so a slow first visit never looks like a blank page. -->
-      <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0a0d14;color:#cbd5e1;font:500 14px Inter,system-ui,sans-serif">
-        <div style="width:36px;height:36px;border-radius:50%;border:3px solid currentColor;border-top-color:transparent;opacity:.7;animation:scio-boot-spin .8s linear infinite"></div>
-        <span>Loading SCIO…</span>
-      </div>
-      <style>@keyframes scio-boot-spin{to{transform:rotate(360deg)}}</style>
+      <div class="scio-boot" role="status"><i></i><span>Loading SCIO…</span></div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

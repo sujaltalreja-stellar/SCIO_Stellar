@@ -42,6 +42,8 @@ export function PageHero({
   title,
   subtitle,
   image,
+  imageAlt,
+  media,
   actions,
 }: {
   crumbs: { label: string; to?: string }[];
@@ -49,6 +51,9 @@ export function PageHero({
   title: React.ReactNode;
   subtitle?: React.ReactNode;
   image?: string;
+  imageAlt?: string;
+  /** Custom right-hand visual (e.g. an animated product screenshot); overrides image. */
+  media?: React.ReactNode;
   actions?: React.ReactNode;
 }) {
   return (
@@ -68,8 +73,8 @@ export function PageHero({
           ))}
         </nav>
 
-        <div className={`mt-8 grid gap-10 ${image ? "lg:grid-cols-[1.1fr_0.9fr] lg:items-end" : ""}`}>
-          <motion.div {...reveal} className="max-w-3xl">
+        <div className={`mt-8 grid gap-10 ${media ? "lg:grid-cols-[0.9fr_1.1fr] lg:items-center" : image ? "lg:grid-cols-[1.1fr_0.9fr] lg:items-end" : ""}`}>
+          <div className="max-w-3xl">
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
             <h1
               className="mt-4 font-display font-bold text-[#111113] text-balance"
@@ -79,11 +84,12 @@ export function PageHero({
             </h1>
             {subtitle && <p className="mt-6 max-w-[58ch] text-[17px] sm:text-[19px] leading-relaxed text-[#4a4843]">{subtitle}</p>}
             {actions && <div className="mt-8 flex flex-wrap items-center gap-3">{actions}</div>}
-          </motion.div>
-          {image && (
-            <motion.div {...reveal} className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#EFEEEB]">
-              <img src={image} alt="" className="absolute inset-0 h-full w-full object-cover" loading="eager" />
-            </motion.div>
+          </div>
+          {media}
+          {!media && image && (
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-[#EFEEEB]">
+              <img src={image} alt={imageAlt ?? ""} className="absolute inset-0 h-full w-full object-cover" loading="eager" fetchPriority="high" />
+            </div>
           )}
         </div>
       </div>
@@ -124,14 +130,16 @@ export function SecondaryButton({ to, href, children, tone = "dark" }: { to?: st
 /** Closing "Let's connect" band with a photo background. */
 export function ConnectBand({
   title = "Let's connect",
-  subtitle = "Tell us about your operation. We'll show you what SCIO sees in your data within weeks, not quarters.",
+  subtitle = "Tell us how your business runs today. We'll show you what SCIO finds in your own data, in weeks rather than quarters.",
 }: { title?: string; subtitle?: string }) {
   const { openDemo } = useSite();
   return (
     <section className="relative overflow-hidden bg-[#0F0F11]">
       <img
-        src="https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1800&q=70"
-        alt=""
+        src="/images/team-collaborating-on-operations.webp"
+        alt="Operations team working together on shared business data"
+        width={1600}
+        height={900}
         className="absolute inset-0 h-full w-full object-cover opacity-45"
         loading="lazy"
       />

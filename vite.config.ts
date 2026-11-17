@@ -24,7 +24,6 @@ export default defineConfig(({ mode }) => {
         "next/navigation": path.resolve(baseDir, "./src/lib/next-compat/navigation.ts"),
         "next/link": path.resolve(baseDir, "./src/lib/next-compat/link.tsx"),
         "next/dynamic": path.resolve(baseDir, "./src/lib/next-compat/dynamic.tsx"),
-        "next/image": path.resolve(baseDir, "./src/lib/next-compat/image.tsx"),
       },
     },
     define: {

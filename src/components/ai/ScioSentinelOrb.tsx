@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import SiteChatWindow from "./SiteChatWindow";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateResponse } from "../../lib/ai/chatbotEngine";
 import {
@@ -49,6 +50,7 @@ interface ChatMessage {
     label: string;
     payload?: any;
   } | null;
+  followUps?: string[];
 }
 
 interface SectionIntel {
@@ -67,101 +69,101 @@ const SECTION_INTELLIGENCE: Record<string, SectionIntel> = {
   hero: {
     id: "top",
     stepNum: "01",
-    tag: "ENTERPRISE OS",
-    title: "Operations Intelligence Overview",
-    color: "#3B82F6",
-    colorBg: "rgba(59, 130, 246, 0.15)",
-    summary: "One platform unifying machines, inspections, supply chain & field operations for complete real-time visibility.",
-    keyPoints: ["12.4 GW Monitored", "98.4% Reliability", "Live AI Copilot"],
-    suggestedPrompt: "Give me a 1-minute executive summary of the Stellar SCIO platform."
+    tag: "Overview",
+    title: "The AI business operating system",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "SCIO connects your ERP, POS, warehouse, HR and finance tools, surfaces issues early and turns insights into approved actions.",
+    keyPoints: ["ERP + POS + WMS", "Plain-language answers", "Approved actions"],
+    suggestedPrompt: "Give me a 1-minute summary of what Stellar SCIO does for a business."
   },
-  industries: {
-    id: "industries",
+  "command-center-tour": {
+    id: "command-center-tour",
     stepNum: "02",
-    tag: "4 SECTOR HUBS",
-    title: "Multi-Industry Operations",
-    color: "#10B981",
-    colorBg: "rgba(16, 185, 129, 0.15)",
-    summary: "Specialized intelligence modules for Renewable Energy, Maritime Fleets, Manufacturing 4.0, and Supply Chain.",
-    keyPoints: ["Energy Grid", "Maritime AIS", "Plant OEE", "Cold-Chain"],
-    suggestedPrompt: "Which 4 industries does SCIO support and what are the main features?"
+    tag: "Command Center",
+    title: "Your whole business on one screen",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Live sales vs target, one health score, stockout risk, supplier delays and every connected system, in a single view.",
+    keyPoints: ["Live sales", "Health score", "Stockout risk"],
+    suggestedPrompt: "What does the SCIO Command Center show, and how would my team use it every day?"
   },
-  problem: {
-    id: "problem",
+  product: {
+    id: "product",
     stepNum: "03",
-    tag: "OPERATIONAL BOTTLENECKS",
-    title: "The Problem: Siloed Industrial Data",
-    color: "#EF4444",
-    colorBg: "rgba(239, 68, 68, 0.15)",
-    summary: "Fragmented SCADA systems, false alarm fatigue, and parts stockouts cause 18% unexpected production downtime.",
-    keyPoints: ["Data Silos", "Alert Fatigue", "Delayed Repairs"],
-    suggestedPrompt: "How does SCIO solve industrial data silos and false alarm fatigue?"
+    tag: "The product",
+    title: "See SCIO at work",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Real screens from SCIO: ask a question and get the reasons and the fix, see intelligence your ERP can't show, and act from one place.",
+    keyPoints: ["Ask SCIO", "Intelligence", "Priority actions"],
+    suggestedPrompt: "Walk me through asking SCIO a question, from the answer to approving the action."
   },
-  solution: {
-    id: "solution",
+  outcomes: {
+    id: "outcomes",
     stepNum: "04",
-    tag: "CLOSED-LOOP OS",
-    title: "Autonomous Context Graph",
-    color: "#6366F1",
-    colorBg: "rgba(99, 102, 241, 0.15)",
-    summary: "Connects raw sensors with equipment BOMs, maintenance manuals & ERP systems into a live semantic Digital Twin.",
-    keyPoints: ["Semantic Twin", "Sub-second Ingestion", "Closed-Loop Actions"],
-    suggestedPrompt: "Explain the SCIO Context Graph and semantic Digital Twin."
+    tag: "Outcomes",
+    title: "Skip the dashboards. Just ask.",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Ask instead of digging through reports, hear about problems first, and act without switching between tools.",
+    keyPoints: ["Ask, don't dig", "Early warnings", "Act in one place"],
+    suggestedPrompt: "What kinds of questions can my team ask SCIO?"
+  },
+  "use-cases": {
+    id: "use-cases",
+    stepNum: "05",
+    tag: "Use cases",
+    title: "Where businesses start",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Inventory and replenishment, store and sales performance, purchasing and suppliers, invoice matching and approvals.",
+    keyPoints: ["Inventory", "Purchasing", "Finance"],
+    suggestedPrompt: "How does SCIO help with inventory, replenishment and purchasing?"
   },
   "how-it-works": {
     id: "how-it-works",
-    stepNum: "05",
-    tag: "4-STEP LOOP",
-    title: "How SCIO Works (4 Simple Steps)",
-    color: "#06B6D4",
-    colorBg: "rgba(6, 182, 212, 0.15)",
-    summary: "CONNECT all telemetry → UNDERSTAND digital twins → PREDICT bearing failure 14 days early → ACT in SAP/Maximo.",
-    keyPoints: ["1. Connect", "2. Understand", "3. Predict", "4. Act"],
-    suggestedPrompt: "Explain the 4 steps: CONNECT, UNDERSTAND, PREDICT, and ACT."
-  },
-  "control-tower": {
-    id: "control-tower",
     stepNum: "06",
-    tag: "CONTROL TOWER",
-    title: "Operations Control Tower (Live OCC)",
-    color: "#8B5CF6",
-    colorBg: "rgba(139, 92, 246, 0.15)",
-    summary: "Live interactive telemetry cockpit tracking 2,854 MW load, 50.02 Hz frequency, and automated dispatch matrix.",
-    keyPoints: ["2,854 MW Live", "50.02 Hz Grid", "Real-time Telemetry"],
-    suggestedPrompt: "Explain what metrics are shown in this Control Tower dashboard."
+    tag: "How it works",
+    title: "Connect. Understand. Ask. Act.",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Connect the systems you already run, link them into one picture, ask in plain language and act with approvals.",
+    keyPoints: ["1. Connect", "2. Understand", "3. Ask", "4. Act"],
+    suggestedPrompt: "Explain how SCIO works in 4 simple steps: Connect, Understand, Ask, Act."
   },
-  gallery: {
-    id: "gallery",
+  capabilities: {
+    id: "capabilities",
     stepNum: "07",
-    tag: "FIELD MOBILITY",
-    title: "Field Telemetry & Mobile Tech App",
-    color: "#EC4899",
-    colorBg: "rgba(236, 72, 153, 0.15)",
-    summary: "Field technicians scan QR codes to view live vibration spectra, schematics, and execute guided digital work orders.",
-    keyPoints: ["QR Scanning", "Offline Sync", "Mobile Checklist"],
-    suggestedPrompt: "How do technicians use the mobile inspection copilot in the field?"
+    tag: "Capabilities",
+    title: "Everything in one place",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Ask anything, live views, alerts, forecasts, document AI, workflows and approvals, a full audit trail and role-based access.",
+    keyPoints: ["Alerts", "Forecasts", "Document AI"],
+    suggestedPrompt: "What are SCIO's main capabilities?"
   },
-  integrations: {
-    id: "integrations",
+  governance: {
+    id: "governance",
     stepNum: "08",
-    tag: "CONNECTORS",
-    title: "Universal Protocols & ERP Sync",
-    color: "#F59E0B",
-    colorBg: "rgba(245, 158, 11, 0.15)",
-    summary: "Plug-and-play drivers for OPC-UA, Modbus, MQTT Sparkplug B, SAP S/4HANA PM, IBM Maximo, and Oracle.",
-    keyPoints: ["OPC-UA / Modbus", "MQTT Sparkplug", "SAP / Maximo Sync"],
-    suggestedPrompt: "How easily can SCIO integrate with our plant's existing OPC-UA & SAP systems?"
+    tag: "Security",
+    title: "Your data, your approvals",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Runs on-premises, in your private cloud or hybrid. AI recommends, people approve, and every action is logged.",
+    keyPoints: ["On-prem or private cloud", "Human approval", "Audit trail"],
+    suggestedPrompt: "How does SCIO keep our data secure, and can it run on our own infrastructure?"
   },
-  "why-scio": {
-    id: "why-scio",
+  faq: {
+    id: "faq",
     stepNum: "09",
-    tag: "ENTERPRISE ROI",
-    title: "Why SCIO: 8.4x Value Realization",
-    color: "#10B981",
-    colorBg: "rgba(16, 185, 129, 0.15)",
-    summary: "Proven metrics: 91% drop in false alarms, 14-day early warning before failure, and $2.8M annual downtime saved per site.",
-    keyPoints: ["8.4x ROI", "14-Day Warning", "$2.8M Saved/Site"],
-    suggestedPrompt: "What is the ROI and payback timeline for deploying SCIO?"
+    tag: "FAQ",
+    title: "Questions businesses ask",
+    color: "#D98B16",
+    colorBg: "rgba(242, 169, 59, 0.15)",
+    summary: "Integration with your ERP, deployment options, data ownership, AI governance and how to get started.",
+    keyPoints: ["ERP integration", "Data ownership", "Getting started"],
+    suggestedPrompt: "How do we get started with SCIO and what does a pilot look like?"
   }
 };
 
@@ -513,30 +515,30 @@ const INDUSTRY_SENTINEL_CONFIG: Record<string, IndustrySentinelInfo> = {
     name: "Stellar SCIO AI Assistant",
     badge: "ENTERPRISE OS",
     color: "#3B82F6",
-    watchingText: "Guiding enterprise executives & engineers across all 4 industrial sectors 24/7.",
-    welcomeMessage: "Welcome to **Stellar SCIO Enterprise Operations Platform**. I am your platform guide across all 4 industrial sectors (Renewable Energy, Maritime Fleets, Manufacturing 4.0, and Supply Chain Logistics).\n\nAsk me about platform features, our 4-step intelligence loop, industry use cases, or private beta access.",
+    watchingText: "Here to answer questions about SCIO, any time.",
+    welcomeMessage: "Welcome to **Stellar SCIO**, the AI business operating system. SCIO connects your ERP, POS, warehouse, HR and finance tools into one place you can ask questions of and act from.\n\nAsk me how it works, what it connects to, how it keeps your data secure, or how to get started.",
     quickPrompts: [
-      { label: "🚀 What is Stellar SCIO?", query: "What is Stellar SCIO and what problem does it solve for enterprise operations?" },
-      { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." },
-      { label: "🏭 Supported Industries", query: "Which 4 industries does SCIO support and what are the main features of each?" },
-      { label: "📈 ROI & Savings", query: "What is the ROI and annual downtime savings achieved with Stellar SCIO?" },
-      { label: "🔌 Systems & ERP Integration", query: "How does SCIO integrate with existing OPC-UA, SCADA, SAP PM, and IBM Maximo?" },
-      { label: "🔒 Security & Data Safety", query: "What security, NERC-CIP compliance, and data encryption standards does SCIO use?" }
+      { label: "🚀 What is Stellar SCIO?", query: "What is Stellar SCIO and what problem does it solve for a business?" },
+      { label: "⚡ How SCIO works", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Ask, Act." },
+      { label: "🔌 Systems it connects to", query: "Which systems can SCIO connect to, such as ERP, POS, WMS, HRMS and CRM?" },
+      { label: "📦 Inventory & purchasing", query: "How does SCIO help with inventory, replenishment and purchasing?" },
+      { label: "🔒 Security & data", query: "How does SCIO keep our data secure, and can it run on our own infrastructure?" },
+      { label: "🧭 Getting started", query: "How do we get started with SCIO and what does a pilot look like?" }
     ]
   },
   general: {
     name: "Stellar SCIO AI Assistant",
     badge: "ENTERPRISE OS",
     color: "#3B82F6",
-    watchingText: "Guiding enterprise executives & engineers across all 4 industrial sectors 24/7.",
-    welcomeMessage: "Welcome to **Stellar SCIO Enterprise Operations Platform**. I am your platform guide across all 4 industrial sectors (Renewable Energy, Maritime Fleets, Manufacturing 4.0, and Supply Chain Logistics).\n\nAsk me about platform features, our 4-step intelligence loop, industry use cases, or private beta access.",
+    watchingText: "Here to answer questions about SCIO, any time.",
+    welcomeMessage: "Welcome to **Stellar SCIO**, the AI business operating system. SCIO connects your ERP, POS, warehouse, HR and finance tools into one place you can ask questions of and act from.\n\nAsk me how it works, what it connects to, how it keeps your data secure, or how to get started.",
     quickPrompts: [
-      { label: "🚀 What is Stellar SCIO?", query: "What is Stellar SCIO and what problem does it solve for enterprise operations?" },
-      { label: "⚡ How SCIO Works (4 Steps)", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Predict, Act." },
-      { label: "🏭 Supported Industries", query: "Which 4 industries does SCIO support and what are the main features of each?" },
-      { label: "📈 ROI & Savings", query: "What is the ROI and annual downtime savings achieved with Stellar SCIO?" },
-      { label: "🔌 Systems & ERP Integration", query: "How does SCIO integrate with existing OPC-UA, SCADA, SAP PM, and IBM Maximo?" },
-      { label: "🔒 Security & Data Safety", query: "What security, NERC-CIP compliance, and data encryption standards does SCIO use?" }
+      { label: "🚀 What is Stellar SCIO?", query: "What is Stellar SCIO and what problem does it solve for a business?" },
+      { label: "⚡ How SCIO works", query: "Explain how SCIO works in 4 simple steps: Connect, Understand, Ask, Act." },
+      { label: "🔌 Systems it connects to", query: "Which systems can SCIO connect to, such as ERP, POS, WMS, HRMS and CRM?" },
+      { label: "📦 Inventory & purchasing", query: "How does SCIO help with inventory, replenishment and purchasing?" },
+      { label: "🔒 Security & data", query: "How does SCIO keep our data secure, and can it run on our own infrastructure?" },
+      { label: "🧭 Getting started", query: "How do we get started with SCIO and what does a pilot look like?" }
     ]
   },
   energy: {
@@ -614,24 +616,24 @@ interface SectorFaceTheme {
 
 const SECTOR_FACE_THEMES: Record<string, SectorFaceTheme> = {
   general: {
-    faceBg: "bg-white",
-    eyeColor: "bg-black",
-    mouthStroke: "#000000",
-    pulseRingColor: "bg-slate-300/60",
+    faceBg: "bg-[#111113]",
+    eyeColor: "bg-[#F2A93B] shadow-[0_0_10px_rgba(242,169,59,0.9)]",
+    mouthStroke: "#F2A93B",
+    pulseRingColor: "bg-[#F2A93B]/25",
     radarBadgeBg: "bg-emerald-500",
-    shadowColor: "shadow-[0_8px_32px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_44px_rgba(37,99,235,0.35)]",
-    borderColor: "border-2 border-slate-900/10",
-    name: "Enterprise White Face"
+    shadowColor: "shadow-[0_12px_32px_-8px_rgba(17,17,19,0.55)] hover:shadow-[0_16px_40px_-8px_rgba(217,139,22,0.55)]",
+    borderColor: "border border-white/10",
+    name: "SCIO Site Face"
   },
   home: {
-    faceBg: "bg-white",
-    eyeColor: "bg-black",
-    mouthStroke: "#000000",
-    pulseRingColor: "bg-slate-300/60",
+    faceBg: "bg-[#111113]",
+    eyeColor: "bg-[#F2A93B] shadow-[0_0_10px_rgba(242,169,59,0.9)]",
+    mouthStroke: "#F2A93B",
+    pulseRingColor: "bg-[#F2A93B]/25",
     radarBadgeBg: "bg-emerald-500",
-    shadowColor: "shadow-[0_8px_32px_rgba(0,0,0,0.35)] hover:shadow-[0_12px_44px_rgba(37,99,235,0.35)]",
-    borderColor: "border-2 border-slate-900/10",
-    name: "Home White Face"
+    shadowColor: "shadow-[0_12px_32px_-8px_rgba(17,17,19,0.55)] hover:shadow-[0_16px_40px_-8px_rgba(217,139,22,0.55)]",
+    borderColor: "border border-white/10",
+    name: "SCIO Site Face"
   },
   maritime: {
     faceBg: "bg-white",
@@ -709,6 +711,9 @@ export default function ScioSentinelOrb({
   
   // Sector Face Theme: Home/General (White), Maritime (White), Energy (Green), Manufacturing (Yellow), Logistics (Light Blue)
   const faceTheme = SECTOR_FACE_THEMES[currentIndustry] || SECTOR_FACE_THEMES.home || SECTOR_FACE_THEMES.general;
+  const isSiteFace = !["energy", "maritime", "manufacturing", "logistics"].includes(currentIndustry);
+  const faceShape = isSiteFace ? "rounded-[20px]" : "rounded-full";
+  const historyKey = isSiteFace ? "site-v2" : currentIndustry;
   
   // Section Guide States
   const [activeSectionKey, setActiveSectionKey] = useState<string>("hero");
@@ -764,6 +769,7 @@ export default function ScioSentinelOrb({
       let loaded: ChatMessage[] = [];
 
       try {
+        if (isSiteFace) throw new Error("site chat keeps history in this browser only");
         const res = await fetch(`/api/chatbot/history?industry=${currentIndustry}`);
         if (res.ok) {
           const data = await res.json();
@@ -778,7 +784,7 @@ export default function ScioSentinelOrb({
       // LocalStorage fallback if offline or no Convex records
       if (loaded.length === 0) {
         try {
-          const storageKey = `scio_chat_history_${currentIndustry}`;
+          const storageKey = `scio_chat_history_${historyKey}`;
           const saved = localStorage.getItem(storageKey);
           if (saved) {
             const parsed = JSON.parse(saved);
@@ -828,20 +834,20 @@ export default function ScioSentinelOrb({
         return;
       }
       try {
-        const storageKey = `scio_chat_history_${currentIndustry}`;
+        const storageKey = `scio_chat_history_${historyKey}`;
         localStorage.setItem(storageKey, JSON.stringify(messages));
       } catch (e) {
         console.warn("Failed to save chat history", e);
       }
     }
-  }, [messages, currentIndustry]);
+  }, [messages, currentIndustry, historyKey]);
 
   // Clear chat function
   const handleClearChat = async () => {
     try {
-      const storageKey = `scio_chat_history_${currentIndustry}`;
+      const storageKey = `scio_chat_history_${historyKey}`;
       localStorage.removeItem(storageKey);
-      await fetch(`/api/chatbot/history?industry=${currentIndustry}`, { method: "DELETE" });
+      if (!isSiteFace) await fetch(`/api/chatbot/history?industry=${currentIndustry}`, { method: "DELETE" });
     } catch (e) {
       console.warn("Failed to clear Convex history", e);
     }
@@ -924,14 +930,14 @@ export default function ScioSentinelOrb({
       const scrollPos = window.scrollY + winHeight * 0.38;
 
       const sectionKeys = [
-        "why-scio",
-        "integrations",
-        "gallery",
-        "control-tower",
+        "faq",
+        "governance",
+        "capabilities",
         "how-it-works",
-        "solution",
-        "problem",
-        "industries",
+        "use-cases",
+        "outcomes",
+        "product",
+        "command-center-tour",
         "top"
       ];
 
@@ -978,6 +984,51 @@ export default function ScioSentinelOrb({
     setMessages((prev) => [...prev, userMessage]);
     setInputQuery("");
     setIsLoading(true);
+
+    if (isSiteFace) {
+      const history = messages
+        .filter((m) => !m.id.startsWith("welcome"))
+        .slice(-6)
+        .map((m) => ({ role: m.sender === "user" ? "user" : "assistant", content: m.text }));
+      try {
+        const res = await fetch("/api/site-assistant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, history, section: activeIntel.title }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data?.error || "Request failed");
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `bot-${Date.now()}`,
+            sender: "bot",
+            text: data.text,
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            provider: data.provider || "SCIO Assistant",
+            suggestedAction: data.suggestedAction || null,
+            followUps: Array.isArray(data.followUps) ? data.followUps : [],
+          },
+        ]);
+      } catch (err) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `bot-${Date.now()}`,
+            sender: "bot",
+            text: err instanceof Error && /too many/i.test(err.message)
+              ? err.message
+              : "Sorry, I couldn't answer that just now. Please try again, or book a demo and our team will help.",
+            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            provider: "SCIO Assistant",
+            suggestedAction: { type: "open_demo", label: "Book a demo" },
+          },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     // Resolve dedicated 5-sector API endpoint
     let apiEndpoint = "/api/chatbot/homepage";
@@ -1064,16 +1115,12 @@ export default function ScioSentinelOrb({
       } else {
         // The marketing site is split into subpages; open the page that holds this section.
         const SECTION_ROUTES: Record<string, string> = {
-          "#industries": "/industries",
-          "#gallery": "/industries#gallery",
-          "#problem": "/why-scio#problem",
           "#why-scio": "/why-scio",
-          "#solution": "/platform#solution",
+          "#use-cases": "/use-cases",
+          "#governance": "/platform#governance",
           "#how-it-works": "/platform#how-it-works",
           "#capabilities": "/platform#capabilities",
-          "#control-tower": "/platform/control-tower",
           "#integrations": "/platform/integrations",
-          "#beta-cohort": "/customers",
           "#enterprise-questions": "/faq",
         };
         const route = SECTION_ROUTES[action.payload];
@@ -1100,7 +1147,26 @@ export default function ScioSentinelOrb({
     <div className="fixed bottom-6 right-6 z-[999999] pointer-events-auto flex items-end justify-end select-text">
       {/* ==================== EXPANDED CHATBOT WINDOW ==================== */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && isSiteFace && (
+          <SiteChatWindow
+            key="site-chat"
+            messages={messages}
+            isLoading={isLoading}
+            input={inputQuery}
+            setInput={setInputQuery}
+            onSend={(q) => handleSend(q)}
+            onClear={handleClearChat}
+            onClose={() => {
+              setIsOpen(false);
+              if (onCloseCopilot) onCloseCopilot();
+            }}
+            onAction={(a) => handleActionClick(a as { type: string; label: string; payload?: any })}
+            quickPrompts={currentIndConfig.quickPrompts}
+            eyeOffset={eyeOffset}
+            blinking={isBlinking}
+          />
+        )}
+        {isOpen && !isSiteFace && (
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.92 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1112,7 +1178,7 @@ export default function ScioSentinelOrb({
             <div className="p-4 border-b border-white/10 bg-slate-900/80 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
                 {/* Miniature Watching Eye Avatar in Header (Dynamic Industry Face Color with Smile) */}
-                <div className={`relative h-9 w-9 rounded-full ${faceTheme.faceBg} ${faceTheme.borderColor} flex items-center justify-center shadow-md shrink-0 transition-colors duration-300`}>
+                <div className={`relative h-9 w-9 ${isSiteFace ? "rounded-xl" : "rounded-full"} ${faceTheme.faceBg} ${faceTheme.borderColor} flex items-center justify-center shadow-md shrink-0 transition-colors duration-300`}>
                   <div
                     className="flex flex-col items-center justify-center transition-transform duration-75"
                     style={{
@@ -1350,174 +1416,118 @@ export default function ScioSentinelOrb({
 
       {/* ==================== THE FLOATING 24/7 EYE / ORB + SECTION INTELLIGENCE GUIDE ==================== */}
       <div className="relative flex items-end justify-end">
-        {/* Dynamic Section Intelligence Card (Updates Real-time On Scroll) */}
+        {/* Section guide card (updates as the visitor scrolls) */}
         <AnimatePresence>
           {!isOpen && !isGuideDismissed && (
             <motion.div
-              initial={{ opacity: 0, x: 25, scale: 0.95 }}
+              initial={{ opacity: 0, x: 20, scale: 0.96 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: 25, scale: 0.95 }}
-              className="hidden sm:block absolute right-20 bottom-0 w-[320px] rounded-2xl bg-slate-950/95 backdrop-blur-xl text-white border border-white/20 shadow-[0_16px_50px_rgba(0,0,0,0.55)] font-sans select-none overflow-hidden"
+              exit={{ opacity: 0, x: 20, scale: 0.96 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="hidden sm:block absolute right-[5.25rem] bottom-0 w-[320px] rounded-2xl bg-white text-[#111113] border border-[#E7E5E1] shadow-[0_24px_60px_-20px_rgba(17,17,19,0.35)] font-sans select-none overflow-hidden"
             >
-              {/* Header Bar with Step #, Section Tag, Collapse Toggle & X Close Button */}
-              <div className="px-3.5 py-2.5 border-b border-white/10 bg-white/[0.04] flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span
-                    className="font-mono text-[10px] font-black px-2 py-0.5 rounded-full text-white shadow-xs"
-                    style={{ backgroundColor: activeIntel.color }}
-                  >
-                    SECTION {activeIntel.stepNum}
+              <div className="px-4 pt-3.5 pb-2 flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="inline-flex items-center rounded-full bg-[#FFF4E2] px-2.5 py-1 text-[11px] font-semibold text-[#B06D0F] whitespace-nowrap">
+                    {activeIntel.stepNum} · {activeIntel.tag}
                   </span>
-                  <span className="font-mono text-[10px] font-bold text-white/60 tracking-wider">
-                    {activeIntel.tag}
+                  <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#6b6862]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Live guide
                   </span>
                 </div>
-
-                <div className="flex items-center gap-1.5">
-                  <span className="font-mono text-[9.5px] text-emerald-400 font-bold flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    LIVE GUIDE
-                  </span>
+                <div className="flex items-center">
                   <button
                     onClick={() => setGuideExpanded(!guideExpanded)}
-                    className="text-white/50 hover:text-white hover:bg-white/10 rounded p-1 transition-colors cursor-pointer"
-                    title={guideExpanded ? "Collapse Guide" : "Expand Guide"}
+                    className="h-7 w-7 rounded-full flex items-center justify-center text-[#8f8b84] hover:text-[#111113] hover:bg-[#F3F2EF] transition-colors cursor-pointer"
+                    aria-label={guideExpanded ? "Collapse guide" : "Expand guide"}
                   >
-                    {guideExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+                    {guideExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
                   </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       setIsGuideDismissed(true);
                     }}
-                    className="text-white/40 hover:text-white hover:bg-white/10 rounded p-1 transition-colors cursor-pointer"
-                    title="Hide Section Guide"
+                    className="h-7 w-7 rounded-full flex items-center justify-center text-[#8f8b84] hover:text-[#111113] hover:bg-[#F3F2EF] transition-colors cursor-pointer"
+                    aria-label="Hide guide"
                   >
-                    <X className="h-3.5 w-3.5" />
+                    <X className="h-4 w-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Expandable Section Body */}
-              <AnimatePresence>
+              <AnimatePresence initial={false}>
                 {guideExpanded ? (
                   <motion.div
+                    key={activeIntel.id}
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="p-3.5 space-y-2.5"
+                    className="px-4 pb-4"
                   >
-                    {/* Section Title */}
-                    <div>
-                      <h4 className="text-xs font-black text-white tracking-tight flex items-center gap-1.5">
-                        <span>{activeIntel.title}</span>
-                      </h4>
-                      <p className="text-[11.5px] text-slate-300 leading-snug mt-1 font-medium">
-                        {activeIntel.summary}
-                      </p>
-                    </div>
-
-                    {/* Key Highlights Badges */}
-                    <div className="flex flex-wrap gap-1 pt-0.5">
+                    <h4 className="font-display text-[17px] font-semibold leading-snug tracking-tight text-[#111113]">{activeIntel.title}</h4>
+                    <p className="mt-1.5 text-[13px] leading-relaxed text-[#5D5A54]">{activeIntel.summary}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
                       {activeIntel.keyPoints.map((pt, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-0.5 rounded-md text-[9.5px] font-mono font-bold bg-white/[0.07] border border-white/10 text-slate-200"
-                        >
+                        <span key={idx} className="rounded-full border border-[#E7E5E1] bg-[#F7F6F4] px-2.5 py-1 text-[11.5px] font-medium text-[#3a3936]">
                           {pt}
                         </span>
                       ))}
                     </div>
-
-                    {/* Quick Ask AI Button */}
-                    <div className="pt-1">
-                      <button
-                        onClick={() => handleSend(activeIntel.suggestedPrompt)}
-                        className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-mono font-bold text-[10.5px] flex items-center justify-between shadow-md transition-all hover:scale-[1.01] cursor-pointer"
-                      >
-                        <span className="flex items-center gap-1.5 truncate">
-                          <Sparkles className="h-3.5 w-3.5 shrink-0 text-cyan-300" />
-                          <span className="truncate">Ask AI about this section</span>
-                        </span>
-                        <ArrowRight className="h-3.5 w-3.5 shrink-0 ml-1 opacity-80" />
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleSend(activeIntel.suggestedPrompt)}
+                      className="group mt-4 w-full rounded-full bg-[#111113] px-4 py-2.5 text-[13px] font-semibold text-white flex items-center justify-between hover:bg-[#2a2a30] transition-colors cursor-pointer"
+                    >
+                      <span className="flex items-center gap-2 truncate">
+                        <Sparkles className="h-4 w-4 shrink-0 text-[#F2A93B]" />
+                        <span className="truncate">Ask SCIO about this</span>
+                      </span>
+                      <ArrowRight className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5" />
+                    </button>
                   </motion.div>
                 ) : (
-                  <div
+                  <button
+                    type="button"
                     onClick={() => setGuideExpanded(true)}
-                    className="px-3.5 py-2 text-[11px] font-semibold text-slate-300 hover:text-white cursor-pointer flex items-center justify-between bg-black/30"
+                    className="w-full px-4 pb-3.5 text-left text-[13px] font-semibold text-[#111113] hover:text-[#B06D0F] truncate cursor-pointer"
                   >
-                    <span className="truncate">{activeIntel.title}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[9.5px] font-mono text-blue-400 font-bold">Tap to expand</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsGuideDismissed(true);
-                        }}
-                        className="text-white/40 hover:text-white hover:bg-white/10 rounded p-0.5"
-                        title="Hide Section Guide"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
+                    {activeIntel.title}
+                  </button>
                 )}
               </AnimatePresence>
 
-              {/* Scroll Progress Bar at Bottom of Card */}
-              <div className="h-1 w-full bg-white/10">
-                <motion.div
-                  className="h-full"
-                  style={{
-                    width: `${scrollProgress}%`,
-                    backgroundColor: activeIntel.color
-                  }}
-                />
+              {/* Scroll progress */}
+              <div className="h-1 w-full bg-[#F3F2EF]">
+                <motion.div className="h-full bg-[#F2A93B]" style={{ width: `${scrollProgress}%` }} />
               </div>
 
-              {/* Triangle Tail pointing to the Orb */}
-              <div className="absolute -right-2 bottom-5 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[8px] border-l-slate-950" />
+              {/* Tail pointing to the assistant */}
+              <div className="absolute -right-[7px] bottom-6 h-3.5 w-3.5 rotate-45 border-r border-t border-[#E7E5E1] bg-white" />
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Animated First-Boot Waving Hand & "Hi!" Greeting */}
+        {/* First-visit greeting */}
         <AnimatePresence>
           {isWaving && (
             <motion.div
-              initial={{ scale: 0, opacity: 0, y: 12, x: 0 }}
-              animate={{ scale: 1, opacity: 1, y: 0, x: 0 }}
-              exit={{ scale: 0, opacity: 0, y: -8, transition: { duration: 0.35, ease: "easeInOut" } }}
+              initial={{ scale: 0.6, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.6, opacity: 0, y: -6, transition: { duration: 0.3 } }}
               className="absolute -top-12 right-0 z-30 flex items-center gap-1.5 pointer-events-none"
             >
-              {/* Cute Waving Hand Emoji / SVG with Realistic Back-and-Forth Oscillation */}
               <motion.div
-                animate={{
-                  rotate: [0, 26, -18, 26, -18, 16, -10, 0],
-                  y: [0, -4, 0, -4, 0]
-                }}
-                transition={{
-                  duration: 2.2,
-                  repeat: 1,
-                  ease: "easeInOut"
-                }}
-                className="text-2xl sm:text-3xl origin-bottom-right drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] select-none"
+                animate={{ rotate: [0, 24, -16, 24, -16, 14, -8, 0] }}
+                transition={{ duration: 2.2, repeat: 1, ease: "easeInOut" }}
+                className="text-2xl origin-bottom-right select-none"
               >
                 👋
               </motion.div>
-
-              {/* Floating "Hi!" Speech Bubble */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.15 }}
-                className="px-2.5 py-1 rounded-full bg-slate-950/95 border border-white/20 text-white font-mono text-[10px] font-extrabold shadow-xl flex items-center gap-1.5 backdrop-blur-md whitespace-nowrap"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                <span>Hi! I&apos;m SCIO AI</span>
-              </motion.div>
+              <div className="rounded-full border border-[#E7E5E1] bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#111113] shadow-lg whitespace-nowrap flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#F2A93B]" />
+                Hi! I&apos;m SCIO. Ask me anything.
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -1528,10 +1538,10 @@ export default function ScioSentinelOrb({
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.94 }}
           onClick={() => setIsOpen(!isOpen)}
-          className={`relative h-14 w-14 sm:h-16 sm:w-16 rounded-full ${faceTheme.faceBg} ${faceTheme.borderColor} cursor-pointer ${faceTheme.shadowColor} flex items-center justify-center transition-all duration-300 group select-none shrink-0`}
+          className={`relative h-14 w-14 sm:h-16 sm:w-16 ${faceShape} ${faceTheme.faceBg} ${faceTheme.borderColor} cursor-pointer ${faceTheme.shadowColor} flex items-center justify-center transition-all duration-300 group select-none shrink-0`}
         >
           {/* Subtle Ambient Pulse Ring */}
-          <span className={`absolute -inset-1 rounded-full ${faceTheme.pulseRingColor} animate-ping opacity-60 pointer-events-none`} />
+          <span className={`absolute -inset-1 ${faceShape} ${faceTheme.pulseRingColor} animate-ping opacity-60 pointer-events-none`} />
 
           {/* Real-time Gaze Eyes & Cute Smile (Matching Sector Theme) */}
           <div
