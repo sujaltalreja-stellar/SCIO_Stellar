@@ -1061,6 +1061,23 @@ export default function ScioSentinelOrb({
       const el = document.querySelector(action.payload);
       if (el) {
         el.scrollIntoView({ behavior: "smooth" });
+      } else {
+        // The marketing site is split into subpages; open the page that holds this section.
+        const SECTION_ROUTES: Record<string, string> = {
+          "#industries": "/industries",
+          "#gallery": "/industries#gallery",
+          "#problem": "/why-scio#problem",
+          "#why-scio": "/why-scio",
+          "#solution": "/platform#solution",
+          "#how-it-works": "/platform#how-it-works",
+          "#capabilities": "/platform#capabilities",
+          "#control-tower": "/platform/control-tower",
+          "#integrations": "/platform/integrations",
+          "#beta-cohort": "/customers",
+          "#enterprise-questions": "/faq",
+        };
+        const route = SECTION_ROUTES[action.payload];
+        if (route) window.location.href = route;
       }
     } else if (action.type === "launch_occ" && onLaunchPlatform) {
       onLaunchPlatform(action.payload?.industry || "energy", action.payload?.tab || "energy-dashboard");

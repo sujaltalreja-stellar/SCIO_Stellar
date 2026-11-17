@@ -1,0 +1,12 @@
+.env
+.env.*
+node_modules
+dist
+Renewable Energy
+demo-video
+design
+log
+scio ui uxxx
+scio-ui-ux
+.agents
+.claude

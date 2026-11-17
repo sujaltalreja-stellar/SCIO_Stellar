@@ -10600,6 +10600,8 @@ async function runRetailCopilot(question, history, events, scopeStores, token, m
   const st = buildState(base, Array.isArray(events) ? events.slice(-2e3) : []);
   const scope = scopeStores ? new Set(scopeStores) : null;
   const proposals = [];
+  let tokensUsed = 0;
+  let aiCalls = 0;
   const T = tools(st, scope, proposals);
   const defs = T.map(({ type, function: f }) => ({ type, function: f }));
   const system = `You are SCIO, the retail operations copilot inside SCIO Retail OS for a retail chain operating in the UAE, Saudi Arabia, Qatar, Kuwait, Oman and Bahrain (${base.stores.length} stores in UAE, Saudi Arabia, Qatar, Kuwait, Oman and Bahrain; ${base.skus.length} SKUs). Today is ${base.anchorDate}. Reporting currency AED.
@@ -10693,11 +10695,14 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
       followUps: Array.from(new Set(used.flatMap((t) => FOLLOW[t] ?? []))).slice(0, 3),
       steps: [...steps, ...used.length ? [`Ranked findings by business impact and drafted actions`] : []],
       actions: actions.filter((a, i) => actions.findIndex((x) => x.to === a.to) === i).slice(0, 3),
-      proposals
+      proposals,
+      usage: { tokens: tokensUsed, aiCalls }
     };
   };
   for (let step = 0; step < 6; step++) {
-    const { message: message2 } = await sarvamChat({ messages, tools: defs, maxTokens: 900 });
+    const { message: message2, tokens: used0 } = await sarvamChat({ messages, tools: defs, maxTokens: 900 });
+    tokensUsed += used0;
+    aiCalls++;
     const calls = message2.tool_calls ?? [];
     if (!calls.length) {
       return finish((message2.content ?? "").trim() || "I couldn't answer that. Try rephrasing.");
@@ -10729,7 +10734,9 @@ headline: max 8 words. summary: max 25 words. 3 or 4 kpis with SHORT values (e.g
       messages.push({ role: "tool", tool_call_id: c.id, content });
     }
   }
-  const { message } = await sarvamChat({ messages, maxTokens: 900 });
+  const { message, tokens: used1 } = await sarvamChat({ messages, maxTokens: 900 });
+  tokensUsed += used1;
+  aiCalls++;
   return finish((message.content ?? "").trim());
 }
 

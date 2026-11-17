@@ -327,3 +327,12 @@ html.light ::-webkit-scrollbar-thumb:hover {
   /* warm greys instead of blue-greys */
   --color-slate-50: #f7f6f4; --color-slate-100: #efeeeb; --color-slate-200: #e5e3df; --color-slate-300: #d4d1cb; --color-slate-400: #a8a49d; --color-slate-500: #7c7871; --color-slate-600: #5d5a54; --color-slate-700: #44423e; --color-slate-800: #2b2a27; --color-slate-900: #1a1918; --color-slate-950: #111113;
 }
+
+/* Marketing site: logo / systems marquee */
+@keyframes scio-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-[scio-marquee"] { animation: none !important; }
+}

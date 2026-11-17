@@ -4,11 +4,6 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/industries',
-        destination: '/#industries',
-        permanent: false,
-      },
-      {
         source: '/energy',
         destination: '/?industry=energy&tab=energy-dashboard',
         permanent: false,
@@ -41,11 +36,6 @@ const nextConfig = {
       {
         source: '/supply-chain',
         destination: '/?industry=logistics&tab=dashboard',
-        permanent: false,
-      },
-      {
-        source: '/platform',
-        destination: '/?industry=energy&tab=energy-dashboard',
         permanent: false,
       },
       {

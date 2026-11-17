@@ -11,6 +11,7 @@ import {
   Sparkles,
   TrendingUp
 } from "lucide-react";
+import SiteLayout from "../../../components/site/SiteLayout";
 import { getIndustryPage, INDUSTRY_PAGES } from "../../../config/industryPages";
 
 export default function IndustryDetailPage({
@@ -65,51 +66,10 @@ export default function IndustryDetailPage({
   };
 
   return (
-    <div className="min-h-screen bg-[#06080d] text-slate-100 font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
+    <SiteLayout orbIndustry={industry.id}>
+    <div className="bg-[#06080d] text-slate-100 font-sans selection:bg-cyan-500/20 selection:text-cyan-300">
 
-      {/* ==================== NAV ==================== */}
-      <nav className="sticky top-0 z-50 h-16 border-b border-slate-800/90 bg-[#06080d]/95 backdrop-blur-2xl px-6 lg:px-12 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-3 group">
-          <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-slate-200 via-slate-400 to-slate-700 p-[1px] shadow-lg">
-            <div className="h-full w-full bg-[#090c14] rounded-[7px] flex items-center justify-center font-mono font-black text-slate-100 text-sm">
-              S
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-bold text-xs tracking-widest text-slate-100 uppercase font-mono group-hover:text-cyan-400 transition-colors">STELLAR SCIO</span>
-            <span className="text-[9px] text-slate-500 font-mono tracking-wider">ENTERPRISE MISSION CONTROL</span>
-          </div>
-        </Link>
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex items-center gap-1.5 border border-slate-800 bg-[#090c14] rounded-lg p-1">
-            {INDUSTRY_PAGES.map((ind) => {
-              const isCurrent = ind.id === industry.id;
-              const TabIcon = ind.icon;
-              return (
-                <Link
-                  key={ind.id}
-                  href={`/industries/${ind.id}`}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[11px] font-mono transition-all ${
-                    isCurrent
-                      ? "bg-slate-800 text-white font-bold shadow-xs border border-slate-700"
-                      : "text-slate-400 hover:text-white hover:bg-slate-900/60"
-                  }`}
-                >
-                  <TabIcon className="h-3 w-3" />
-                  <span>{ind.name.split(" ")[0]}</span>
-                </Link>
-              );
-            })}
-          </div>
-          <button
-            onClick={handleLaunch}
-            className="px-4 py-2 rounded-lg bg-gradient-to-b from-slate-100 via-slate-200 to-slate-400 hover:from-white hover:to-slate-300 text-slate-950 font-bold text-xs font-mono shadow-[0_0_20px_rgba(255,255,255,0.15)] flex items-center gap-1.5 transition-all"
-          >
-            <span>Launch Platform</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </nav>
+
 
       {/* ==================== HERO ==================== */}
       <section className="relative py-20 px-6 lg:px-12 max-w-7xl mx-auto overflow-hidden">
@@ -117,7 +77,7 @@ export default function IndustryDetailPage({
         <div className={`pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[350px] ${industry.color.replace("text-", "bg-")}/5 blur-[120px]`} />
 
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8 relative z-10">
-          <Link href="/#industries" className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors">
+          <Link href="/industries" className="inline-flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-white transition-colors">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to all industries
           </Link>
           <div className="flex md:hidden items-center gap-2 overflow-x-auto pb-1 text-[11px] font-mono">
@@ -272,7 +232,7 @@ export default function IndustryDetailPage({
               <ArrowRight className="h-4 w-4" />
             </button>
             <Link
-              href="/#industries"
+              href="/industries"
               className="px-7 py-3.5 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-bold text-xs sm:text-sm font-mono transition-all"
             >
               Explore Other Industries
@@ -280,20 +240,7 @@ export default function IndustryDetailPage({
           </div>
         </div>
       </section>
-
-      {/* ==================== FOOTER ==================== */}
-      <footer className="border-t border-slate-800/80 bg-[#040508] py-10 px-6 lg:px-12 text-xs font-mono text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-slate-200 via-slate-400 to-slate-700 p-[1px]">
-              <div className="h-full w-full bg-[#090c14] rounded-[6px] flex items-center justify-center font-mono font-black text-slate-100 text-[10px]">S</div>
-            </div>
-            <span className="font-bold text-[10px] text-white uppercase tracking-widest">STELLAR SCIO</span>
-          </div>
-          <span>© 2026 StellarMind.ai — {industry.name} Intelligence</span>
-        </div>
-      </footer>
-
     </div>
+    </SiteLayout>
   );
 }

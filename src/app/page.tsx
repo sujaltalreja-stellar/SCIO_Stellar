@@ -42,7 +42,8 @@ import {
   MARITIME_CLEARANCES, MARITIME_BUNKER_LOGS, MARITIME_SAFETY_INSPECTIONS,
   WorkOrderSeed, MarineSafetyDeficiency, SafetyEquipmentInspection
 } from "../config/industries";
-import StellarHomePage from "../components/landing/StellarHomePage";
+import HomePage from "../components/landing/HomePage";
+import SiteLayout from "../components/site/SiteLayout";
 import ResourcesHub from "../components/resources/ResourcesHub";
 import ScioSentinelOrb from "../components/ai/ScioSentinelOrb";
 import ContactHub from "../components/contact/ContactHub";
@@ -607,11 +608,9 @@ export default function App() {
 
   if (viewMode === "landing") {
     return (
-      <StellarHomePage
-        onLaunchPlatform={handleLaunchPlatform}
-        onOpenResources={() => setViewMode("resources")}
-        onOpenContact={() => setViewMode("contact")}
-      />
+      <SiteLayout onLaunchPlatform={handleLaunchPlatform}>
+        <HomePage />
+      </SiteLayout>
     );
   }
 

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-
 import App from "./app/page";
 import ContactPage from "./app/contact/page";
 import IndustryDetailPage from "./app/industries/[id]/page";
+import { PlatformPage, ControlTowerPage, IntegrationsPage, IndustriesPage, WhyScioPage, CustomersPage, FaqPage } from "./app/site/pages";
 // Loaded on demand so the public site bundle doesn't include the demo.
 import { lazyWithReload } from "./lazyWithReload";
 const DemoApp = lazyWithReload(() => import("./demo/DemoApp"));
@@ -24,6 +25,15 @@ export default function AppRouter() {
         {/* Main Application (Landing, OCC Control Center, Resources) */}
         <Route path="/" element={<App />} />
 
+        {/* Marketing subpages */}
+        <Route path="/platform" element={<PlatformPage />} />
+        <Route path="/platform/control-tower" element={<ControlTowerPage />} />
+        <Route path="/platform/integrations" element={<IntegrationsPage />} />
+        <Route path="/industries" element={<IndustriesPage />} />
+        <Route path="/why-scio" element={<WhyScioPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
+        <Route path="/faq" element={<FaqPage />} />
+
         {/* Contact Page */}
         <Route path="/contact" element={<ContactPage />} />
 
@@ -42,7 +52,6 @@ export default function AppRouter() {
         <Route path="/industries/:id" element={<IndustryDetailRouteWrapper />} />
 
         {/* Redirect Routes matching next.config.mjs */}
-        <Route path="/industries" element={<Navigate to="/#industries" replace />} />
         <Route path="/energy" element={<Navigate to="/?industry=energy&tab=energy-dashboard" replace />} />
         <Route path="/renewable-energy" element={<Navigate to="/?industry=energy&tab=energy-dashboard" replace />} />
         <Route path="/maritime" element={<Navigate to="/?industry=maritime&tab=dashboard" replace />} />
@@ -50,7 +59,6 @@ export default function AppRouter() {
         <Route path="/manufacturing" element={<Navigate to="/?industry=manufacturing&tab=dashboard" replace />} />
         <Route path="/logistics" element={<Navigate to="/?industry=logistics&tab=dashboard" replace />} />
         <Route path="/supply-chain" element={<Navigate to="/?industry=logistics&tab=dashboard" replace />} />
-        <Route path="/platform" element={<Navigate to="/?industry=energy&tab=energy-dashboard" replace />} />
         <Route path="/dashboard" element={<Navigate to="/?industry=energy&tab=energy-dashboard" replace />} />
         <Route path="/resources" element={<Navigate to="/?view=resources" replace />} />
 
