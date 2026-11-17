@@ -28,6 +28,7 @@ import HeroCommandCenter from "./HeroCommandCenter";
 import ProductShowcase from "./ProductShowcase";
 import ScrollShowcase from "./ScrollShowcase";
 import SystemsHub from "./SystemsHub";
+import ProductDemo from "./ProductDemo";
 
 // ---------- Content ----------
 
@@ -189,6 +190,28 @@ export default function HomePage() {
       {/* ===== 4. Use cases carousel ===== */}
       <section id="use-cases" className="bg-[#F6F5F3] border-y border-[#E7E5E1]">
         <div className={`${SITE_SHELL} pt-20 sm:pt-28 pb-10`}>
+          {/* Product walkthrough (real screens, animated cursor) */}
+          <div className="mb-20 sm:mb-28 grid gap-10 lg:grid-cols-[0.62fr_1.38fr] lg:items-center">
+            <div>
+              <Eyebrow>Watch it work</Eyebrow>
+              <SectionTitle className="mt-4">From issue to approved action in four clicks</SectionTitle>
+              <ol className="mt-8 space-y-4 text-[16px] text-[#4a4843]">
+                {[
+                  "See today's priorities, ranked by money at stake",
+                  "Find where money is leaking, across every system",
+                  "Ask why, and approve the fix SCIO drafts",
+                  "Know every figure comes from a connected source",
+                ].map((t, i) => (
+                  <li key={t} className="flex gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#111113] text-[13px] font-semibold text-white">{i + 1}</span>
+                    <span className="pt-0.5">{t}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <ProductDemo />
+          </div>
+
           <div className="flex items-end justify-between gap-6">
             <div>
               <Eyebrow>Use cases</Eyebrow>

@@ -43,6 +43,7 @@ import { USE_CASES } from "../../components/site/nav";
 import { ENTERPRISE_QUESTIONS_DATA } from "../../components/site/faqData";
 import { LeadForm } from "../../components/site/ContactForms";
 import AnimatedScreenshot from "../../components/site/AnimatedScreenshot";
+import ProductDemo from "../../components/landing/ProductDemo";
 
 // ---------- shared bits ----------
 function H2({ children, className = "" }: { children: React.ReactNode; className?: string }) {
@@ -371,6 +372,7 @@ export function UseCasesPage() {
         eyebrow="Use cases"
         title="Start with one problem. Expand from there."
         subtitle="Most businesses begin with one workflow that costs them money every week. Here's where SCIO usually starts."
+        media={<ProductDemo />}
         actions={<TalkButton />}
       />
       {USE_CASES.map((u, i) => {
