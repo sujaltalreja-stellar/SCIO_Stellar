@@ -1,12 +1,36 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
-import App from "./app/page";
-import ContactPage from "./app/contact/page";
-import IndustryDetailPage from "./app/industries/[id]/page";
-import { PlatformPage, ControlTowerPage, IntegrationsPage, IndustriesPage, WhyScioPage, CustomersPage, FaqPage } from "./app/site/pages";
-// Loaded on demand so the public site bundle doesn't include the demo.
+// Every page is loaded on demand, so /app (the SCIO application) doesn't download
+// the marketing site and industry dashboards, and vice versa.
 import { lazyWithReload } from "./lazyWithReload";
+const App = lazyWithReload(() => import("./app/page"));
+const ContactPage = lazyWithReload(() => import("./app/contact/page"));
+const IndustryDetailPage = lazyWithReload(() => import("./app/industries/[id]/page")) as unknown as React.ComponentType<{ params: Promise<{ id: string }> }>;
 const DemoApp = lazyWithReload(() => import("./demo/DemoApp"));
+const sitePage = (name: "PlatformPage" | "ControlTowerPage" | "IntegrationsPage" | "IndustriesPage" | "WhyScioPage" | "CustomersPage" | "FaqPage") =>
+  lazyWithReload(() => import("./app/site/pages").then((m) => ({ default: m[name] })));
+const PlatformPage = sitePage("PlatformPage");
+const ControlTowerPage = sitePage("ControlTowerPage");
+const IntegrationsPage = sitePage("IntegrationsPage");
+const IndustriesPage = sitePage("IndustriesPage");
+const WhyScioPage = sitePage("WhyScioPage");
+const CustomersPage = sitePage("CustomersPage");
+const FaqPage = sitePage("FaqPage");
+
+function PageLoader({ dark = false }: { dark?: boolean }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={`flex min-h-screen flex-col items-center justify-center gap-4 ${
+        dark ? "bg-[#0a0d14] text-slate-300" : "bg-white text-slate-600"
+      }`}
+    >
+      <span className="h-9 w-9 animate-spin rounded-full border-[3px] border-current border-t-transparent opacity-70" />
+      <span className="text-sm font-medium">Loading SCIO…</span>
+    </div>
+  );
+}
 
 function IndustryDetailRouteWrapper() {
   const params = useParams<{ id: string }>();
@@ -42,7 +66,7 @@ export default function AppRouter() {
         <Route
           path="/app/*"
           element={
-            <React.Suspense fallback={<div className="min-h-screen bg-[#0a0d14]" />}>
+            <React.Suspense fallback={<PageLoader dark />}>
               <DemoApp />
             </React.Suspense>
           }

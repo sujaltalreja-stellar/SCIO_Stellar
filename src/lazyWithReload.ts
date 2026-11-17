@@ -1,7 +1,9 @@
 import React from "react";
 
 // After a new deployment, an open tab may request code files that no longer
-// exist. Reload once to pick up the new version instead of showing a blank page.
+// exist, and a slow or flaky first visit can drop a chunk request. Retry the
+// import once, then reload once to pick up the current version, instead of
+// leaving a blank page.
 const RELOAD_KEY = "scio_reloaded_for_update";
 function reloadForNewVersion() {
   try {
@@ -26,11 +28,16 @@ if (typeof window !== "undefined") {
     }
   }, 15000);
 }
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export function lazyWithReload<T extends React.ComponentType<object>>(load: () => Promise<{ default: T }>) {
   return React.lazy(() =>
-    load().catch((err) => {
-      if (reloadForNewVersion()) return new Promise<{ default: T }>(() => {});
-      throw err;
-    })
+    load()
+      .catch(() => wait(800).then(load))
+      .catch((err) => {
+        if (reloadForNewVersion()) return new Promise<{ default: T }>(() => {});
+        throw err;
+      })
   );
 }
