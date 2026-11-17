@@ -3,19 +3,18 @@
 import React, { useLayoutEffect, useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 
-/** Public-site light/dark theme. Stored per visitor; defaults to the system setting. */
+/** Public-site light/dark theme. Light by default; dark only when the visitor chooses it (remembered per browser). */
 export type SiteTheme = "light" | "dark";
 const KEY = "scio_site_theme";
 const EVENT = "scio-site-theme";
 
 function preferred(): SiteTheme {
   try {
-    const saved = localStorage.getItem(KEY);
-    if (saved === "light" || saved === "dark") return saved;
+    if (localStorage.getItem(KEY) === "dark") return "dark";
   } catch {
     /* storage unavailable */
   }
-  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  return "light";
 }
 
 function apply(theme: SiteTheme) {
@@ -48,22 +47,7 @@ export function useSiteThemeRoot() {
   useLayoutEffect(() => {
     apply(preferred());
     window.dispatchEvent(new Event(EVENT));
-    const mq = window.matchMedia?.("(prefers-color-scheme: dark)");
-    const onSystem = () => {
-      let saved: string | null = null;
-      try {
-        saved = localStorage.getItem(KEY);
-      } catch {
-        /* ignore */
-      }
-      if (!saved) {
-        apply(mq!.matches ? "dark" : "light");
-        window.dispatchEvent(new Event(EVENT));
-      }
-    };
-    mq?.addEventListener?.("change", onSystem);
     return () => {
-      mq?.removeEventListener?.("change", onSystem);
       document.documentElement.removeAttribute("data-site-theme");
     };
   }, []);
