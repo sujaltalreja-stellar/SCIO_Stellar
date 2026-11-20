@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import SiteLayout, { SITE_SHELL } from "../../components/site/SiteLayout";
 import { useSite } from "../../components/site/SiteContext";
-import { ConnectBand, Eyebrow, NextPages, PageHero, PrimaryButton, SecondaryButton, SectionHeading } from "../../components/site/blocks";
+import { ConnectBand, Eyebrow, NextPages, PageHero, PrimaryButton, SecondaryButton } from "../../components/site/blocks";
 import { useSeo } from "../../components/site/seo";
 import { USE_CASES } from "../../components/site/nav";
 import { ENTERPRISE_QUESTIONS_DATA } from "../../components/site/faqData";
@@ -47,7 +47,14 @@ import ProductDemo from "../../components/landing/ProductDemo";
 
 // ---------- shared bits ----------
 function H2({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <SectionHeading className={className}>{children}</SectionHeading>;
+  return (
+    <h2
+      className={`font-display font-bold text-[#111113] text-balance ${className}`}
+      style={{ fontSize: "clamp(30px, 4vw, 50px)", lineHeight: 1.06, letterSpacing: "-0.035em" }}
+    >
+      {children}
+    </h2>
+  );
 }
 
 function TalkButton({ label = "Book a demo" }: { label?: string }) {
@@ -169,9 +176,9 @@ export function PlatformPage() {
         <div className={`${SITE_SHELL} py-20 sm:py-28 grid gap-12 lg:grid-cols-2 lg:items-center`}>
           <div>
             <Eyebrow tone="light">Security & governance</Eyebrow>
-            <SectionHeading tone="light" className="mt-4">
+            <h2 className="mt-4 font-display font-bold text-white" style={{ fontSize: "clamp(30px, 4vw, 50px)", lineHeight: 1.06, letterSpacing: "-0.035em" }}>
               Your data, your infrastructure, your approvals
-            </SectionHeading>
+            </h2>
             <ul className="mt-10 space-y-6">
               {[
                 { icon: Server, title: "Deploy where you want", body: "On-premises, private cloud or hybrid, aligned with your data-residency rules." },
