@@ -6,6 +6,7 @@ import { ScioLogo } from "../layout/ScioLogo";
 import { Aurora, cx } from "../ui";
 import { ThemeToggle } from "../theme";
 import ConnectLoginPage from "./ConnectLoginPage";
+import { StellarScioMark } from "../../components/site/StellarScioLogo";
 
 const FEATURES = [
   { icon: Sparkles, title: "AI Operations Copilot", text: "Ask in plain language, get answers with evidence and next actions." },
@@ -74,7 +75,9 @@ export function HomeStyleLoginPage() {
     <main className="scio-login min-h-screen bg-[#f8fafc] font-sans text-[#090d16]">
       <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-[#fff]/95 px-5 shadow-sm backdrop-blur-xl sm:px-8 lg:px-12">
         <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#090d16] font-mono text-sm font-black text-[#fff] shadow-sm">S</div>
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-[#090d16] text-[#fff] shadow-sm">
+            <StellarScioMark className="h-[18px] w-auto" />
+          </div>
           <div className="leading-none">
             <div className="flex items-center gap-1.5 text-sm font-extrabold tracking-tight">
               STELLAR SCIO <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
