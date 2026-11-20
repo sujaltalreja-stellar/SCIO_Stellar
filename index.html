@@ -12,7 +12,7 @@
       name="keywords"
       content="Stellar SCIO, business operating system, AI for business operations, ERP integration, POS analytics, inventory management, replenishment, purchasing automation, multi-store operations, business intelligence"
     />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
     <link rel="canonical" href="https://www.stellarscio.app/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
@@ -25,7 +25,7 @@
       property="og:description"
       content="Skip the dashboards. Just ask. SCIO connects your ERP, POS, WMS and every system you run, and turns any question into an answer and an approved action."
     />
-    <meta property="og:image" content="/thumbnail.png?v=2" />
+    <meta property="og:image" content="https://www.stellarscio.app/thumbnail.png?v=2" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Stellar SCIO: Skip the dashboards. Just ask." />
@@ -36,7 +36,9 @@
       name="twitter:description"
       content="Skip the dashboards. Just ask. SCIO connects your ERP, POS, WMS and every system you run, and turns any question into an answer and an approved action."
     />
-    <meta name="twitter:image" content="/thumbnail.png?v=2" />
+    <meta name="twitter:image" content="https://www.stellarscio.app/thumbnail.png?v=2" />
+    <meta property="og:locale" content="en_US" />
+    <link rel="alternate" type="text/plain" title="LLM summary" href="/llms.txt" />
 
     <!-- Structured data for search engines -->
     <script type="application/ld+json">
@@ -47,24 +49,37 @@
             "@type": "Organization",
             "@id": "https://www.stellarscio.app/#org",
             "name": "Stellar SCIO",
+            "alternateName": "SCIO",
             "url": "https://www.stellarscio.app/",
-            "logo": "https://www.stellarscio.app/favicon.svg",
+            "logo": "https://www.stellarscio.app/logos/stellar-scio.svg",
+            "parentOrganization": { "@type": "Organization", "name": "Stellarmind.ai" },
             "email": "info@stellarmind.ai",
             "contactPoint": [{ "@type": "ContactPoint", "contactType": "sales", "email": "sales@stellarmind.ai", "telephone": "+91-97230-99765" }]
           },
           {
             "@type": "SoftwareApplication",
+            "@id": "https://www.stellarscio.app/#software",
             "name": "Stellar SCIO",
             "applicationCategory": "BusinessApplication",
             "operatingSystem": "Web",
             "url": "https://www.stellarscio.app/",
+            "image": "https://www.stellarscio.app/thumbnail.png?v=2",
             "description": "AI business operating system that connects ERP, POS, warehouse, HR and finance systems, answers questions in plain language and turns them into approved actions.",
+            "featureList": [
+              "Connects ERP, point of sale, warehouse (WMS), HR and finance, CRM, procurement, spreadsheets and documents",
+              "Plain-language questions and answers across all connected systems",
+              "Early detection of stock, sales and supplier problems",
+              "Approval workflows with a full audit trail",
+              "Works alongside existing systems without replacing them"
+            ],
             "publisher": { "@id": "https://www.stellarscio.app/#org" }
           },
           {
             "@type": "WebSite",
+            "@id": "https://www.stellarscio.app/#website",
             "name": "Stellar SCIO",
             "url": "https://www.stellarscio.app/",
+            "inLanguage": "en",
             "publisher": { "@id": "https://www.stellarscio.app/#org" }
           }
         ]
@@ -78,18 +93,18 @@
     <link
       rel="preload"
       as="style"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     />
     <link
       rel="stylesheet"
       media="print"
       onload="this.media='all'"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     />
     <noscript>
       <link
         rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
       />
     </noscript>
 

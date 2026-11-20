@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronRight, MoveRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { SITE_SHELL } from "./SiteLayout";
 import { useSite } from "./SiteContext";
@@ -32,6 +32,43 @@ export function Eyebrow({ children, tone = "dark" }: { children: React.ReactNode
     <p className={`text-[13px] font-semibold uppercase tracking-[0.14em] ${tone === "light" ? "text-[#f2a93b]" : "text-[#B06D0F]"}`}>
       {children}
     </p>
+  );
+}
+
+/**
+ * Section heading — the one heading style for every section on the marketing site.
+ * Type scale (UI/UX Pro Max: Plus Jakarta Sans, consistent modular scale; Regular 400 for an airy, editorial feel):
+ *   section  32 → 56px, line-height 1.08, tracking -0.03em  (main section titles)
+ *   sub      26 → 36px, line-height 1.15, tracking -0.025em (minor sections, e.g. "Keep exploring")
+ */
+export const HEADING_SCALE = {
+  section: { fontSize: "clamp(32px, 4.4vw, 56px)", lineHeight: 1.1, letterSpacing: "-0.025em" },
+  sub: { fontSize: "clamp(26px, 3vw, 36px)", lineHeight: 1.15, letterSpacing: "-0.025em" },
+} as const;
+
+export function SectionHeading({
+  children,
+  id,
+  tone = "dark",
+  size = "section",
+  as: Tag = "h2",
+  className = "",
+}: {
+  children: React.ReactNode;
+  id?: string;
+  tone?: "dark" | "light";
+  size?: keyof typeof HEADING_SCALE;
+  as?: "h2" | "h3";
+  className?: string;
+}) {
+  return (
+    <Tag
+      id={id}
+      className={`scio-section-heading font-display font-normal text-balance ${tone === "light" ? "text-white" : "text-[#111113]"} ${className}`}
+      style={HEADING_SCALE[size]}
+    >
+      {children}
+    </Tag>
   );
 }
 
@@ -127,33 +164,42 @@ export function SecondaryButton({ to, href, children, tone = "dark" }: { to?: st
   return to ? <Link to={to} className={cls}>{inner}</Link> : <a href={href} className={cls}>{inner}</a>;
 }
 
-/** Closing "Let's connect" band with a photo background. */
+/** Closing "Let's connect" band: wide, short, title left and two glass pill buttons right. */
 export function ConnectBand({
-  title = "Let's connect",
-  subtitle = "Tell us how your business runs today. We'll show you what SCIO finds in your own data, in weeks rather than quarters.",
+  title = "Let’s connect",
+  subtitle,
 }: { title?: string; subtitle?: string }) {
   const { openDemo } = useSite();
+  const pill =
+    "group inline-flex h-[52px] items-center gap-3 px-7 rounded-full border text-[16px] font-medium backdrop-blur-md transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0F0F11]";
   return (
-    <section className="relative overflow-hidden bg-[#0F0F11]">
+    <section className="theme-fixed relative overflow-hidden bg-[#0F0F11]">
       <img
         src="/images/team-collaborating-on-operations.webp"
         alt="Operations team working together on shared business data"
         width={1600}
         height={900}
-        className="absolute inset-0 h-full w-full object-cover opacity-45"
+        className="absolute inset-0 h-full w-full object-cover"
         loading="lazy"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F11] via-[#0F0F11]/80 to-[#0F0F11]/30" />
-      <div className={`${SITE_SHELL} relative py-24 sm:py-32`}>
-        <motion.div {...reveal} className="max-w-2xl">
-          <h2 className="font-display font-bold text-white" style={{ fontSize: "clamp(40px, 6vw, 80px)", lineHeight: 1, letterSpacing: "-0.04em" }}>
+      {/* Light dark layer so the photo stays visible but text reads clearly */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/45 via-black/30 to-black/20" />
+      {/* Texture layer: fine film grain over the photo (generated SVG noise, no image file) */}
+      <div aria-hidden="true" className="scio-grain pointer-events-none absolute inset-0" />
+      <div className="relative mx-auto max-w-[1840px] px-[clamp(20px,2.6vw,48px)] min-h-[clamp(340px,27.5vw,560px)] py-16 flex flex-col justify-center gap-10 lg:flex-row lg:items-center lg:justify-between">
+        <motion.div {...reveal}>
+          <h2 className="font-sans font-light text-white" style={{ fontSize: "clamp(52px, 5.6vw, 108px)", lineHeight: 1, letterSpacing: "-0.04em", textShadow: "0 2px 28px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.3)" }}>
             {title}
           </h2>
-          <p className="mt-6 text-[17px] sm:text-[19px] leading-relaxed text-white/75 max-w-xl">{subtitle}</p>
-          <div className="mt-10 flex flex-wrap gap-3">
-            <PrimaryButton tone="light" onClick={openDemo}>Talk to our team</PrimaryButton>
-            <SecondaryButton tone="light" to="/platform">Explore the platform</SecondaryButton>
-          </div>
+          {subtitle && <p className="mt-5 text-[17px] leading-relaxed text-white/70 max-w-xl">{subtitle}</p>}
+        </motion.div>
+        <motion.div {...reveal} className="flex flex-wrap gap-3 lg:shrink-0 lg:flex-nowrap">
+          <button type="button" onClick={openDemo} className={`${pill} border-white/70 bg-white/90 text-[#111113] hover:bg-white`}>
+            Talk to our team <MoveRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          </button>
+          <Link to="/platform" className={`${pill} border-white/30 bg-black/35 text-white hover:bg-black/50`}>
+            Explore the platform <MoveRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          </Link>
         </motion.div>
       </div>
     </section>
@@ -165,7 +211,7 @@ export function NextPages({ items }: { items: { label: string; desc: string; to:
   return (
     <section className="bg-[#F6F5F3] border-t border-[#E7E5E1]">
       <div className={`${SITE_SHELL} py-16 sm:py-20`}>
-        <h2 className="font-display font-bold text-[#111113] text-[28px] sm:text-[36px] tracking-tight">Keep exploring</h2>
+        <SectionHeading size="sub">Keep exploring</SectionHeading>
         <div className={`mt-8 grid gap-4 sm:grid-cols-2 ${items.length > 2 ? "lg:grid-cols-3" : ""}`}>
           {items.map((it) => (
             <Link
