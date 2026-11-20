@@ -1,16 +1,14 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { getLenis, scrollToTarget, startSmoothScroll } from "../../lib/smoothScroll";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, ChevronDown, Menu, X, Mail, Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, X, Mail, Phone, ShieldCheck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SiteContext, SiteActions, launchHref } from "./SiteContext";
 import { NAV_GROUPS, FOOTER_COLUMNS } from "./nav";
 import { LeadModal } from "./ContactForms";
 import { ThemeToggle, useSiteThemeRoot } from "./theme";
 import { lazyWithReload } from "../../lazyWithReload";
-import { StellarScioLogo } from "./StellarScioLogo";
 
 // The AI assistant is large (~240 KB); load it after the page is visible, not before.
 const ScioSentinelOrb = lazyWithReload(() => import("../ai/ScioSentinelOrb"));
@@ -30,45 +28,38 @@ function useAfterFirstPaint(delayMs = 1200) {
 
 export const SITE_SHELL = "mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-10";
 
-/** The StellarSCIO wordmark. One component everywhere (header, footer) so it renders the same in
- *  light and dark mode; colour comes from `tone`, never from the theme remap. */
-function Logo({ tone = "ink" }: { tone?: "ink" | "light" }) {
+function Logo({ dark = false }: { dark?: boolean }) {
   return (
-    <span
-      className={`theme-fixed inline-flex items-center select-none leading-none ${
-        tone === "light" ? "text-white" : "scio-logo-ink"
-      }`}
-    >
-      <StellarScioLogo className="block h-[clamp(24px,0.8vw+16px,30px)] w-auto" />
+    <span className="flex items-center gap-2.5 select-none">
+      <span
+        className={`relative h-9 w-9 rounded-[10px] flex items-center justify-center font-black text-[15px] ${
+          dark ? "bg-white text-[#111113]" : "bg-[#111113] text-white"
+        }`}
+      >
+        S
+        <span className="absolute right-[5px] top-[5px] h-2 w-2 rounded-full bg-[#f2a93b]" />
+      </span>
+      <span className={`font-extrabold text-[16px] tracking-tight ${dark ? "text-white" : "text-[#111113]"}`}>
+        Stellar <span className="text-[#f2a93b]">SCIO</span>
+      </span>
     </span>
   );
 }
 
-function DesktopDropdown({ groupIndex, open, active, onOpen, onClose }: { groupIndex: number; open: boolean; active: boolean; onOpen: () => void; onClose: () => void }) {
+function DesktopDropdown({ groupIndex, open, onOpen, onClose }: { groupIndex: number; open: boolean; onOpen: () => void; onClose: () => void }) {
   const group = NAV_GROUPS[groupIndex];
-  // 4+ items: lay them out as a 2-column grid (2x2 for Platform); short menus stay a single list.
-  const twoCol = group.items.length >= 4;
   return (
-    <div
-      onMouseEnter={onOpen}
-      onMouseLeave={onClose}
-      onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) onClose();
-      }}
-    >
+    <div className="relative" onMouseEnter={onOpen} onMouseLeave={onClose}>
       <button
         type="button"
         aria-expanded={open}
-        aria-haspopup="true"
         onClick={() => (open ? onClose() : onOpen())}
-        className={`relative flex h-10 items-center gap-1.5 px-[18px] rounded-full text-[15px] font-medium transition-[color,background-color,box-shadow] duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] ${
-          open || active
-            ? "text-[#111113] bg-white shadow-[0_1px_2px_rgba(17,17,19,0.08),0_4px_12px_-4px_rgba(17,17,19,0.12)]"
-            : "text-[#4a4843] hover:text-[#111113]"
+        className={`flex items-center gap-1 px-3 py-2 rounded-full text-[14px] font-medium transition-colors cursor-pointer ${
+          open ? "text-[#111113] bg-[#F3F2EF]" : "text-[#3a3936] hover:text-[#111113]"
         }`}
       >
         {group.label}
-        <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       <AnimatePresence>
         {open && (
@@ -77,20 +68,15 @@ function DesktopDropdown({ groupIndex, open, active, onOpen, onClose }: { groupI
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.16 }}
-            className="absolute left-1/2 top-full -translate-x-1/2 pt-3 z-50"
+            className="absolute left-0 top-full pt-3 z-50"
           >
-            <div
-              className={`rounded-2xl border border-[#E7E5E1] bg-white p-2 shadow-[0_24px_60px_-20px_rgba(17,17,19,0.25)] ${
-                twoCol ? "w-[600px]" : "w-[360px]"
-              }`}
-            >
-              <div className={twoCol ? "grid grid-cols-2 gap-1" : ""}>
+            <div className="w-[360px] rounded-2xl border border-[#E7E5E1] bg-white p-2 shadow-[0_24px_60px_-20px_rgba(17,17,19,0.25)]">
               {group.items.map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}
                   onClick={onClose}
-                  className="group flex items-start justify-between gap-3 rounded-xl px-4 py-3 hover:bg-[#F6F5F3] focus-visible:bg-[#F6F5F3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] transition-colors"
+                  className="group flex items-start justify-between gap-3 rounded-xl px-4 py-3 hover:bg-[#F6F5F3] transition-colors"
                 >
                   <span>
                     <span className="block text-[14px] font-semibold text-[#111113]">{item.label}</span>
@@ -99,7 +85,6 @@ function DesktopDropdown({ groupIndex, open, active, onOpen, onClose }: { groupI
                   <ArrowRight className="h-4 w-4 mt-0.5 text-[#b5b1aa] group-hover:text-[#D98B16] group-hover:translate-x-0.5 transition-all shrink-0" />
                 </Link>
               ))}
-              </div>
               {group.footer && (
                 <Link
                   to={group.footer.href}
@@ -123,65 +108,13 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
   const [mobileGroup, setMobileGroup] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const closeTimer = useRef<number | null>(null);
-  const { pathname } = useLocation();
 
-  // Same behaviour as the Real Estate OS navbar: hide on scroll down, reveal on any
-  // scroll up, always shown near the top. One rAF per frame keeps it smooth.
-  const [hidden, setHidden] = useState(false);
-  const lastY = useRef(0);
   useEffect(() => {
-    lastY.current = window.scrollY;
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const y = window.scrollY;
-        setScrolled(y >= 24);
-        setHidden(!(y < 80 || y <= lastY.current));
-        lastY.current = y;
-        ticking = false;
-      });
-    };
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  // Close menus on navigation; Escape closes everything.
-  useEffect(() => {
-    setOpenIdx(null);
-    setMobileOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpenIdx(null);
-        setMobileOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-  // Stop the page scrolling behind the open mobile menu.
-  useEffect(() => {
-    if (!mobileOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    getLenis()?.stop();
-    return () => {
-      document.body.style.overflow = prev;
-      getLenis()?.start();
-    };
-  }, [mobileOpen]);
-
-  const isActive = (i: number) =>
-    NAV_GROUPS[i].items.some((it) => {
-      const base = it.href.split("#")[0];
-      return base !== "/" && (pathname === base || pathname.startsWith(base + "/"));
-    });
 
   const open = (i: number) => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
@@ -192,76 +125,50 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
     closeTimer.current = window.setTimeout(() => setOpenIdx(null), 120);
   };
 
-  const hideBar = hidden && openIdx === null && !mobileOpen;
-  // On the home page the hero photo runs up behind the header: until the bar turns solid,
-  // use light colours so the logo and buttons read on the dark photo.
-  const overHero = pathname === "/" && !scrolled && !mobileOpen;
-
   return (
-    <>
-    {/* Spacer: the header is fixed, so reserve its height in the page flow. */}
-    <div aria-hidden="true" className="h-[var(--nav-offset)]" />
     <header
-      className={`scio-nav fixed inset-x-0 top-0 z-50 focus-within:!translate-y-0 focus-within:!opacity-100 focus-within:!pointer-events-auto ${hideBar ? "is-hidden" : ""}`}
-      style={{ padding: "var(--nav-top) clamp(8px,1.5vw + 3px,32px) 0" }}
+      className={`sticky top-0 z-50 bg-white/95 backdrop-blur-xl transition-shadow ${
+        scrolled ? "shadow-[0_1px_0_#E7E5E1]" : ""
+      }`}
     >
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[#111113] focus:px-4 focus:py-2 focus:text-white">
         Skip to content
       </a>
-      <div
-        className={`relative mx-auto max-w-[1240px] h-[var(--nav-h)] px-[5px] lg:px-[7px] flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] rounded-full border transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ease-out ${
-          scrolled || mobileOpen
-            ? "border-[#E7E5E1] bg-white/95 backdrop-blur-[14px] shadow-[0_8px_32px_0_rgba(17,17,19,0.14)]"
-            : "border-transparent"
-        }`}
-      >
-        <Link to="/" aria-label="Stellar SCIO home" className="ml-3.5 lg:ml-4 justify-self-start rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-2">
-          <Logo tone={overHero ? "light" : "ink"} />
-        </Link>
+      <div className={`${SITE_SHELL} h-[72px] flex items-center justify-between gap-4`}>
+        <div className="flex items-center gap-8">
+          <Link to="/" aria-label="Stellar SCIO home">
+            <Logo />
+          </Link>
+          <nav className="hidden lg:flex items-center gap-0.5" aria-label="Main">
+            {NAV_GROUPS.map((g, i) => (
+              <DesktopDropdown key={g.label} groupIndex={i} open={openIdx === i} onOpen={() => open(i)} onClose={close} />
+            ))}
+          </nav>
+        </div>
 
-        {/* Centered segmented pill nav */}
-        <nav
-          className="relative hidden lg:flex h-12 items-center gap-0.5 rounded-full border border-[#E7E5E1] bg-[#F6F5F3] p-1"
-          aria-label="Main"
-        >
-          {NAV_GROUPS.map((g, i) => (
-            <DesktopDropdown key={g.label} groupIndex={i} open={openIdx === i} active={isActive(i)} onOpen={() => open(i)} onClose={close} />
-          ))}
-        </nav>
-
-        <div className="flex items-center justify-self-end gap-2">
-          {/* Theme + app chip */}
-          <div className="hidden md:inline-flex h-11 lg:h-12 items-center gap-1 rounded-full border border-[#E7E5E1] bg-white p-1 pr-1.5">
-            <ThemeToggle className="!h-9 !w-9 lg:!h-10 lg:!w-10 !border-0 bg-[#F6F5F3] hover:bg-[#EFEEEB]" />
-            <a
-              href="/app"
-              className="inline-flex h-9 lg:h-10 items-center px-3.5 rounded-full whitespace-nowrap text-[15px] font-semibold text-[#111113] hover:text-[#B06D0F] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
-            >
-              Open SCIO
-            </a>
-          </div>
-          <div className="md:hidden">
-            <ThemeToggle className={`!h-11 !w-11 ${overHero ? "theme-fixed !border-white/35 !text-white hover:!border-white" : ""}`} />
-          </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <a
+            href="/app"
+            className="hidden md:inline-flex px-4 py-2.5 rounded-full text-[14px] font-medium text-[#3a3936] hover:text-[#111113]"
+          >
+            Open SCIO
+          </a>
           <button
             type="button"
             onClick={onTalk}
-            className={`group hidden sm:inline-flex h-11 lg:h-12 items-center gap-2 px-5 lg:px-6 rounded-full whitespace-nowrap text-[15px] font-semibold active:scale-[0.98] transition duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-2 ${
-              overHero ? "theme-fixed bg-white text-[#111113] hover:bg-[#F2EFEA]" : "bg-[#111113] text-white hover:bg-[#2a2a30]"
-            }`}
+            className="hidden sm:inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#111113] text-white text-[14px] font-semibold hover:bg-[#2a2a30] transition-colors cursor-pointer"
           >
-            Book a demo <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+            Talk to our team <ArrowRight className="h-4 w-4" />
           </button>
           <button
             type="button"
-            className={`lg:hidden inline-flex h-11 items-center gap-2 px-4 rounded-full border text-[15px] font-medium cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] ${
-              overHero ? "theme-fixed border-white/35 text-white" : "border-[#E7E5E1] text-[#111113]"
-            }`}
+            className="lg:hidden inline-flex items-center gap-1.5 px-3 py-2 rounded-full border border-[#E7E5E1] text-[14px] font-medium text-[#111113] cursor-pointer"
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav"
             onClick={() => setMobileOpen((v) => !v)}
           >
-            {mobileOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             Menu
           </button>
         </div>
@@ -275,15 +182,15 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden mx-auto mt-2 max-w-[1280px] overflow-hidden rounded-3xl border border-[#E7E5E1] bg-white shadow-[0_16px_40px_-16px_rgba(17,17,19,0.25)]"
+            className="lg:hidden overflow-hidden border-t border-[#E7E5E1] bg-white"
           >
-            <div className={`${SITE_SHELL} py-4 max-h-[calc(100dvh-110px)] overflow-y-auto`}>
+            <div className={`${SITE_SHELL} py-4 max-h-[calc(100vh-72px)] overflow-y-auto`}>
               {NAV_GROUPS.map((g, i) => (
                 <div key={g.label} className="border-b border-[#EFEEEB]">
                   <button
                     type="button"
                     onClick={() => setMobileGroup(mobileGroup === i ? null : i)}
-                    className="w-full min-h-[52px] flex items-center justify-between py-3 text-[16px] font-semibold text-[#111113] cursor-pointer rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
+                    className="w-full flex items-center justify-between py-4 text-[16px] font-semibold text-[#111113] cursor-pointer"
                   >
                     {g.label}
                     <ChevronDown className={`h-4 w-4 transition-transform ${mobileGroup === i ? "rotate-180" : ""}`} />
@@ -307,11 +214,11 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
                     setMobileOpen(false);
                     onTalk();
                   }}
-                  className="inline-flex justify-center items-center gap-1.5 min-h-[48px] px-5 rounded-full bg-[#111113] text-white text-[15px] font-semibold cursor-pointer"
+                  className="inline-flex justify-center items-center gap-1.5 px-5 py-3 rounded-full bg-[#111113] text-white text-[15px] font-semibold cursor-pointer"
                 >
-                  Book a demo <ArrowRight className="h-4 w-4" />
+                  Talk to our team <ArrowRight className="h-4 w-4" />
                 </button>
-                <a href="/app" className="inline-flex justify-center items-center min-h-[48px] px-5 rounded-full border border-[#E7E5E1] text-[15px] font-medium text-[#111113]">
+                <a href="/app" className="inline-flex justify-center px-5 py-3 rounded-full border border-[#E7E5E1] text-[15px] font-medium text-[#111113]">
                   Open SCIO
                 </a>
               </div>
@@ -320,95 +227,78 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
         )}
       </AnimatePresence>
     </header>
-    </>
   );
 }
 
 function SiteFooter({ onTalk, onBeta }: { onTalk: () => void; onBeta: () => void }) {
-  const link = "inline-flex min-h-[32px] items-center text-left text-[15px] text-[#B9B5AE] hover:text-white transition-colors duration-200 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]";
   return (
-    <footer className="theme-fixed relative overflow-hidden bg-[#0B0B0D] text-[#B9B5AE] border-t border-white/[0.08]">
-      <div className="relative mx-auto max-w-[1280px] px-[clamp(20px,2.6vw,40px)] pt-16 sm:pt-20">
-        <div className="grid gap-14 lg:grid-cols-[1.1fr_2fr]">
-          {/* Brand + primary actions */}
-          <div>
-            <Link to="/" aria-label="Stellar SCIO home" className="inline-block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-4 focus-visible:ring-offset-[#0B0B0D]">
-              <Logo tone="light" />
-            </Link>
-            <p className="mt-5 max-w-sm text-[15px] leading-relaxed">
+    <footer className="bg-[#0F0F11] text-[#B9B5AE]">
+      <div className={`${SITE_SHELL} pt-16 pb-10`}>
+        <div className="grid gap-12 lg:grid-cols-[1.3fr_repeat(3,1fr)_1.2fr]">
+          <div className="space-y-5">
+            <Logo dark />
+            <p className="text-[14px] leading-relaxed max-w-xs">
               The business operating system that connects your ERP, POS, warehouse, HR and finance tools, answers questions in plain language, and turns them into approved actions.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={onTalk}
-                className="group inline-flex h-[42px] items-center gap-3 px-[22px] rounded-full bg-white text-[#111113] text-[15px] font-medium whitespace-nowrap hover:bg-[#EFEEEB] active:scale-[0.98] transition duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0B0D]"
-              >
-                Book a demo <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
-              </button>
+            <div className="flex items-center gap-2">
               <a
-                href="/app"
-                className="inline-flex h-[42px] items-center px-[22px] rounded-full border border-white/15 bg-white/[0.04] text-white text-[15px] font-medium whitespace-nowrap hover:bg-white/10 hover:border-white/30 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
+                href="mailto:info@stellarmind.ai"
+                aria-label="Email"
+                className="h-9 w-9 rounded-full border border-white/10 flex items-center justify-center hover:border-white/30 hover:text-white transition-colors"
               >
-                Open SCIO
+                <Mail className="h-4 w-4" />
               </a>
             </div>
           </div>
 
-          {/* Link columns */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-[1fr_1.15fr_0.9fr_1.35fr]">
-            {FOOTER_COLUMNS.map((col) => (
-              <nav key={col.label} aria-label={col.label}>
-                <h3 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-white/50 mb-4">{col.label}</h3>
-                <ul className="space-y-1.5">
-                  {col.items.map((item) => (
-                    <li key={item.href}>
-                      <Link to={item.href} className={link}>{item.label}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ))}
-            <div className="col-span-2 sm:col-span-1">
-              <h3 className="text-[13px] font-semibold uppercase tracking-[0.12em] text-white/50 mb-4">Get in touch</h3>
-              <ul className="space-y-1.5">
-                <li>
-                  <button type="button" onClick={onTalk} className={`${link} gap-1.5 whitespace-nowrap !text-white font-semibold hover:!text-[#f2a93b] cursor-pointer`}>
-                    Start a conversation <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                </li>
-                <li>
-                  <button type="button" onClick={onBeta} className={`${link} cursor-pointer`}>Join the private beta</button>
-                </li>
-                <li>
-                  <a href="mailto:sales@stellarmind.ai" className={`${link} gap-2 whitespace-nowrap`}>
-                    <Mail className="h-4 w-4 shrink-0" aria-hidden="true" /> sales@stellarmind.ai
-                  </a>
-                </li>
-                <li>
-                  <a href="tel:+919723099765" className={`${link} gap-2 whitespace-nowrap`}>
-                    <Phone className="h-4 w-4 shrink-0" aria-hidden="true" /> +91 97230 99765
-                  </a>
-                </li>
+          {FOOTER_COLUMNS.map((col) => (
+            <div key={col.label}>
+              <h3 className="text-[13px] font-semibold text-white mb-4">{col.label}</h3>
+              <ul className="space-y-2.5 text-[14px]">
+                {col.items.map((item) => (
+                  <li key={item.href}>
+                    <Link to={item.href} className="hover:text-white transition-colors">
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
+          ))}
+
+          <div>
+            <h3 className="text-[13px] font-semibold text-white mb-4">Get in touch</h3>
+            <ul className="space-y-2.5 text-[14px]">
+              <li>
+                <button type="button" onClick={onTalk} className="inline-flex items-center gap-1.5 text-white font-semibold hover:text-[#f2a93b] cursor-pointer">
+                  Start a conversation <ArrowRight className="h-4 w-4" />
+                </button>
+              </li>
+              <li>
+                <button type="button" onClick={onBeta} className="hover:text-white cursor-pointer">
+                  Join the private beta
+                </button>
+              </li>
+              <li>
+                <a href="mailto:sales@stellarmind.ai" className="inline-flex items-center gap-2 hover:text-white">
+                  <Mail className="h-3.5 w-3.5" /> sales@stellarmind.ai
+                </a>
+              </li>
+              <li>
+                <a href="tel:+919723099765" className="inline-flex items-center gap-2 hover:text-white">
+                  <Phone className="h-3.5 w-3.5" /> +91 97230 99765
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
 
-        <div className="mt-16 pt-6 border-t border-white/10 flex flex-col gap-4 text-[13px] sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between text-[13px]">
           <p>© 2026 Stellarmind.ai. All rights reserved.</p>
           <p className="inline-flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-[#f2a93b]" aria-hidden="true" />
+            <ShieldCheck className="h-4 w-4 text-[#f2a93b]" />
             Deployed on your infrastructure · TLS 1.3 · Full audit trail
           </p>
-        </div>
-
-        {/* Oversized wordmark, cropped by the footer edge */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none select-none mt-10 -mb-[5%] leading-none text-white/[0.05]"
-        >
-          <StellarScioLogo className="block w-full h-auto" />
         </div>
       </div>
     </footer>
@@ -418,7 +308,6 @@ function SiteFooter({ onTalk, onBeta }: { onTalk: () => void; onBeta: () => void
 /** Scrolls to the URL hash after navigation (or to top on a new page). */
 function ScrollManager() {
   const { pathname, hash } = useLocation();
-  useEffect(() => startSmoothScroll(), []);
   useEffect(() => {
     if (hash) {
       const id = hash.slice(1);
@@ -427,13 +316,12 @@ function ScrollManager() {
         const el = document.getElementById(id);
         if (el || ++tries > 20) {
           window.clearInterval(t);
-          if (el) scrollToTarget(el);
+          el?.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }, 50);
       return () => window.clearInterval(t);
     }
-    if (getLenis()) getLenis()?.scrollTo(0, { immediate: true });
-    else window.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }, [pathname, hash]);
   return null;
 }

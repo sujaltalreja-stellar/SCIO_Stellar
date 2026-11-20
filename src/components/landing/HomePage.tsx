@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Link } from "react-router-dom";
 import {
   ArrowRight,
-  ArrowUpRight,
+  ArrowLeft,
   Plug,
   Network,
   MessageSquareText,
@@ -16,27 +16,19 @@ import {
   Plus,
   Minus,
   Play,
-  Pause,
-  Maximize2,
-  Volume2,
-  VolumeX,
   Check,
-  RotateCcw,
-  RotateCw,
 } from "lucide-react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { SITE_SHELL } from "../site/SiteLayout";
 import { useSite } from "../site/SiteContext";
-import { ArrowLink, ConnectBand, Eyebrow, PrimaryButton, SectionHeading, reveal } from "../site/blocks";
+import { ArrowLink, ConnectBand, Eyebrow, PrimaryButton, reveal } from "../site/blocks";
 import { useSeo } from "../site/seo";
 import { ENTERPRISE_QUESTIONS_DATA } from "../site/faqData";
 import HeroCommandCenter from "./HeroCommandCenter";
 import ProductShowcase from "./ProductShowcase";
+import ScrollShowcase from "./ScrollShowcase";
 import SystemsHub from "./SystemsHub";
-import UseCasesTabs from "./UseCasesTabs";
-import WatchItWork from "./WatchItWork";
-import TrustedPlatforms from "./TrustedPlatforms";
-import PositioningCompare from "./PositioningCompare";
+import ProductDemo from "./ProductDemo";
 
 // ---------- Content ----------
 
@@ -70,219 +62,24 @@ const STEPS = [
   { icon: CheckCircle2, step: "04", title: "Act", body: "Recommendations become approved actions, written back to your systems with a full audit trail." },
 ];
 
-const FAQ_TEASER_IDS = [1, 2, 5, 10];
-
-function SectionTitle({ children, className = "", as = "h2" }: { children: React.ReactNode; className?: string; as?: "h2" | "h3" }) {
-  return <SectionHeading as={as} className={className}>{children}</SectionHeading>;
-}
-
-/** Drop the demo recording at /public/videos/hero-demo.mp4 (and optionally hero-demo.webm + hero-poster.webp). */
-const HERO_VIDEO = { mp4: "/videos/hero-demo.mp4", poster: "/videos/hero-poster.webp" };
-
-/** Hero backdrop photos: the store floor, the warehouse and the checkout, side by side and
- *  feathered so they read as one scene. */
-const HERO_BACKDROP = [
-  { src: "/images/multi-store-retail-shop.webp", cls: "left-0 w-[46%] object-[50%_40%]", mask: "linear-gradient(90deg, black 55%, transparent 100%)" },
-  { src: "/images/warehouse-inventory-shelves.webp", cls: "left-[28%] w-[44%] object-[50%_55%]", mask: "linear-gradient(90deg, transparent 0%, black 28%, black 72%, transparent 100%)" },
-  { src: "/images/point-of-sale-checkout-tablet.webp", cls: "right-0 w-[46%] object-[40%_60%]", mask: "linear-gradient(270deg, black 55%, transparent 100%)" },
+const USE_CASE_CARDS = [
+  { title: "Reorder the right stock, in the right store, before it runs out", img: "/images/warehouse-inventory-shelves.webp", alt: "Warehouse shelves stocked with inventory boxes", to: "/use-cases#inventory" },
+  { title: "See every store, channel and product in one place", img: "/images/retail-store-aisle-inventory.webp", alt: "Retail store aisle with stocked shelves", to: "/use-cases#sales" },
+  { title: "Draft purchase orders and keep suppliers on time", img: "/images/distribution-center-stock.webp", alt: "Distribution centre with stock ready to ship", to: "/use-cases#purchasing" },
+  { title: "Read invoices and POs, match them, flag the gaps", img: "/images/invoices-and-finance-documents.webp", alt: "Invoices and finance documents on a desk", to: "/use-cases#finance" },
+  { title: "Send every action to the right person to approve", img: "/images/point-of-sale-checkout-tablet.webp", alt: "Store employee using a point-of-sale tablet at checkout", to: "/use-cases#approvals" },
 ];
 
-/** Film-grain texture (SVG noise), tiled over the hero backdrop. */
-const HERO_GRAIN =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+const FAQ_TEASER_IDS = [1, 2, 5, 10];
 
-function HeroVideoFrame({ reduceMotion }: { reduceMotion: boolean }) {
-  const [failed, setFailed] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [muted, setMuted] = useState(true);
-  const [clock, setClock] = useState({ cur: 0, dur: 0 });
-  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
-  const userPaused = useRef(false);
-  const inView = useInView(frameRef, { amount: 0.3 });
-
-  // Autoplay (muted) while visible, pause when scrolled away. A manual pause is respected.
-  useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (inView && !reduceMotion && !userPaused.current) v.play().catch(() => undefined);
-    else v.pause();
-  }, [inView, reduceMotion, failed]);
-
-  const toggle = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) {
-      userPaused.current = false;
-      v.play().catch(() => undefined);
-    } else {
-      userPaused.current = true;
-      v.pause();
-    }
-  };
-
-  const skip = (delta: number) => {
-    const v = videoRef.current;
-    if (!v || !v.duration) return;
-    v.currentTime = Math.min(v.duration, Math.max(0, v.currentTime + delta));
-  };
-
-  const toggleMute = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = !v.muted;
-    setMuted(v.muted);
-  };
-
-  const fullscreen = () => {
-    const el = videoRef.current?.parentElement;
-    if (!el) return;
-    if (document.fullscreenElement) void document.exitFullscreen();
-    else void el.requestFullscreen?.();
-  };
-
-  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const v = videoRef.current;
-    if (!v || !v.duration) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    v.currentTime = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * v.duration;
-  };
-
+function SectionTitle({ children, className = "", as: Tag = "h2" }: { children: React.ReactNode; className?: string; as?: "h2" | "h3" }) {
   return (
-    <div ref={frameRef} className="relative">
-      <div className="relative overflow-hidden rounded-[20px] border border-[#E7E5E1] bg-white shadow-[0_30px_90px_-40px_rgba(17,17,19,0.45)]">
-        {/* window chrome */}
-        <div className="relative flex h-11 items-center border-b border-[#E4E6E9] bg-[#EEF0F2] px-4 sm:h-[52px] sm:px-5" aria-hidden="true">
-          <div className="flex items-center gap-2">
-            <span className="h-3 w-3 rounded-full bg-[#FF5F57]" />
-            <span className="h-3 w-3 rounded-full bg-[#FEBC2E]" />
-            <span className="h-3 w-3 rounded-full bg-[#28C840]" />
-          </div>
-          <span className="absolute left-1/2 top-1/2 flex h-7 w-[46%] max-w-[380px] -translate-x-1/2 -translate-y-1/2 items-center justify-center truncate rounded-lg border border-[#E1E3E6] bg-white px-3 text-[12px] text-[#5f5c57] sm:h-8 sm:text-[14px]">
-            SCIO command center
-          </span>
-        </div>
-        <div className="relative aspect-[16/9] w-full bg-[#FAFAF9]">
-          {failed ? (
-            <div className="absolute inset-0 flex items-start justify-center overflow-hidden p-4 sm:p-8">
-              <div className="w-full max-w-[860px]">
-                <HeroCommandCenter />
-              </div>
-            </div>
-          ) : (
-            <>
-              <video
-                ref={videoRef}
-                className="absolute inset-0 h-full w-full cursor-pointer object-cover"
-                muted
-                loop
-                playsInline
-                preload="metadata"
-                poster={HERO_VIDEO.poster}
-                aria-label="Product demo: SCIO turning a detected issue into an approved action"
-                onClick={toggle}
-                onPlay={() => setPlaying(true)}
-                onPause={() => setPlaying(false)}
-                onTimeUpdate={(e) => {
-                  const v = e.currentTarget;
-                  if (v.duration) {
-                    setProgress(v.currentTime / v.duration);
-                    setClock({ cur: v.currentTime, dur: v.duration });
-                  }
-                }}
-                onLoadedMetadata={(e) => setClock({ cur: 0, dur: e.currentTarget.duration })}
-                onError={() => setFailed(true)}
-              >
-                <source src={HERO_VIDEO.mp4} type="video/mp4" onError={() => setFailed(true)} />
-              </video>
-
-              {/* Big play button while paused */}
-              {!playing && (
-                <button
-                  type="button"
-                  onClick={toggle}
-                  aria-label="Play demo video"
-                  className="absolute inset-0 z-20 flex cursor-pointer items-center justify-center bg-black/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F2A93B]"
-                >
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#111113] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] transition-transform duration-200 hover:scale-105 sm:h-20 sm:w-20">
-                    <Play className="ml-1 h-7 w-7 fill-current sm:h-8 sm:w-8" aria-hidden="true" />
-                  </span>
-                </button>
-              )}
-
-              {/* Controls */}
-              <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col bg-gradient-to-t from-black/70 to-transparent px-3 pb-2 pt-10 sm:px-4">
-                <div
-                  className="group flex h-5 w-full cursor-pointer items-center"
-                  onClick={seek}
-                  role="progressbar"
-                  aria-label="Video progress"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={Math.round(progress * 100)}
-                >
-                  <div className="relative h-[3px] w-full rounded-full bg-white/30">
-                    <div className="absolute inset-y-0 left-0 rounded-full bg-[#3B82F6]" style={{ width: `${progress * 100}%` }} />
-                    <div className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow" style={{ left: `${progress * 100}%` }} />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 sm:gap-2">
-                <button
-                  type="button"
-                  onClick={toggle}
-                  aria-label={playing ? "Pause video" : "Play video"}
-                  className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
-                >
-                  {playing ? <Pause className="h-5 w-5 fill-current" aria-hidden="true" /> : <Play className="h-5 w-5 fill-current" aria-hidden="true" />}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => skip(-5)}
-                  aria-label="Back 5 seconds"
-                  className="relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
-                >
-                  <RotateCcw className="h-[22px] w-[22px]" aria-hidden="true" />
-                  <span className="absolute text-[8px] font-bold leading-none" aria-hidden="true">5</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => skip(5)}
-                  aria-label="Forward 5 seconds"
-                  className="relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
-                >
-                  <RotateCw className="h-[22px] w-[22px]" aria-hidden="true" />
-                  <span className="absolute text-[8px] font-bold leading-none" aria-hidden="true">5</span>
-                </button>
-                <span className="ml-1 font-mono text-[13px] tabular-nums text-white">
-                  {fmt(clock.cur)} <span className="text-white/60">/ {fmt(clock.dur)}</span>
-                </span>
-                <span className="flex-1" />
-                <button
-                  type="button"
-                  onClick={toggleMute}
-                  aria-label={muted ? "Unmute video" : "Mute video"}
-                  aria-pressed={!muted}
-                  className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
-                >
-                  {muted ? <VolumeX className="h-5 w-5" aria-hidden="true" /> : <Volume2 className="h-5 w-5" aria-hidden="true" />}
-                </button>
-                <button
-                  type="button"
-                  onClick={fullscreen}
-                  aria-label="Toggle full screen"
-                  className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-white hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]"
-                >
-                  <Maximize2 className="h-[18px] w-[18px]" aria-hidden="true" />
-                </button>
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
+    <Tag
+      className={`font-display font-bold text-[#111113] text-balance ${className}`}
+      style={{ fontSize: "clamp(32px, 4.4vw, 56px)", lineHeight: 1.05, letterSpacing: "-0.035em" }}
+    >
+      {children}
+    </Tag>
   );
 }
 
@@ -296,121 +93,75 @@ export default function HomePage() {
   });
 
   const { openDemo } = useSite();
-  const reduceMotion = useReducedMotion();
+  const railRef = useRef<HTMLDivElement>(null);
   const [openFaq, setOpenFaq] = useState<number | null>(FAQ_TEASER_IDS[0]);
   const faqs = ENTERPRISE_QUESTIONS_DATA.filter((f) => FAQ_TEASER_IDS.includes(f.id));
+
+  const scrollRail = (dir: 1 | -1) => {
+    const el = railRef.current;
+    if (el) el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.8, 480), behavior: "smooth" });
+  };
 
   return (
     <>
       {/* ===== 1. Hero ===== */}
-      <section
-        id="top"
-        className="relative isolate overflow-hidden bg-white -mt-[var(--nav-offset)] pt-[var(--nav-offset)]"
-        aria-labelledby="hero-heading"
-      >
-        {/* Backdrop: the three places SCIO runs (store floor, warehouse, checkout) blended into one
-            photo, under a textured black layer. It starts at the very top (the fixed header sits over it)
-            and ends just past the top of the product frame, so the video overlaps its bottom edge. */}
-        <div
-          aria-hidden="true"
-          className="theme-fixed pointer-events-none absolute inset-x-2 top-2 -z-10 overflow-hidden rounded-[20px] bg-[#0E0F11] sm:inset-x-4 sm:rounded-[28px] lg:inset-x-5 bottom-[calc(min(1080px,100vw_-_32px)*0.47_+_64px)] sm:bottom-[calc(min(1080px,100vw_-_48px)*0.47_+_96px)]"
-        >
-          {/* Photo blend: store (left), warehouse (centre), checkout (right), feathered into each other */}
-          <div className="absolute inset-0 [filter:grayscale(0.55)_contrast(1.05)]">
-            {HERO_BACKDROP.map((p) => (
-              <img
-                key={p.src}
-                src={p.src}
-                alt=""
-                loading="eager"
-                decoding="async"
-                className={`absolute inset-y-0 h-full object-cover ${p.cls}`}
-                style={{ maskImage: p.mask, WebkitMaskImage: p.mask }}
-              />
-            ))}
-          </div>
-          {/* Black layer */}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,11,13,0.74)_0%,rgba(10,11,13,0.58)_45%,rgba(10,11,13,0.8)_100%)]" />
-          {/* Texture: fine grid + film grain */}
-          <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,0.9)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.9)_1px,transparent_1px)] [background-size:56px_56px]" style={{ maskImage: "radial-gradient(ellipse 75% 70% at 50% 40%, black, transparent)", WebkitMaskImage: "radial-gradient(ellipse 75% 70% at 50% 40%, black, transparent)" }} />
-          <div className="absolute inset-0 opacity-[0.22] mix-blend-overlay" style={{ backgroundImage: HERO_GRAIN, backgroundSize: "180px 180px" }} />
-          {/* Edge vignette + a faint gold glow behind the headline */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_40%,transparent_45%,rgba(0,0,0,0.55)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_32%,rgba(242,169,59,0.09),transparent_70%)]" />
-        </div>
-
-        <div className={`${SITE_SHELL} pb-16 pt-14 sm:pb-24 sm:pt-20 lg:pt-24`}>
-          <motion.div
-            className="theme-fixed mx-auto flex max-w-[1120px] flex-col items-center text-center"
-            initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <h1
-              id="hero-heading"
-              className="font-display text-balance"
-              style={{ fontSize: "clamp(34px, 5.2vw, 72px)", lineHeight: 1.14, letterSpacing: "-0.03em", fontWeight: 500 }}
-            >
-              <span className="block text-white">The AI business operating system</span>{" "}
-              <span className="mt-1 block text-white sm:mt-2">for ERP, POS &amp; inventory.</span>
-            </h1>
-            <p className="mt-7 max-w-[40rem] text-[17px] sm:text-[20px] leading-[1.6] text-[#E4E2DE] text-balance">
-              Connect your ERP, POS, warehouse, HR and finance tools. Spot problems early. Approve every fix in one place.
+      <section id="top" className="relative overflow-hidden bg-white">
+        <div className={`${SITE_SHELL} pt-12 pb-14 sm:pt-16 sm:pb-20 grid gap-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14 lg:items-center`}>
+          <div>
+            <p className="flex items-center gap-4 text-[13px] font-semibold uppercase tracking-[0.16em] text-[#E0900F]">
+              AI business operating system
+              <span className="h-px w-12 bg-[#E0900F]" aria-hidden="true" />
             </p>
-            <div className="mt-9 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-              <button
-                type="button"
-                onClick={openDemo}
-                className="group inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-full bg-white px-7 text-[15px] font-semibold text-[#111113] transition duration-200 hover:bg-[#F2EFEA] active:scale-[0.98] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#16171A] sm:w-auto"
-              >
-                Book a demo
-                <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
-              </button>
+            <h1
+              className="mt-6 font-display font-bold text-[#111113] text-balance"
+              style={{ fontSize: "clamp(40px, 4.6vw, 68px)", lineHeight: 1.04, letterSpacing: "-0.045em" }}
+            >
+              Your systems are connected. Now connect <span className="text-[#F2A93B]">the decisions.</span>
+            </h1>
+            <p className="mt-7 max-w-[52ch] text-[18px] sm:text-[20px] leading-relaxed text-[#4a4843]">
+              SCIO connects ERP, POS, warehouse, HR, and finance tools, surfaces operational issues, and turns insights into approved actions.
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <PrimaryButton onClick={openDemo}>Book a demo</PrimaryButton>
               <Link
                 to="/platform#how-it-works"
-                className="group inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-full border border-white/35 bg-white/[0.06] px-7 text-[15px] font-semibold text-white backdrop-blur-sm transition duration-200 hover:border-white/70 hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-2 focus-visible:ring-offset-[#16171A] sm:w-auto"
+                className="group inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full border border-[#D6D3CE] text-[15px] font-semibold text-[#111113] hover:border-[#111113] transition-colors"
               >
-                <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
                 See how it works
+                <Play className="h-4 w-4 fill-current" aria-hidden="true" />
               </Link>
             </div>
-          </motion.div>
-
-          {/* Product frame: plays the hero video; falls back to the interactive-looking dashboard mockup */}
-          <motion.div
-            className="relative mx-auto mt-12 max-w-[1080px] sm:mt-16"
-            initial={reduceMotion ? false : { opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          >
-            {/* Invitation to watch, as a sentence above the frame (nothing drawn over the video) */}
-            <p className="theme-fixed mb-5 flex items-center justify-center gap-2.5 text-center text-[15px] text-[#D9D6D0] sm:mb-6 sm:text-[16px]">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FFF4E2] text-[#B06D0F]" aria-hidden="true">
-                <Play className="ml-0.5 h-3 w-3 fill-current" />
-              </span>
-              <span>
-                <span className="font-semibold text-white">See how SCIO works</span>
-                <span className="hidden sm:inline">: a tour of the real product in under 4 minutes.</span>
-                <span className="sm:hidden">: a tour in under 4 minutes.</span>
-              </span>
-            </p>
-            <HeroVideoFrame reduceMotion={!!reduceMotion} />
-          </motion.div>
+            <ul className="mt-9 flex flex-wrap items-center gap-x-4 gap-y-3 text-[13.5px] text-[#3a3936]">
+              {["Works with your existing systems", "From insight to action", "Enterprise-ready & secure"].map((t) => (
+                <li key={t} className="inline-flex items-center gap-2">
+                  <span className="h-[18px] w-[18px] rounded-full bg-[#F2A93B] text-white flex items-center justify-center">
+                    <Check className="h-3 w-3" strokeWidth={3.5} aria-hidden="true" />
+                  </span>
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <HeroCommandCenter />
         </div>
       </section>
 
       {/* ===== 2. Systems strip ===== */}
       <section className="bg-white" aria-labelledby="systems-heading">
-        <div className={`${SITE_SHELL} pt-16 pb-20 sm:pt-20 sm:pb-24`}>
-          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-            <Eyebrow>Connected systems</Eyebrow>
-            <SectionHeading id="systems-heading" className="mt-4">
+        <div className={`${SITE_SHELL} pb-20 sm:pb-24`}>
+          <div className="flex items-center gap-6">
+            <span className="h-px flex-1 bg-[#E7E5E1]" aria-hidden="true" />
+            <h2 id="systems-heading" className="text-center text-[13px] sm:text-[14px] font-medium uppercase tracking-[0.16em] text-[#3a3936]">
               Works on top of the systems you already run
-            </SectionHeading>
+            </h2>
+            <span className="h-px flex-1 bg-[#E7E5E1]" aria-hidden="true" />
           </div>
           <SystemsHub />
         </div>
       </section>
+
+      {/* ===== Scroll-driven Command Center tour ===== */}
+      <ScrollShowcase />
 
       {/* ===== Real product screenshots ===== */}
       <ProductShowcase />
@@ -436,10 +187,73 @@ export default function HomePage() {
         </div>
       </section>
 
-      <WatchItWork />
+      {/* ===== 4. Use cases carousel ===== */}
+      <section id="use-cases" className="bg-[#F6F5F3] border-y border-[#E7E5E1]">
+        <div className={`${SITE_SHELL} pt-20 sm:pt-28 pb-10`}>
+          {/* Product walkthrough (real screens, animated cursor) */}
+          <div className="mb-20 sm:mb-28 grid gap-10 lg:grid-cols-[0.62fr_1.38fr] lg:items-center">
+            <div>
+              <Eyebrow>Watch it work</Eyebrow>
+              <SectionTitle className="mt-4">From issue to approved action in four clicks</SectionTitle>
+              <ol className="mt-8 space-y-4 text-[16px] text-[#4a4843]">
+                {[
+                  "See today's priorities, ranked by money at stake",
+                  "Find where money is leaking, across every system",
+                  "Ask why, and approve the fix SCIO drafts",
+                  "Know every figure comes from a connected source",
+                ].map((t, i) => (
+                  <li key={t} className="flex gap-3">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#111113] text-[13px] font-semibold text-white">{i + 1}</span>
+                    <span className="pt-0.5">{t}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <ProductDemo />
+          </div>
 
-      {/* ===== 4. Use cases (tabbed) ===== */}
-      <UseCasesTabs />
+          <div className="flex items-end justify-between gap-6">
+            <div>
+              <Eyebrow>Use cases</Eyebrow>
+              <SectionTitle className="mt-4 max-w-2xl">Built for the work that runs your business</SectionTitle>
+            </div>
+            <div className="hidden sm:flex gap-2 shrink-0">
+              <button type="button" aria-label="Previous use case" onClick={() => scrollRail(-1)} className="h-12 w-12 rounded-full border border-[#D6D3CE] bg-white flex items-center justify-center hover:border-[#111113] cursor-pointer">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <button type="button" aria-label="Next use case" onClick={() => scrollRail(1)} className="h-12 w-12 rounded-full border border-[#D6D3CE] bg-white flex items-center justify-center hover:border-[#111113] cursor-pointer">
+                <ArrowRight className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+        <div
+          ref={railRef}
+          className="flex gap-5 overflow-x-auto snap-x snap-mandatory pb-20 sm:pb-28 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={{
+            paddingLeft: "max(1rem, calc((100vw - 1320px) / 2 + 2.5rem))",
+            scrollPaddingLeft: "max(1rem, calc((100vw - 1320px) / 2 + 2.5rem))",
+            paddingRight: "1rem",
+          }}
+        >
+          {USE_CASE_CARDS.map((r) => (
+            <Link
+              key={r.title}
+              to={r.to}
+              className="group relative shrink-0 snap-start w-[80vw] sm:w-[400px] aspect-[4/5] overflow-hidden rounded-3xl bg-[#111113]"
+            >
+              <img src={r.img} alt={r.alt} loading="lazy" width={900} height={1125} className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-7">
+                <h3 className="font-display font-semibold text-white text-[24px] leading-tight">{r.title}</h3>
+                <span className="mt-5 inline-flex items-center gap-1.5 text-[14px] font-semibold text-white/85 group-hover:text-[#f2a93b]">
+                  Learn more <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* ===== 5. How it works ===== */}
       <section id="how-it-works" className="bg-white">
@@ -471,12 +285,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== Market positioning: SCIO vs other tool categories ===== */}
-      <PositioningCompare />
-
       {/* ===== 6. Control & governance ===== */}
       <section id="governance" className="bg-white">
-        <div className={`${SITE_SHELL} py-20 sm:py-28`}>
+        <div className={`${SITE_SHELL} pb-20 sm:pb-28`}>
           <SectionTitle>Built for control and governance</SectionTitle>
           <div className="mt-12 grid gap-5 lg:grid-cols-2">
             {[
@@ -550,10 +361,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== 8. Trusted platforms ===== */}
-      <TrustedPlatforms />
-
-      {/* ===== 9. Let's connect ===== */}
+      {/* ===== 8. Let's connect ===== */}
       <ConnectBand />
     </>
   );

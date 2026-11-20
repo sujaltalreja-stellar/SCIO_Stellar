@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { SITE_SHELL } from "../site/SiteLayout";
 import { Eyebrow } from "../site/blocks";
 
@@ -14,18 +14,18 @@ const POINTS = [
   { x: 8, y: 80, title: "Every system connected", body: "ERP, POS, WMS, CRM and more feed one picture. Nothing is re-entered." },
 ];
 
-const START = 0.2; // when the first callout appears
-const STEP = 0.15; // scroll distance between callouts
+const START = 0.22; // when the first callout appears
+const STEP = 0.13; // scroll distance between callouts
 
 function Hotspot({ i, progress, still }: { i: number; progress: MotionValue<number>; still: boolean }) {
   const p = POINTS[i];
   const s = START + i * STEP;
   const last = i === POINTS.length - 1;
-  const opacity = useTransform(progress, [s - 0.02, s + 0.03], [0, 1]);
-  const scale = useTransform(progress, [s - 0.02, s + 0.03], [0.6, 1]);
+  const opacity = useTransform(progress, [s, s + 0.04], [0, 1]);
+  const scale = useTransform(progress, [s, s + 0.04], [0.6, 1]);
   // Only the current step shows its card; earlier steps keep just the dot.
-  const cardOpacity = useTransform(progress, last ? [s, s + 0.05] : [s, s + 0.05, s + STEP - 0.04, s + STEP], last ? [0, 1] : [0, 1, 1, 0]);
-  const cardY = useTransform(progress, last ? [s, s + 0.05] : [s, s + 0.05, s + STEP - 0.04, s + STEP], last ? [14, 0] : [14, 0, 0, -10]);
+  const cardOpacity = useTransform(progress, last ? [s, s + 0.04] : [s, s + 0.04, s + STEP - 0.02, s + STEP], last ? [0, 1] : [0, 1, 1, 0]);
+  const cardY = useTransform(progress, [s, s + 0.04], [10, 0]);
   const cardLeft = p.x > 50;
 
   return (
@@ -34,12 +34,12 @@ function Hotspot({ i, progress, still }: { i: number; progress: MotionValue<numb
       style={{ left: `${p.x}%`, top: `${p.y}%`, opacity: still ? 1 : opacity, scale: still ? 1 : scale }}
     >
       <span className="relative -translate-x-1/2 -translate-y-1/2 flex h-5 w-5">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F2A93B] opacity-60 motion-reduce:animate-none" />
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F2A93B] opacity-60" />
         <span className="relative inline-flex h-5 w-5 rounded-full border-[3px] border-white bg-[#F2A93B] shadow-md" />
       </span>
       <motion.div
         style={{ opacity: still ? 1 : cardOpacity, y: still ? 0 : cardY }}
-        className={`hidden md:block absolute -top-6 w-[260px] z-10 rounded-2xl border border-white/10 bg-[#111113]/95 p-4 text-left text-white shadow-[0_24px_60px_-18px_rgba(0,0,0,0.6)] backdrop-blur ${
+        className={`hidden md:block absolute -top-6 w-[240px] z-10 rounded-xl bg-[#111113] p-4 text-left text-white shadow-2xl ${
           cardLeft ? "right-6" : "left-6"
         }`}
       >
@@ -56,12 +56,10 @@ export default function ScrollShowcase() {
   const still = !!useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
-  // Spring-smoothed progress removes the jitter of raw wheel/trackpad scrolling.
-  const smooth = useSpring(scrollYProgress, { stiffness: 110, damping: 28, mass: 0.4, restDelta: 0.0005 });
-  const scale = useTransform(smooth, [0, 0.16], [0.9, 1]);
-  const rotateX = useTransform(smooth, [0, 0.16], [12, 0]);
-  const y = useTransform(smooth, [0, 0.16], [40, 0]);
-  const headOpacity = useTransform(smooth, [0, 0.14], [1, 0.55]);
+  const scale = useTransform(scrollYProgress, [0, 0.2], [0.82, 1]);
+  const rotateX = useTransform(scrollYProgress, [0, 0.2], [22, 0]);
+  const y = useTransform(scrollYProgress, [0, 0.2], [60, 0]);
+  const headOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0.35]);
 
   // Which callout is active (for the mobile caption under the screenshot).
   const [active, setActive] = useState(-1);
@@ -71,14 +69,14 @@ export default function ScrollShowcase() {
   });
 
   return (
-    <section id="command-center-tour" ref={ref} className="relative bg-white" style={{ height: still ? "auto" : "420vh" }} aria-labelledby="scroll-showcase-heading">
+    <section id="command-center-tour" ref={ref} className="relative bg-white" style={{ height: still ? "auto" : "360vh" }} aria-labelledby="scroll-showcase-heading">
       <div className={`${still ? "" : "sticky top-[72px] h-[calc(100vh-72px)]"} flex flex-col items-center justify-center overflow-hidden py-6`}>
         <motion.div style={{ opacity: still ? 1 : headOpacity }} className={`${SITE_SHELL} text-center`}>
           <Eyebrow>Command Center</Eyebrow>
           <h2
             id="scroll-showcase-heading"
-            className="mx-auto mt-3 max-w-4xl font-display font-bold text-[#111113] text-balance"
-            style={{ fontSize: "clamp(28px, 4.2vw, 52px)", lineHeight: 1.15, letterSpacing: "-0.025em", wordSpacing: "0.1em" }}
+            className="mx-auto mt-3 max-w-3xl font-display font-bold text-[#111113] text-balance"
+            style={{ fontSize: "clamp(28px, 3.6vw, 46px)", lineHeight: 1.08, letterSpacing: "-0.035em" }}
           >
             Your whole business, on one screen
           </h2>
@@ -106,7 +104,7 @@ export default function ScrollShowcase() {
                   className="block h-auto w-full"
                 />
                 {POINTS.map((_, i) => (
-                  <Hotspot key={i} i={i} progress={smooth} still={still} />
+                  <Hotspot key={i} i={i} progress={scrollYProgress} still={still} />
                 ))}
               </div>
             </div>
@@ -126,7 +124,7 @@ export default function ScrollShowcase() {
         {!still && (
           <div className="mt-4 flex gap-2" aria-hidden="true">
             {POINTS.map((_, i) => (
-              <span key={i} className={`h-1.5 rounded-full transition-all duration-300 ease-out ${i <= active ? "w-6 bg-[#F2A93B]" : "w-1.5 bg-[#D6D3CE]"}`} />
+              <span key={i} className={`h-1.5 rounded-full transition-all ${i <= active ? "w-6 bg-[#F2A93B]" : "w-1.5 bg-[#D6D3CE]"}`} />
             ))}
           </div>
         )}
