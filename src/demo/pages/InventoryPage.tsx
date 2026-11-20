@@ -24,7 +24,9 @@ export default function InventoryPage({ mode = "inventory" }: { mode?: "inventor
   const ds = useDataset();
   const { request } = useApproval();
   const [tab, setTab] = useState<Tab>(mode === "procurement" ? "suppliers" : "plan");
-  useEffect(() => setTab(mode === "procurement" ? "suppliers" : "plan"), [mode]);
+  useEffect(() => {
+    setTab(mode === "procurement" ? "suppliers" : "plan");
+  }, [mode]);
   const [ordered, setOrdered] = useState<Record<string, string>>({});
 
   const m = useMemo(() => {

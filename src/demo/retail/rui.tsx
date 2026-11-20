@@ -184,7 +184,9 @@ export function DataGrid<T>({
     return r;
   }, [rows, q, sort, columns, search]);
 
-  useEffect(() => setPage(0), [q, rows.length]);
+  useEffect(() => {
+    setPage(0);
+  }, [q, rows.length]);
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const view = filtered.slice(page * pageSize, page * pageSize + pageSize);
 
