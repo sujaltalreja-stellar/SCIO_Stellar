@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 export const SITE_URL = "https://www.stellarscio.app";
-const DEFAULT_IMAGE = `${SITE_URL}/thumbnail.png?v=2`;
+const DEFAULT_IMAGE = `${SITE_URL}/thumbnail.png?v=3`;
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
