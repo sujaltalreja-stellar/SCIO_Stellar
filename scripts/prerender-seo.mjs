@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist");
 const SITE = "https://www.stellarscio.app";
-const DEFAULT_IMAGE = "/thumbnail.png?v=2";
+const DEFAULT_IMAGE = "/thumbnail.png?v=3";
 
 // Keep in sync with the useSeo() calls and PageHero copy in src/app/site/pages.tsx and HomePage.tsx.
 const ROUTES = [
