@@ -162,8 +162,13 @@ function staticBody(route, faq) {
   return `<div class="scio-static"><header><a href="/">Stellar SCIO</a></header><main><h1>${esc(route.h1)}</h1><p>${esc(route.intro)}</p>${points}${faqHtml}<nav aria-label="Site"><ul>${nav}</ul></nav></main></div>`;
 }
 
-// Shown only until React renders (normally a fraction of a second). Plain, readable, on-brand.
-const STATIC_CSS = `<style>.scio-static{max-width:760px;margin:0 auto;padding:96px 20px 64px;font:400 17px/1.6 Inter,system-ui,sans-serif;color:#4a4843;background:#fff}.scio-static header a{font-weight:700;color:#111113;text-decoration:none}.scio-static h1{margin:40px 0 16px;font-size:clamp(30px,5vw,52px);line-height:1.15;letter-spacing:-.03em;font-weight:500;color:#111113}.scio-static h2{margin:40px 0 8px;font-size:22px;color:#111113}.scio-static h3{margin:24px 0 4px;font-size:17px;color:#111113}.scio-static nav ul{display:flex;flex-wrap:wrap;gap:8px 20px;padding:0;list-style:none;margin-top:40px}.scio-static a{color:#111113}html[data-site-theme="dark"] .scio-static{background:#111113;color:#A39F98}html[data-site-theme="dark"] .scio-static :is(h1,h2,h3,a){color:#F5F4F1}</style>`;
+// The plain-text copy of each page is for crawlers, AI answer engines and screen readers. It stays in
+// the HTML but is visually hidden, so a refresh shows the normal loading background (instead of a page
+// of plain text) until React renders and replaces everything inside #root.
+const STATIC_CSS = `<style>.scio-static{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}</style>`;
+
+// Visitors with JavaScript turned off get the plain-text copy as a readable page instead of a blank one.
+const NOSCRIPT_CSS = `<noscript><style>.scio-boot{display:none!important}.scio-static{position:static!important;width:auto;height:auto;margin:0 auto;overflow:visible;clip:auto;clip-path:none;white-space:normal;max-width:760px;padding:96px 20px 64px;font:400 17px/1.6 Inter,system-ui,sans-serif;color:#4a4843;background:#fff}.scio-static header a{font-weight:700;color:#111113;text-decoration:none}.scio-static h1{margin:40px 0 16px;font-size:clamp(30px,5vw,52px);line-height:1.15;letter-spacing:-.03em;font-weight:500;color:#111113}.scio-static h2{margin:40px 0 8px;font-size:22px;color:#111113}.scio-static h3{margin:24px 0 4px;font-size:17px;color:#111113}.scio-static nav ul{display:flex;flex-wrap:wrap;gap:8px 20px;padding:0;list-style:none;margin-top:40px}.scio-static a{color:#111113}</style></noscript>`;
 
 function build() {
   const shell = readFileSync(join(DIST, "index.html"), "utf8");
@@ -187,8 +192,10 @@ function build() {
       // Page-specific images are not 1200x630, so drop the default's fixed dimensions.
       html = html.replace(/\s*<meta property="og:image:(width|height)" content="\d+"\s*\/?>/g, "");
     }
-    html = html.replace("</head>", `    ${jsonLd(route, faq)}\n    ${STATIC_CSS}\n  </head>`);
-    html = setTag(html, /<div class="scio-boot"[^>]*>[\s\S]*?<\/div>/, staticBody(route, faq), "boot placeholder");
+    html = html.replace("</head>", `    ${jsonLd(route, faq)}\n    ${STATIC_CSS}\n    ${NOSCRIPT_CSS}\n  </head>`);
+    // Keep the loading placeholder on screen and put the hidden plain-text copy right after it. Both sit
+    // inside #root, so React replaces them together on its first render.
+    html = setTag(html, /<div class="scio-boot"[^>]*>[\s\S]*?<\/div>/, (boot) => `${boot}${staticBody(route, faq)}`, "boot placeholder");
 
     const out = route.path === "/" ? join(DIST, "index.html") : join(DIST, `${route.path.slice(1)}.html`);
     mkdirSync(dirname(out), { recursive: true });
