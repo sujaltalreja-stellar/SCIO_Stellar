@@ -29,7 +29,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: "Integrations", desc: "ERP, POS, WMS, HRMS, CRM and more", href: "/platform/integrations" },
       { label: "Security & governance", desc: "Your infrastructure, your approvals", href: "/platform#governance" },
     ],
-    footer: { label: "Open SCIO", href: "/app" },
+    footer: { label: "Try live demo", href: "/app" },
   },
   {
     label: "Use cases",
@@ -54,7 +54,7 @@ export const FOOTER_COLUMNS: NavGroup[] = [
       { label: "How it works", href: "/platform#how-it-works" },
       { label: "Integrations", href: "/platform/integrations" },
       { label: "Security", href: "/platform#governance" },
-      { label: "Open SCIO", href: "/app" },
+      { label: "Try live demo", href: "/app" },
     ],
   },
   {

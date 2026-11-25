@@ -33,6 +33,9 @@ import { ENTERPRISE_QUESTIONS_DATA } from "../site/faqData";
 import HeroCommandCenter from "./HeroCommandCenter";
 import ProductShowcase from "./ProductShowcase";
 import SystemsHub from "./SystemsHub";
+import ErpTrust from "./ErpTrust";
+import Industries from "./Industries";
+import StaffAugmentation from "./StaffAugmentation";
 import UseCasesTabs from "./UseCasesTabs";
 import WatchItWork from "./WatchItWork";
 import TrustedPlatforms from "./TrustedPlatforms";
@@ -79,17 +82,22 @@ function SectionTitle({ children, className = "", as = "h2" }: { children: React
 /** Drop the demo recording at /public/videos/hero-demo.mp4 (and optionally hero-demo.webm + hero-poster.webp). */
 const HERO_VIDEO = { mp4: "/videos/hero-demo.mp4", poster: "/videos/hero-poster.webp" };
 
-/** Hero backdrop photos: the store floor, the warehouse and the checkout, side by side and
- *  feathered so they read as one scene. */
-const HERO_BACKDROP = [
-  { src: "/images/multi-store-retail-shop.webp", cls: "left-0 w-[46%] object-[50%_40%]", mask: "linear-gradient(90deg, black 55%, transparent 100%)" },
-  { src: "/images/warehouse-inventory-shelves.webp", cls: "left-[28%] w-[44%] object-[50%_55%]", mask: "linear-gradient(90deg, transparent 0%, black 28%, black 72%, transparent 100%)" },
-  { src: "/images/point-of-sale-checkout-tablet.webp", cls: "right-0 w-[46%] object-[40%_60%]", mask: "linear-gradient(270deg, black 55%, transparent 100%)" },
+/** The five use cases as the hero background: five slanted photo panels side by side, one per tab in
+ *  "Start with one problem" (Inventory, Sales, Purchasing, Finance, Approvals). Full colour. */
+const HERO_SLICES = [
+  // Photos: Pexels (free for commercial use, no attribution required). IDs for reference:
+  // Inventory 4484078, Sales 36730427, Purchasing 34585121 (forklift unloading a supplier truck), Finance 8296970, Approvals 8729721 (manager signing)
+  { label: "Inventory", src: "/images/hero-inventory.webp", pos: "50% 40%" },
+  { label: "Sales", src: "/images/hero-sales.webp", pos: "30% 45%" },
+  { label: "Purchasing", src: "/images/hero-purchasing.webp", pos: "45% 68%" },
+  { label: "Finance", src: "/images/hero-finance.webp", pos: "50% 50%" },
+  { label: "Approvals", src: "/images/hero-approvals.webp", pos: "48% 35%" },
 ];
 
-/** Film-grain texture (SVG noise), tiled over the hero backdrop. */
+/** Fine, neutral grain (SVG noise) tiled over the hero photos. Blended with "overlay" at low opacity so it adds
+ *  texture without draining the colour. */
 const HERO_GRAIN =
-  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
+  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1.7 0 0 0 -0.35 1.7 0 0 0 -0.35 1.7 0 0 0 -0.35 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
 function HeroVideoFrame({ reduceMotion }: { reduceMotion: boolean }) {
   const [failed, setFailed] = useState(false);
@@ -308,40 +316,66 @@ export default function HomePage() {
         className="relative isolate overflow-hidden bg-white -mt-[var(--nav-offset)] pt-[var(--nav-offset)]"
         aria-labelledby="hero-heading"
       >
-        {/* Backdrop: the three places SCIO runs (store floor, warehouse, checkout) blended into one
-            photo, under a textured black layer. It starts at the very top (the fixed header sits over it)
+        {/* Backdrop: the five use cases, one photo panel each, in full colour. It starts at the very top (the fixed header sits over it)
             and ends just past the top of the product frame, so the video overlaps its bottom edge. */}
         <div
           aria-hidden="true"
           className="theme-fixed pointer-events-none absolute inset-x-2 top-2 -z-10 overflow-hidden rounded-[20px] bg-[#0E0F11] sm:inset-x-4 sm:rounded-[28px] lg:inset-x-5 bottom-[calc(min(1080px,100vw_-_32px)*0.47_+_64px)] sm:bottom-[calc(min(1080px,100vw_-_48px)*0.47_+_96px)]"
         >
-          {/* Photo blend: store (left), warehouse (centre), checkout (right), feathered into each other */}
-          <div className="absolute inset-0 [filter:grayscale(0.55)_contrast(1.05)]">
-            {HERO_BACKDROP.map((p) => (
-              <img
-                key={p.src}
-                src={p.src}
-                alt=""
-                loading="eager"
-                decoding="async"
-                className={`absolute inset-y-0 h-full object-cover ${p.cls}`}
-                style={{ maskImage: p.mask, WebkitMaskImage: p.mask }}
-              />
+          {/* Five use-case panels. Phones: five stacked bands. From tablet width: slanted side-by-side panels that read as
+              one sweep, each photo counter-slanted to stay upright. */}
+          <div className="absolute inset-0 flex flex-col sm:-inset-x-[7%] sm:flex-row [filter:saturate(1.2)_contrast(1.04)]">
+            {HERO_SLICES.map((sl, i) => (
+              <div key={sl.label} className="relative flex-1 overflow-hidden border-t border-white/30 first:border-t-0 sm:-skew-x-[7deg] sm:border-l sm:border-t-0 sm:first:border-l-0">
+                <img
+                  src={sl.src}
+                  alt=""
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full max-w-none object-cover sm:right-auto sm:-left-[14%] sm:w-[128%] sm:skew-x-[7deg]"
+                  style={{ objectPosition: sl.pos }}
+                />
+              </div>
             ))}
           </div>
-          {/* Black layer */}
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(10,11,13,0.74)_0%,rgba(10,11,13,0.58)_45%,rgba(10,11,13,0.8)_100%)]" />
-          {/* Texture: fine grid + film grain */}
-          <div className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(rgba(255,255,255,0.9)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.9)_1px,transparent_1px)] [background-size:56px_56px]" style={{ maskImage: "radial-gradient(ellipse 75% 70% at 50% 40%, black, transparent)", WebkitMaskImage: "radial-gradient(ellipse 75% 70% at 50% 40%, black, transparent)" }} />
-          <div className="absolute inset-0 opacity-[0.22] mix-blend-overlay" style={{ backgroundImage: HERO_GRAIN, backgroundSize: "180px 180px" }} />
+          {/* Numbered labels: one row across the visible width, nudged right to sit in the middle of each slanted panel */}
+          <div className="absolute inset-x-0 top-[112px] z-[1] hidden translate-x-[1.5%] grid-cols-5 sm:grid lg:translate-x-[3%]">
+            {HERO_SLICES.map((sl, i) => (
+              <div key={sl.label} className="flex justify-center">
+                {/* Tag: a pulsing gold dot and the name, no box. Slides in one after another. */}
+                <motion.div
+                  initial={reduceMotion ? false : { opacity: 0, y: -12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.55, delay: 0.5 + i * 0.09, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center gap-2 lg:gap-2.5 [text-shadow:0_1px_12px_rgba(0,0,0,0.9),0_0_3px_rgba(0,0,0,0.7)]"
+                >
+                  <span aria-hidden="true" className="relative h-2 w-2 shrink-0 lg:h-2.5 lg:w-2.5">
+                    <span className="absolute inset-0 rounded-full bg-[#F2A93B] opacity-70 motion-safe:animate-ping" />
+                    <span className="absolute inset-0 rounded-full bg-[#F2A93B]" />
+                  </span>
+                  <span className="text-[12.5px] font-semibold leading-none tracking-tight text-white lg:text-[15px]">{sl.label}</span>
+                </motion.div>
+              </div>
+            ))}
+          </div>
+          {/* Black layer over all five photos so the text is easy to read (raise or lower the 0.58 to taste) */}
+          <div className="absolute inset-0 bg-[rgba(8,9,11,0.58)]" />
+          {/* Readability shade: light overall, a little darker at the top (header) and bottom, and a soft pool
+              of dark behind the headline. Photo colours stay visible everywhere else. */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,13,16,0.38)_0%,rgba(12,13,16,0.16)_40%,rgba(12,13,16,0.66)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_58%_44%_at_50%_36%,rgba(12,13,16,0.5),transparent_100%)]" />
+          {/* Phones: the text column is narrower than the photo, so shade a wider band behind it */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_105%_48%_at_50%_42%,rgba(12,13,16,0.6),transparent_100%)] sm:hidden" />
+          {/* Texture: fine grain over the photos (no grid) */}
+          <div className="absolute inset-0 opacity-[0.3] mix-blend-overlay" style={{ backgroundImage: HERO_GRAIN, backgroundSize: "220px 220px" }} />
           {/* Edge vignette + a faint gold glow behind the headline */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_40%,transparent_45%,rgba(0,0,0,0.55)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_32%,rgba(242,169,59,0.09),transparent_70%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_90%_80%_at_50%_40%,transparent_55%,rgba(0,0,0,0.28)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_45%_at_50%_32%,rgba(242,169,59,0.12),transparent_70%)]" />
         </div>
 
         <div className={`${SITE_SHELL} pb-16 pt-14 sm:pb-24 sm:pt-20 lg:pt-24`}>
           <motion.div
-            className="theme-fixed mx-auto flex max-w-[1120px] flex-col items-center text-center"
+            className="theme-fixed mx-auto flex max-w-[1120px] flex-col items-center text-center [text-shadow:0_2px_28px_rgba(0,0,0,0.45)]"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -412,26 +446,95 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== 2b. ERP and planning systems: trust ===== */}
+      <ErpTrust />
+
       {/* ===== Real product screenshots ===== */}
       <ProductShowcase />
 
       {/* ===== 3. Outcomes ===== */}
-      <section id="outcomes" className="bg-white">
-        <div className={`${SITE_SHELL} py-20 sm:py-28`}>
-          <SectionTitle className="max-w-3xl">Skip the dashboards. Just ask.</SectionTitle>
-          <p className="mt-5 max-w-[60ch] text-[18px] leading-relaxed text-[#4a4843]">
-            Your business already has the answers. They're just split across a dozen systems. SCIO brings them together so your team spends less time pulling reports and more time acting on them.
-          </p>
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {OUTCOMES.map((o) => (
-              <motion.div key={o.title} {...reveal} className="rounded-2xl border border-[#E7E5E1] bg-[#F6F5F3] p-7">
-                <span className="h-12 w-12 rounded-2xl bg-[#FFF4E2] text-[#B06D0F] flex items-center justify-center">
-                  <o.icon className="h-6 w-6" aria-hidden="true" />
-                </span>
-                <h3 className="mt-6 text-[20px] font-semibold text-[#111113]">{o.title}</h3>
-                <p className="mt-3 text-[15px] leading-relaxed text-[#5D5A54]">{o.body}</p>
+      <section id="outcomes" className="relative overflow-hidden bg-white">
+        {/* soft gold glow behind the chat window */}
+        <div aria-hidden="true" className="pointer-events-none absolute right-[-10%] top-1/2 h-[620px] w-[760px] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(242,169,59,0.2),transparent)]" />
+        <div className={`${SITE_SHELL} relative py-20 sm:py-28`}>
+          <div className="grid items-center gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10">
+            <div>
+              <SectionTitle className="max-w-3xl">Skip the dashboards. Just ask.</SectionTitle>
+              <p className="mt-5 max-w-[56ch] text-[18px] leading-relaxed text-[#4a4843]">
+                Your business already has the answers. They're just split across a dozen systems. SCIO brings them together so your team spends less time pulling reports and more time acting on them.
+              </p>
+              <ul className="mt-9 grid gap-3 sm:grid-cols-2">
+                {OUTCOMES.map((o, i) => (
+                  <motion.li
+                    key={o.title}
+                    initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                    className="rounded-2xl border border-[#E7E5E1] bg-[#F6F5F3] p-5"
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF4E2] text-[#B06D0F]">
+                      <o.icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="mt-4 text-[17px] font-semibold text-[#111113]">{o.title}</h3>
+                    <p className="mt-2 text-[14.5px] leading-relaxed text-[#5D5A54]">{o.body}</p>
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+
+            {/* The assistant, shown for real: an answer with the numbers, the reasons and actions ready to approve */}
+            <motion.div
+              {...reveal}
+              className="relative mx-auto w-full max-w-[680px] lg:max-w-none"
+            >
+              <div className="theme-fixed relative overflow-hidden rounded-[22px] border border-[#E7E5E1] bg-white shadow-[0_44px_90px_-40px_rgba(17,17,19,0.55)] lg:[transform:perspective(1600px)_rotateY(-6deg)_rotateX(2deg)]">
+                <div className="flex items-center gap-2 border-b border-[#E7E5E1] bg-[#F6F5F3] px-4 py-3">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
+                  <span className="ml-3 rounded-md bg-white px-3 py-1 text-[11.5px] text-[#6b6862] ring-1 ring-[#E7E5E1]">Ask SCIO</span>
+                </div>
+                <img
+                  src="/images/scio-ai-assistant-answer-with-approvals.webp"
+                  alt="SCIO's assistant answering why a store's sales dropped, with the numbers, the causes and two actions ready to approve"
+                  width={2160}
+                  height={1350}
+                  loading="lazy"
+                  decoding="async"
+                  className="block h-auto w-full"
+                />
+              </div>
+
+              {/* floating callouts taken from the screen */}
+              <motion.div
+                animate={reduceMotion ? undefined : { y: [0, -8, 0] }}
+                transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                className="theme-fixed absolute -left-3 top-[14%] hidden items-center gap-2.5 rounded-full border border-[#E7E5E1] bg-white py-2 pl-2 pr-4 shadow-[0_18px_40px_-18px_rgba(17,17,19,0.45)] sm:flex lg:-left-10"
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-[#111113] text-[12px] font-bold text-white">S</span>
+                <span className="text-[13.5px] font-semibold text-[#111113]">Checked 7 sources in 4 steps</span>
               </motion.div>
-            ))}
+              <motion.div
+                animate={reduceMotion ? undefined : { y: [0, 9, 0] }}
+                transition={{ duration: 6.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
+                className="theme-fixed absolute -right-2 top-[46%] hidden items-center gap-2.5 rounded-2xl border border-[#E7E5E1] bg-white px-4 py-2.5 shadow-[0_18px_40px_-18px_rgba(17,17,19,0.45)] sm:flex lg:-right-8"
+              >
+                <span className="h-2 w-2 rounded-full bg-[#F2A93B]" />
+                <span className="text-[13.5px] font-semibold text-[#111113]">2 actions ready for your approval</span>
+              </motion.div>
+              <motion.div
+                animate={reduceMotion ? undefined : { y: [0, -7, 0] }}
+                transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut", delay: 1.1 }}
+                className="theme-fixed absolute -bottom-5 left-[8%] hidden items-center gap-2.5 rounded-full border border-[#E7E5E1] bg-[#111113] px-4 py-2.5 text-white shadow-[0_18px_40px_-18px_rgba(17,17,19,0.6)] sm:flex lg:-left-4"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inset-0 rounded-full bg-[#34D399] opacity-70 motion-safe:animate-ping" />
+                  <span className="relative h-2 w-2 rounded-full bg-[#34D399]" />
+                </span>
+                <span className="text-[13.5px] font-medium">12 sources connected, all live</span>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -440,6 +543,12 @@ export default function HomePage() {
 
       {/* ===== 4. Use cases (tabbed) ===== */}
       <UseCasesTabs />
+
+      {/* ===== 4b. Industries ===== */}
+      <Industries />
+
+      {/* ===== 4c. Staff augmentation ===== */}
+      <StaffAugmentation />
 
       {/* ===== 5. How it works ===== */}
       <section id="how-it-works" className="bg-white">
