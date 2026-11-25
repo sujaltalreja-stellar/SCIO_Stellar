@@ -23,6 +23,7 @@ import {
   Zap,
 } from "lucide-react";
 import { DEMO_ACCOUNTS, useDemoAuth } from "../auth";
+import { StellarScioMark, StellarScioWordmark } from "../../components/site/StellarScioLogo";
 
 const MASTER = "sujal.talreja@stellarmind.ai";
 const GOLD = "#f2a93b";
@@ -124,15 +125,14 @@ export default function ConnectLoginPage() {
       <div className="relative mx-auto flex min-h-screen max-w-[1600px] flex-col px-5 py-6 sm:px-10 lg:px-14">
         {/* Brand */}
         <header className="scio-rise flex items-center gap-3.5">
-          <div className="relative grid h-14 w-14 place-items-center rounded-2xl bg-[#111113] text-2xl font-black text-[#fff] shadow-lg shadow-black/20">
-            S
-            <span className="absolute right-1.5 top-1.5 h-3 w-3 rounded-full bg-[#f2a93b]" />
+          <div className="relative grid h-14 w-14 place-items-center rounded-2xl bg-[#111113] text-[#fff] shadow-lg shadow-black/20">
+            <StellarScioMark className="h-7 w-auto" />
           </div>
           <div className="leading-tight">
-            <div className="text-2xl font-extrabold tracking-tight">
-              Stellar <span className="text-[#f2a93b]">SCIO</span>
+            <div className="text-[#111113]">
+              <StellarScioWordmark className="block h-[22px] w-auto" />
             </div>
-            <div className="text-[15px] text-[#3a3a40]">Business Operating System</div>
+            <div className="mt-1.5 text-[15px] text-[#3a3a40]">Business Operating System</div>
           </div>
           <div className="ml-auto hidden items-center gap-2 rounded-full border border-[#ececef] bg-[#fff]/80 px-3.5 py-1.5 text-[13px] font-semibold text-[#2c2c32] shadow-sm backdrop-blur md:flex lg:mr-[34%]">
             <span className="relative h-2 w-2 rounded-full bg-[#22c55e]"><span className="scio-ping absolute inset-0 rounded-full bg-[#22c55e]" /></span>

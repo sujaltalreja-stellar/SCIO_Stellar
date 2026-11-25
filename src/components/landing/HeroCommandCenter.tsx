@@ -95,19 +95,8 @@ export default function HeroCommandCenter() {
 
   return (
     <div ref={ref} className="theme-fixed relative w-full" style={{ height: DESIGN_H * scale + 24 }} aria-hidden="true">
-      {/* Soft orange shape behind the window */}
-      <svg className="absolute -right-10 -top-10 h-[115%] w-[85%] text-[#FBD9A8] opacity-70" viewBox="0 0 400 400" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="hero-blob" x1="0" x2="1" y1="0" y2="1">
-            <stop offset="0" stopColor="#FDE7C7" />
-            <stop offset="1" stopColor="#F9C982" />
-          </linearGradient>
-        </defs>
-        <path
-          fill="url(#hero-blob)"
-          d="M170 10c60-14 140 10 175 60s40 120 50 170-20 110-80 140-140 25-190-5S40 290 25 230 20 120 60 70 110 24 170 10Z"
-        />
-      </svg>
+      {/* Soft glow behind the window */}
+      <div className="absolute inset-x-[6%] top-[8%] h-[80%] rounded-[40px] bg-[#F9C982]/40 blur-3xl" />
 
       <div
         className="absolute left-0 top-3 origin-top-left"
@@ -285,6 +274,16 @@ export default function HeroCommandCenter() {
             </div>
           </div>
         </div>
+      </div>
+      {/* Floating approval card: shows the issue-to-action outcome */}
+      <div className="absolute -bottom-1 left-3 hidden sm:flex items-center gap-3 rounded-2xl border border-[#E7E5E1] bg-white py-3 pl-3 pr-5 shadow-[0_18px_40px_-18px_rgba(17,17,19,0.35)] font-sans">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+          <CircleCheck className="h-5 w-5" />
+        </span>
+        <span>
+          <span className="block text-[13px] font-semibold text-[#111113]">Purchase order approved</span>
+          <span className="block text-[12px] text-[#6b6862]">Synced to ERP · logged in audit trail</span>
+        </span>
       </div>
     </div>
   );

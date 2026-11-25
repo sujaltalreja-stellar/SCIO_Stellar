@@ -10,6 +10,7 @@ import { KIND, useProposalRunner } from "./AgentChat";
 import { SOURCE, SOURCES, TOOL_SOURCES, type SourceId } from "../sources";
 import { cx } from "../../ui";
 import { aed, nf } from "../rui";
+import { StellarScioMark } from "../../../components/site/StellarScioLogo";
 
 // ---------------------------------------------------------------------------
 // Ask SCIO: the master assistant. Chat-first and deliberately quiet: one accent
@@ -217,7 +218,11 @@ function StatusPart({ children, onClick }: { children: React.ReactNode; onClick:
 const Dot = () => <span className="text-slate-300">·</span>;
 
 function Mark() {
-  return <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-[#111113] ring-1 ring-[#fff]/10 text-[13px] font-bold text-[#fff]">S</span>;
+  return (
+    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-[#111113] ring-1 ring-[#fff]/10 text-[#fff]">
+      <StellarScioMark className="h-3.5 w-auto" />
+    </span>
+  );
 }
 
 function Thinking() {
