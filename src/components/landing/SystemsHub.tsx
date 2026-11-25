@@ -3,6 +3,7 @@
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Database, Store, Box, Users, Contact, ShoppingCart, FileSpreadsheet, Mail } from "lucide-react";
+import { StellarScioMark, StellarScioWordmark } from "../site/StellarScioLogo";
 
 // Business systems around the SCIO hub: left column then right column, top to bottom.
 const LEFT = [
@@ -56,15 +57,14 @@ function HubLogo() {
               transition={{ duration: 2.6, repeat: Infinity, delay: i * 1.3, ease: "easeOut" }}
             />
           ))}
-        <div className="relative flex h-[108px] w-[108px] items-center justify-center rounded-[30px] bg-[#111113] shadow-[0_24px_60px_-18px_rgba(17,17,19,0.6)]">
-          <span className="font-display text-[54px] font-black leading-none text-white">S</span>
-          <span className="absolute right-[18px] top-[18px] h-4 w-4 rounded-full bg-[#F2A93B] shadow-[0_0_14px_rgba(242,169,59,0.9)]" />
+        <div className="theme-fixed relative flex h-[108px] w-[108px] items-center justify-center rounded-[30px] bg-[#111113] text-white shadow-[0_24px_60px_-18px_rgba(17,17,19,0.6)] ring-1 ring-white/10">
+          <StellarScioMark className="h-[54px] w-auto" />
         </div>
       </div>
-      <p className="mt-4 font-display text-[18px] font-bold text-[#111113]">
-        Stellar <span className="text-[#D98B16]">SCIO</span>
+      <p className="mt-5 text-[#111113]">
+        <StellarScioWordmark className="block h-[22px] w-auto" />
       </p>
-      <p className="text-[13px] text-[#6b6862]">One operating picture</p>
+      <p className="mt-1.5 text-[13px] text-[#6b6862]">One operating picture</p>
     </div>
   );
 }
