@@ -5,8 +5,7 @@ import { SITE_SHELL } from "../site/SiteLayout";
 
 /*
  * "Built on the platforms you already trust" — an auto-scrolling strip of the
- * official brand logos (public/logos). Shown in muted greyscale, each logo
- * returns to its true brand colour on hover.
+ * official brand logos (public/logos), shown in full colour.
  *
  * Sources: simple-icons (ClickHouse, Databricks, OpenAI, Oracle, Snowflake) and
  * svgl.app (IBM, Salesforce, Google Cloud, Azure, AWS).
@@ -31,14 +30,14 @@ const LOGOS: Logo[] = [
   { name: "Microsoft Azure", src: "/logos/azure.svg", label: "Azure", h: "h-8" },
   { name: "AWS", src: "/logos/aws.svg", h: "h-9" },
   { name: "Snowflake", src: "/logos/snowflake.svg", label: "snowflake", h: "h-8" },
-  { name: "Databricks", src: "/logos/databricks.svg", label: "databricks", h: "h-7" },
+  { name: "Databricks", src: "/logos/partners/databricks.svg", label: "databricks", h: "h-7" },
 ];
 
 function LogoItem({ logo, hidden = false }: { logo: Logo; hidden?: boolean }) {
   return (
     <li
       aria-hidden={hidden || undefined}
-      className="group/logo shrink-0 px-7 sm:px-10 flex items-center gap-2.5 h-12 grayscale opacity-55 transition-[filter,opacity] duration-300 hover:grayscale-0 hover:opacity-100"
+      className="group/logo shrink-0 px-7 sm:px-10 flex items-center gap-2.5 h-12 transition-transform duration-300 hover:scale-105"
     >
       <img
         src={logo.src}

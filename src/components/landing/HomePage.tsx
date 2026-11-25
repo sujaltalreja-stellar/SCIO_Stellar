@@ -39,6 +39,7 @@ import StaffAugmentation from "./StaffAugmentation";
 import UseCasesTabs from "./UseCasesTabs";
 import WatchItWork from "./WatchItWork";
 import TrustedPlatforms from "./TrustedPlatforms";
+import PartnerStrip from "./PartnerStrip";
 import PositioningCompare from "./PositioningCompare";
 
 // ---------- Content ----------
@@ -432,6 +433,9 @@ export default function HomePage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ===== 1b. Certifications and partners (right under the hero) ===== */}
+      <PartnerStrip />
 
       {/* ===== 2. Systems strip ===== */}
       <section className="bg-white" aria-labelledby="systems-heading">
