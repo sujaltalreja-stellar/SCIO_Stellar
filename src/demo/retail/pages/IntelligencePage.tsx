@@ -33,7 +33,11 @@ export default function IntelligencePage() {
   const intel = useIntel();
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" }), [msgs, busy]);
+  // Block body: scrollIntoView() returns a Promise in newer Chrome, and an
+  // implicitly returned value would be treated as the effect's cleanup.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [msgs, busy]);
 
   const d = useMemo(() => {
     const t = salesTotals(st, scope, 30);

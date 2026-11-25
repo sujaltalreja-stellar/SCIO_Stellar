@@ -11,7 +11,9 @@ export default function ExplainButton() {
   const [open, setOpen] = useState(false);
   const e = explainerFor(pathname);
 
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
   useEffect(() => {
     if (!open) return;
     const onKey = (ev: KeyboardEvent) => ev.key === "Escape" && setOpen(false);

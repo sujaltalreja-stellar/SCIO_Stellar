@@ -80,7 +80,11 @@ export function SkuChat() {
   const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), [msgs, busy]);
+  // Block body: scrollIntoView() returns a Promise in newer Chrome, and an
+  // implicitly returned value would be treated as the effect's cleanup.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [msgs, busy]);
 
   const send = async (text: string) => {
     const question = text.trim();
