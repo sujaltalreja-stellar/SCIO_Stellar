@@ -131,7 +131,7 @@ export function PlatformPage() {
         actions={
           <>
             <TalkButton />
-            <SecondaryButton href="/app">Open SCIO</SecondaryButton>
+            <SecondaryButton href="/app">Try live demo</SecondaryButton>
           </>
         }
       />

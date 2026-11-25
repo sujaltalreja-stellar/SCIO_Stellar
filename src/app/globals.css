@@ -398,3 +398,25 @@ html.light ::-webkit-scrollbar-thumb:hover {
 @media (min-width: 1024px) {
   :root { --nav-h: 64px; }
 }
+
+/* ERP / planning group panels (ErpTrust): translucent white on light, a faint lift on dark. */
+.scio-erp-group { background-color: rgba(255, 255, 255, 0.7); }
+:root[data-site-theme="dark"] .scio-erp-group { background-color: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.1); }
+
+/* ---------------------------------------------------------------------------
+   Cream marketing site (light mode only).
+   Page and section backgrounds are warm cream; cards and form fields stay white so they lift off it.
+   Dark mode keeps its own palette (site-dark.css).
+   --------------------------------------------------------------------------- */
+:root {
+  --scio-cream: #FAF6EE;        /* base page / section colour */
+  --scio-cream-deep: #F3ECDE;   /* alternate sections */
+  --scio-cream-edge: #E9E0CD;   /* hairlines between cream sections */
+}
+:root:not([data-site-theme="dark"]) .scio-brand { background-color: var(--scio-cream); }
+:root:not([data-site-theme="dark"]) #main section.bg-white { background-color: var(--scio-cream); }
+:root:not([data-site-theme="dark"]) #main section.bg-\[\#F6F5F3\],
+:root:not([data-site-theme="dark"]) #main section.bg-\[\#FAFAF9\],
+:root:not([data-site-theme="dark"]) #main section.bg-\[\#F7F6F4\],
+:root:not([data-site-theme="dark"]) #main section.bg-\[\#FBFAF8\] { background-color: var(--scio-cream-deep); }
+:root:not([data-site-theme="dark"]) #main section.border-\[\#E7E5E1\] { border-color: var(--scio-cream-edge); }

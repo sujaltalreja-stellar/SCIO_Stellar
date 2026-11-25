@@ -52,3 +52,6 @@ tsconfig.tsbuildinfo
 
 .vercel
 .env*
+
+# Local video reels
+reels/
