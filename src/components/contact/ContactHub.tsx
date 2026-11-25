@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Calendar as CalendarIcon,
   Clock,
@@ -100,10 +100,60 @@ const SOCIAL_CHANNELS = [
 ];
 
 export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResources }: ContactHubProps) {
-  // Formspree hooks for General Contact Form (Form ID: mrpznygn)
-  const [contactState, handleContactSubmit] = useForm("mrpznygn");
-  // Formspree hooks for Calendar Booking (Form ID: mrpznygn)
-  const [bookingState, handleBookingSubmit] = useForm("mrpznygn");
+  // Formspree hooks for General Contact Form (Form ID: mnpdwgvw)
+  const [contactState, handleContactSubmit] = useForm("mnpdwgvw");
+  // Formspree hooks for Calendar Booking (Form ID: mnpdwgvw)
+  const [bookingState, handleBookingSubmit] = useForm("mnpdwgvw");
+
+  const lastContactRef = useRef<Record<string, string> | null>(null);
+  const contactConfirmSentRef = useRef(false);
+  const lastBookingRef = useRef<Record<string, string> | null>(null);
+  const bookingConfirmSentRef = useRef(false);
+
+  useEffect(() => {
+    if (!contactState.succeeded || contactConfirmSentRef.current || !lastContactRef.current?.email) return;
+    contactConfirmSentRef.current = true;
+    fetch("/api/contact/confirmation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variant: "contact", ...lastContactRef.current }),
+    }).catch(() => {});
+  }, [contactState.succeeded]);
+
+  useEffect(() => {
+    if (!bookingState.succeeded || bookingConfirmSentRef.current || !lastBookingRef.current?.email) return;
+    bookingConfirmSentRef.current = true;
+    fetch("/api/contact/confirmation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variant: "booking", ...lastBookingRef.current }),
+    }).catch(() => {});
+  }, [bookingState.succeeded]);
+
+  const onContactSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const fd = new FormData(e.currentTarget);
+    lastContactRef.current = {
+      name: String(fd.get("name") || ""),
+      email: String(fd.get("email") || ""),
+      company: String(fd.get("company") || ""),
+      sector: String(fd.get("sector") || ""),
+      message: String(fd.get("message") || ""),
+    };
+    contactConfirmSentRef.current = false;
+    return handleContactSubmit(e);
+  };
+
+  const onBookingSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const fd = new FormData(e.currentTarget);
+    lastBookingRef.current = {
+      name: String(fd.get("name") || ""),
+      email: String(fd.get("email") || ""),
+      meetingType: String(fd.get("meeting_type") || ""),
+      scheduledDate: String(fd.get("scheduled_date") || ""),
+    };
+    bookingConfirmSentRef.current = false;
+    return handleBookingSubmit(e);
+  };
 
   // Meeting Booking Calendar State
   const [meetingType, setMeetingType] = useState<"discovery" | "technical">("discovery");
@@ -346,7 +396,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
             </div>
           </div>
 
-          {/* Booking Confirmation Form (Formspree: mrpznygn) */}
+          {/* Booking Confirmation Form (Formspree: mnpdwgvw) */}
           <div className="pt-4 border-t border-white/10">
             {bookingState.succeeded ? (
               <div className="p-6 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-center space-y-3">
@@ -368,7 +418,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleBookingSubmit} className="space-y-3 font-sans text-xs">
+              <form onSubmit={onBookingSubmit} className="space-y-3 font-sans text-xs">
                 <input type="hidden" name="form_type" value="Calendar Meeting Booking" />
                 <input type="hidden" name="meeting_type" value={meetingType === "discovery" ? "30-min Executive Discovery Briefing" : "45-min Technical Sandbox"} />
                 <input type="hidden" name="scheduled_date" value={`Day ${selectedDate}, Time: ${selectedTimeSlot} (${selectedTimezone})`} />
@@ -460,7 +510,7 @@ export default function ContactHub({ onBackToHome, onLaunchPlatform, onOpenResou
               </p>
             </div>
           ) : (
-            <form onSubmit={handleContactSubmit} className="space-y-3.5 text-xs font-sans">
+            <form onSubmit={onContactSubmit} className="space-y-3.5 text-xs font-sans">
               <input type="hidden" name="form_type" value="Direct Enterprise Inquiry Form" />
               <input type="hidden" name="source" value="Stellar SCIO Contact Hub" />
 

@@ -10,6 +10,11 @@ import { processDocument } from "./demo/documents";
 import { explainAsset, explainItem } from "./demo/explain";
 import { NotSignedInError } from "./demo/data";
 import { rateLimited, sarvamConfigured } from "./demo/sarvam";
+import {
+  getConfirmationEmailSubject,
+  renderConfirmationEmailHtml,
+  type ConfirmationVariant,
+} from "./emailTemplate";
 
 function sendJson(res: ServerResponse, statusCode: number, data: any) {
   if (typeof (res as any).status === "function" && typeof (res as any).json === "function") {
@@ -220,7 +225,91 @@ export async function handleApiRequest(
     return true;
   }
 
-  // 4. SECTOR-SPECIFIC CHATBOT ROUTES
+  // 4. CONTACT CONFIRMATION AUTORESPONDER (sends branded HTML email to submitter)
+  if (pathname === "/api/contact/confirmation" && method === "POST") {
+    const ip = String(req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown").split(",")[0].trim();
+    if (rateLimited(`contact-confirm:${ip}`, 20)) {
+      sendJson(res, 429, { error: "Too many requests. Please wait a few minutes." });
+      return true;
+    }
+    try {
+      const body = await parseJsonBody(req);
+      const email = typeof body?.email === "string" ? body.email.trim() : "";
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        sendJson(res, 400, { error: "Valid email address is required" });
+        return true;
+      }
+
+      const rawVariant = body?.variant;
+      const variant: ConfirmationVariant =
+        rawVariant === "demo" || rawVariant === "beta" || rawVariant === "booking" ? rawVariant : "contact";
+
+      const payload = {
+        variant,
+        email,
+        name: typeof body?.name === "string" ? body.name.slice(0, 160) : undefined,
+        company: typeof body?.company === "string" ? body.company.slice(0, 160) : undefined,
+        role: typeof body?.role === "string" ? body.role.slice(0, 160) : undefined,
+        sector: typeof body?.sector === "string" ? body.sector.slice(0, 160) : undefined,
+        businessType: typeof body?.businessType === "string" ? body.businessType.slice(0, 160) : undefined,
+        locations: typeof body?.locations === "string" ? body.locations.slice(0, 80) : undefined,
+        message: typeof body?.message === "string" ? body.message.slice(0, 2000) : undefined,
+        meetingType: typeof body?.meetingType === "string" ? body.meetingType.slice(0, 160) : undefined,
+        scheduledDate: typeof body?.scheduledDate === "string" ? body.scheduledDate.slice(0, 160) : undefined,
+      };
+
+      const subject = getConfirmationEmailSubject(payload);
+      const html = renderConfirmationEmailHtml(payload);
+
+      const resendApiKey = process.env.RESEND_API_KEY?.trim();
+      if (!resendApiKey) {
+        sendJson(res, 200, {
+          success: true,
+          sent: false,
+          reason: "RESEND_API_KEY is not configured in environment variables",
+        });
+        return true;
+      }
+
+      const fromAddress = process.env.RESEND_FROM?.trim() || "Stellar SCIO <onboarding@resend.dev>";
+      const resendRes = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: fromAddress,
+          to: [email],
+          subject,
+          html,
+        }),
+      });
+
+      const resendJson = await resendRes.json().catch(() => ({}));
+      if (!resendRes.ok) {
+        console.warn("Resend confirmation email failed:", resendRes.status, resendJson);
+        sendJson(res, 200, {
+          success: false,
+          sent: false,
+          error: (resendJson as any)?.message || `Email provider returned ${resendRes.status}`,
+        });
+        return true;
+      }
+
+      sendJson(res, 200, {
+        success: true,
+        sent: true,
+        id: (resendJson as any)?.id,
+      });
+    } catch (error: any) {
+      console.error("Contact confirmation email error:", error);
+      sendJson(res, 500, { error: error?.message || "Failed to send confirmation email" });
+    }
+    return true;
+  }
+
+  // 5. SECTOR-SPECIFIC CHATBOT ROUTES
   const chatbotMatch = pathname.match(/^\/api\/chatbot\/(energy|maritime|manufacturing|logistics|homepage)$/);
   if (chatbotMatch && method === "POST") {
     const sector = chatbotMatch[1];

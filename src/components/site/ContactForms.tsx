@@ -5,7 +5,7 @@ import { useForm, ValidationError } from "@formspree/react";
 import { ArrowRight, CheckCircle2, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const FORMSPREE_ID = "mrpznygn";
+const FORMSPREE_ID = "mnpdwgvw";
 
 type Variant = "demo" | "beta" | "contact";
 
@@ -41,6 +41,35 @@ const errCls = "mt-1 block text-[12px] text-red-600";
 export function LeadForm({ variant }: { variant: Variant }) {
   const [state, handleSubmit] = useForm(FORMSPREE_ID);
   const copy = COPY[variant];
+  const lastSubmissionRef = useRef<Record<string, string> | null>(null);
+  const confirmationSentRef = useRef(false);
+
+  useEffect(() => {
+    if (!state.succeeded || confirmationSentRef.current || !lastSubmissionRef.current) return;
+    const payload = lastSubmissionRef.current;
+    if (!payload.email) return;
+    confirmationSentRef.current = true;
+    fetch("/api/contact/confirmation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ variant, ...payload }),
+    }).catch(() => {});
+  }, [state.succeeded, variant]);
+
+  const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const fd = new FormData(e.currentTarget);
+    lastSubmissionRef.current = {
+      name: String(fd.get("name") || ""),
+      email: String(fd.get("email") || ""),
+      company: String(fd.get("company") || ""),
+      role: String(fd.get("role") || ""),
+      businessType: String(fd.get("businessType") || ""),
+      locations: String(fd.get("locations") || ""),
+      message: String(fd.get("message") || ""),
+    };
+    confirmationSentRef.current = false;
+    return handleSubmit(e);
+  };
 
   if (state.succeeded) {
     return (
@@ -53,7 +82,7 @@ export function LeadForm({ variant }: { variant: Variant }) {
 
   const id = (n: string) => `${variant}-${n}`;
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 sm:grid-cols-2">
+    <form onSubmit={onFormSubmit} className="grid gap-4 sm:grid-cols-2">
       <input type="hidden" name="_subject" value={copy.source} />
       <input type="hidden" name="source" value={copy.source} />
       <div>
