@@ -335,13 +335,10 @@ const SOCIAL_LINKS = [
 
 /** Trusted partners and certifications, as shown on stellarmind.ai. */
 const TRUSTED_PARTNERS = [
-  { name: "Guru", src: "/logos/partners/guru-trim.png", cls: "h-[22px]" },
-  { name: "Clutch", src: "/logos/partners/clutch-trim.png", cls: "h-[26px]" },
-  { name: "ISO 9001 certified", src: "/logos/partners/iso-trim.png", cls: "h-11" },
   { name: "OpenAI Select Partner", src: "/logos/partners/openai.png", cls: "h-11" },
   { name: "Databricks", src: "/logos/partners/databricks.svg", cls: "h-9" },
   { name: "AWS Partner", src: "/logos/partners/aws-logo-white.png", cls: "h-9" },
-  { name: "NVIDIA Inception", src: "/logos/partners/nvidia-logo-white.svg", cls: "h-5" },
+  { name: "NVIDIA Inception", src: "/logos/partners/nvidia-original-white.svg", cls: "h-12" },
   { name: "Sarvam AI Startup Program", src: "/logos/partners/sarvam-wordmark-white.svg", cls: "h-[18px]" },
 ];
 

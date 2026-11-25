@@ -372,6 +372,8 @@ html.light ::-webkit-scrollbar-thumb:hover {
 :root[data-site-theme="dark"] .scio-section-heading { font-weight: 300; }
 /* Dark mode: brand logos are dark marks; flip them to light grey so they stay visible. */
 :root[data-site-theme="dark"] .scio-platform-logo { filter: invert(1) brightness(1.15); }
+/* Partner logos made for the light page (full colour): turned white on the dark page. */
+:root[data-site-theme="dark"] .scio-partner-mono { filter: brightness(0) invert(1); }
 
 /* Dark mode: the highlighted SCIO comparison column needs its own surface to stand out from the dark page. */
 :root[data-site-theme="dark"] .scio-compare-col { background-color: #2A2318; }
