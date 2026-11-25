@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 export const SITE_URL = "https://www.stellarscio.app";
-const DEFAULT_IMAGE = `${SITE_URL}/thumbnail.png?v=3`;
+const DEFAULT_IMAGE = `${SITE_URL}/thumbnail.png?v=4`;
 
 function setMeta(attr: "name" | "property", key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(`meta[${attr}="${key}"]`);
@@ -24,10 +24,11 @@ function setCanonical(href: string) {
 }
 
 /** Per-page title, description, canonical URL and social tags for the public site. */
-export function useSeo({ title, description, path, image }: { title: string; description: string; path: string; image?: string }) {
+/** `image` is accepted for compatibility but ignored: every page shares the one branded card. */
+export function useSeo({ title, description, path }: { title: string; description: string; path: string; image?: string }) {
   useEffect(() => {
     const url = `${SITE_URL}${path}`;
-    const img = image ? `${SITE_URL}${image}` : DEFAULT_IMAGE;
+    const img = DEFAULT_IMAGE;
     document.title = title;
     setMeta("name", "description", description);
     setCanonical(url);
@@ -40,5 +41,5 @@ export function useSeo({ title, description, path, image }: { title: string; des
     setMeta("name", "twitter:title", title);
     setMeta("name", "twitter:description", description);
     setMeta("name", "twitter:image", img);
-  }, [title, description, path, image]);
+  }, [title, description, path]);
 }

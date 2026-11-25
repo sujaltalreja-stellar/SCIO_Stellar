@@ -14,7 +14,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = join(ROOT, "dist");
 const SITE = "https://www.stellarscio.app";
-const DEFAULT_IMAGE = "/thumbnail.png?v=3";
+// Every page shares the same branded card (public/thumbnail.png, 1200x630). Bump ?v= to make chat apps re-fetch it.
+const DEFAULT_IMAGE = "/thumbnail.png?v=4";
 
 // Keep in sync with the useSeo() calls and PageHero copy in src/app/site/pages.tsx and HomePage.tsx.
 const ROUTES = [
@@ -133,7 +134,7 @@ function jsonLd(route, faq) {
       inLanguage: "en",
       isPartOf: { "@id": `${SITE}/#website` },
       about: { "@id": `${SITE}/#software` },
-      primaryImageOfPage: abs(route.image || DEFAULT_IMAGE),
+      primaryImageOfPage: abs(DEFAULT_IMAGE),
     },
   ];
   if (crumbs.length > 1) {
@@ -176,7 +177,7 @@ function build() {
 
   for (const route of ROUTES) {
     const pageUrl = url(route.path);
-    const image = abs(route.image || DEFAULT_IMAGE);
+    const image = abs(DEFAULT_IMAGE);
     let html = shell;
     html = setTag(html, /<title>[\s\S]*?<\/title>/, `<title>${esc(route.title)}</title>`, "<title>");
     html = setTag(html, /<meta\s+name="description"\s+content="[^"]*"\s*\/?>/, `<meta name="description" content="${esc(route.description)}" />`, "meta description");
@@ -188,10 +189,6 @@ function build() {
     html = setTag(html, /<meta name="twitter:title" content="[^"]*"\s*\/?>/, `<meta name="twitter:title" content="${esc(route.title)}" />`, "twitter:title");
     html = setTag(html, /<meta\s+name="twitter:description"\s+content="[^"]*"\s*\/?>/, `<meta name="twitter:description" content="${esc(route.description)}" />`, "twitter:description");
     html = setTag(html, /<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${image}" />`, "twitter:image");
-    if (route.image) {
-      // Page-specific images are not 1200x630, so drop the default's fixed dimensions.
-      html = html.replace(/\s*<meta property="og:image:(width|height)" content="\d+"\s*\/?>/g, "");
-    }
     html = html.replace("</head>", `    ${jsonLd(route, faq)}\n    ${STATIC_CSS}\n    ${NOSCRIPT_CSS}\n  </head>`);
     // Keep the loading placeholder on screen and put the hidden plain-text copy right after it. Both sit
     // inside #root, so React replaces them together on its first render.
