@@ -38,7 +38,7 @@ import {
 import SiteLayout, { SITE_SHELL } from "../../components/site/SiteLayout";
 import { useSite } from "../../components/site/SiteContext";
 import { ConnectBand, Eyebrow, NextPages, PageHero, PrimaryButton, SecondaryButton, SectionHeading } from "../../components/site/blocks";
-import { useSeo } from "../../components/site/seo";
+import { pageSeo, useSeo } from "../../components/site/seo";
 import { USE_CASES } from "../../components/site/nav";
 import { ENTERPRISE_QUESTIONS_DATA } from "../../components/site/faqData";
 import { LeadForm } from "../../components/site/ContactForms";
@@ -107,13 +107,7 @@ const CAPABILITIES = [
 ];
 
 export function PlatformPage() {
-  useSeo({
-    title: "Platform | Stellar SCIO AI Business Operating System",
-    description:
-      "How SCIO works: connect your ERP, POS, WMS and HR systems, understand your business in one model, ask questions in plain language, and act with approvals and a full audit trail.",
-    path: "/platform",
-    image: "/images/scio-intelligence-dashboard.webp",
-  });
+  useSeo(pageSeo("/platform"));
   return (
     <SiteLayout>
       <PageHero
@@ -220,13 +214,7 @@ const SYSTEM_GROUPS = [
 ];
 
 export function IntegrationsPage() {
-  useSeo({
-    title: "Integrations: ERP, POS, WMS, HRMS & CRM | Stellar SCIO",
-    description:
-      "SCIO connects to your ERP (SAP, Oracle and others), point of sale, warehouse, HR, CRM, procurement and accounting systems, plus spreadsheets and documents, without replacing them.",
-    path: "/platform/integrations",
-    image: "/images/distribution-center-stock.webp",
-  });
+  useSeo(pageSeo("/platform/integrations"));
   return (
     <SiteLayout>
       <PageHero
@@ -351,13 +339,7 @@ const USE_CASE_DETAIL: Record<(typeof USE_CASES)[number]["id"], { img: string; a
 };
 
 export function UseCasesPage() {
-  useSeo({
-    title: "Use Cases: Inventory, Sales, Purchasing & Finance | Stellar SCIO",
-    description:
-      "How businesses use SCIO: inventory and replenishment, store and sales performance, purchasing and supplier management, invoice and document matching, and approval workflows.",
-    path: "/use-cases",
-    image: "/images/warehouse-inventory-shelves.webp",
-  });
+  useSeo(pageSeo("/use-cases"));
   return (
     <SiteLayout>
       <PageHero
@@ -403,13 +385,7 @@ export function UseCasesPage() {
 
 // ================= /why-scio =================
 export function WhyScioPage() {
-  useSeo({
-    title: "Why SCIO | One Business Operating System Instead of a Dozen Tools",
-    description:
-      "Your ERP, POS, warehouse and finance tools each hold part of the picture. SCIO connects them without replacing anything, answers questions in plain language and keeps people in control.",
-    path: "/why-scio",
-    image: "/images/leadership-business-review-meeting.webp",
-  });
+  useSeo(pageSeo("/why-scio"));
   const rows = [
     ["Finding an answer", "Export reports from several systems and combine them in Excel", "Ask a question and get the answer with sources"],
     ["Spotting problems", "Noticed after the fact, in weekly or monthly reviews", "Flagged as they develop, with the likely cause"],
@@ -496,12 +472,7 @@ const FAQ_CATEGORIES = [
 ] as const;
 
 export function FaqPage() {
-  useSeo({
-    title: "FAQ | Stellar SCIO Business Operating System",
-    description:
-      "Answers to common questions about SCIO: ERP integration, on-premises and private cloud deployment, data ownership, AI governance, security and how to get started.",
-    path: "/faq",
-  });
+  useSeo(pageSeo("/faq"));
   const [cat, setCat] = useState<(typeof FAQ_CATEGORIES)[number]["id"]>("all");
   const [q, setQ] = useState("");
   const [open, setOpen] = useState<number[]>([1]);
@@ -595,11 +566,7 @@ export function FaqPage() {
 
 // ================= /contact =================
 export function ContactPage() {
-  useSeo({
-    title: "Contact | Stellar SCIO",
-    description: "Talk to the Stellar SCIO team about a demo, a pilot or pricing for your business. Email sales@stellarmind.ai or send us a message.",
-    path: "/contact",
-  });
+  useSeo(pageSeo("/contact"));
   return (
     <SiteLayout>
       <PageHero

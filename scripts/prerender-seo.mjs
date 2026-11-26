@@ -17,14 +17,18 @@ const SITE = "https://www.stellarscio.app";
 // Every page shares the same branded card (public/thumbnail.png, 1200x630). Bump ?v= to make chat apps re-fetch it.
 const DEFAULT_IMAGE = "/thumbnail.png?v=4";
 
-// Keep in sync with the useSeo() calls and PageHero copy in src/app/site/pages.tsx and HomePage.tsx.
-const ROUTES = [
+// Titles and descriptions come from src/components/site/seoRoutes.json, the same file the live pages
+// read through pageSeo(), so the two can't drift apart. Keep h1/intro/points in sync with the PageHero
+// copy in src/app/site/pages.tsx, ErpExpertsPage.tsx and HomePage.tsx.
+const SEO = JSON.parse(readFileSync(join(ROOT, "src/components/site/seoRoutes.json"), "utf8"));
+// Google shows roughly 60 title characters and 160 description characters before cutting them off.
+const MAX_TITLE = 60;
+const MAX_DESCRIPTION = 160;
+
+const ROUTE_CONTENT = [
   {
     path: "/",
     name: "Home",
-    title: "Stellar SCIO | The AI Business Operating System for ERP, POS & Inventory",
-    description:
-      "SCIO connects your ERP, POS, warehouse, HR and finance systems into one AI business operating system. Ask questions in plain language, spot problems early and act with approvals.",
     image: "/images/business-operations-team-at-work.webp",
     h1: "The AI business operating system for ERP, POS & inventory.",
     intro: "Connect your ERP, POS, warehouse, HR and finance tools. Spot problems early. Approve every fix in one place.",
@@ -42,51 +46,70 @@ const ROUTES = [
   {
     path: "/platform",
     name: "Platform",
-    title: "Platform | Stellar SCIO AI Business Operating System",
-    description:
-      "How SCIO works: connect your ERP, POS, WMS and HR systems, understand your business in one model, ask questions in plain language, and act with approvals and a full audit trail.",
     image: "/images/scio-intelligence-dashboard.webp",
     h1: "Connect. Understand. Ask. Act.",
     intro: "SCIO sits on top of the systems you already run and turns them into one operating picture your whole team can question and act on.",
+    points: [
+      "Connect: lightweight connectors read from your ERP, POS, warehouse, HR, CRM and finance tools, plus spreadsheets and documents. Your existing systems stay the system of record.",
+      "Understand: SCIO links stores, products, stock, orders, suppliers, staff and money into one connected model of your business, refreshed as things change.",
+      "Ask: anyone on the team can ask questions in plain language, from margin by store this month to which supplier is late most often, and see the evidence behind every answer.",
+      "Act: recommendations become actions (a purchase order, a stock transfer, a task). Each one goes to the right person to approve and is written back to your systems.",
+      "Capabilities: plain-language questions with sources, live views, alerts, demand and stock forecasts, document AI, workflows and approvals, a full audit trail, and roles and permissions.",
+      "Security and governance: deploy on-premises, in a private cloud or hybrid, with encryption in transit and at rest, single sign-on and least-privilege access. Nothing happens without approval.",
+    ],
   },
   {
     path: "/platform/integrations",
     name: "Integrations",
     parent: { name: "Platform", path: "/platform" },
-    title: "Integrations: ERP, POS, WMS, HRMS & CRM | Stellar SCIO",
-    description:
-      "SCIO connects to your ERP (SAP, Oracle and others), point of sale, warehouse, HR, CRM, procurement and accounting systems, plus spreadsheets and documents, without replacing them.",
     image: "/images/distribution-center-stock.webp",
     h1: "Works with the systems you already run",
     intro: "SCIO reads from and writes back to your existing tools. Nothing gets replaced, and your systems stay the source of truth.",
+    points: [
+      "ERP: products, stock, purchase and sales orders, finance and master data.",
+      "Point of sale: sales by store, product, time and payment, as they happen.",
+      "Warehouse (WMS): stock levels, locations, receipts, picks and transfers.",
+      "HR and payroll: teams, shifts, roles and labour cost by location.",
+      "CRM: customers, accounts, orders and service history.",
+      "Procurement: suppliers, POs, lead times, deliveries and quality.",
+      "Accounting: invoices, payments, margins and cost centres.",
+      "Spreadsheets and documents: the Excel files, PDFs and emails your team really runs on.",
+      "Live in weeks, not a migration project. SCIO runs where your data lives: on-premises, private cloud or hybrid.",
+    ],
   },
   {
     path: "/use-cases",
     name: "Use cases",
-    title: "Use Cases: Inventory, Sales, Purchasing & Finance | Stellar SCIO",
-    description:
-      "How businesses use SCIO: inventory and replenishment, store and sales performance, purchasing and supplier management, invoice and document matching, and approval workflows.",
     image: "/images/warehouse-inventory-shelves.webp",
     h1: "Start with one problem. Expand from there.",
     intro: "Most businesses begin with one workflow that costs them money every week. Here's where SCIO usually starts.",
+    points: [
+      "Inventory and replenishment: SCIO combines sales, stock on hand, stock in transit and supplier lead times to tell you what to reorder and where to move stock between locations.",
+      "Store and sales performance: compare stores, regions and channels side by side, and find out why numbers moved, not only that they did.",
+      "Purchasing and suppliers: SCIO drafts POs from real demand, tracks deliveries against promises and scores suppliers on reliability and quality.",
+      "Invoices and documents: document AI reads invoices, purchase orders and delivery notes, matches them against each other and your records, and highlights what doesn't add up.",
+      "Approvals: set rules by role, amount and location. SCIO routes each recommendation to the right approver and records every decision.",
+    ],
   },
   {
     path: "/why-scio",
     name: "Why SCIO",
-    title: "Why SCIO | One Business Operating System Instead of a Dozen Tools",
-    description:
-      "Your ERP, POS, warehouse and finance tools each hold part of the picture. SCIO connects them without replacing anything, answers questions in plain language and keeps people in control.",
     image: "/images/leadership-business-review-meeting.webp",
     h1: "Your data already knows what's happening",
     intro:
       "The answers are in your systems. They're just split across your ERP, POS, warehouse, HR and finance tools, and nobody has time to stitch them together.",
+    points: [
+      "Finding an answer: instead of exporting reports from several systems into Excel, ask a question and get the answer with sources.",
+      "Spotting problems: instead of noticing them in weekly or monthly reviews, see them flagged as they develop, with the likely cause.",
+      "Taking action: instead of re-keying data and chasing approvals by email, go in one click to an approved PO, transfer or task.",
+      "Rollout: instead of a long, risky migration, SCIO sits on top of what you have and goes live in weeks.",
+      "Control: every recommendation and approval is logged, so you can see who changed what and why.",
+      "What we believe: keep what works, people stay in charge, and measure rather than promise.",
+    ],
   },
   {
     path: "/erp-experts",
     name: "ERP experts",
-    title: "ERP & Supply Chain Planning Experts for Your Team | Stellar SCIO by Stellarmind.ai",
-    description:
-      "Hire experienced ERP and IT experts from Stellarmind.ai: Blue Yonder planning consultants (10+ years) and developers (5+ years), SAP S/4HANA & SAC data migration (7+ years), SAP Treasury (5+ years) and M365 / Windows infrastructure engineers (6+ years), plus SAP, Oracle, Dynamics 365, Kinaxis and o9 specialists.",
     h1: "ERP and planning experts, ready to join your team.",
     intro:
       "Consultants and developers for SAP, Oracle, Microsoft Dynamics 365, Blue Yonder, Kinaxis and o9 Solutions, including Blue Yonder planning leads with 10+ years and developers with 5+. They work inside your team, managed by you, for as long as you need them.",
@@ -103,9 +126,6 @@ const ROUTES = [
   {
     path: "/faq",
     name: "FAQ",
-    title: "FAQ | Stellar SCIO Business Operating System",
-    description:
-      "Answers to common questions about SCIO: ERP integration, on-premises and private cloud deployment, data ownership, AI governance, security and how to get started.",
     h1: "Questions businesses ask us",
     intro: "Deployment, security, AI and getting started.",
     faqAll: true,
@@ -113,13 +133,24 @@ const ROUTES = [
   {
     path: "/contact",
     name: "Contact",
-    title: "Contact | Stellar SCIO",
-    description:
-      "Talk to the Stellar SCIO team about a demo, a pilot or pricing for your business. Email sales@stellarmind.ai or send us a message.",
     h1: "Let's talk about your business",
     intro: "Tell us how you run today and what you'd like to fix. We'll reply within one business day. Email sales@stellarmind.ai.",
+    points: [
+      "Sales: sales@stellarmind.ai",
+      "General enquiries: info@stellarmind.ai",
+      "Phone: +91 97230 99765",
+      "Ask about a live demo, a pilot on one workflow, pricing, deployment options or ERP expert staff augmentation.",
+    ],
   },
 ];
+
+const ROUTES = ROUTE_CONTENT.map((route) => {
+  const seo = SEO[route.path];
+  if (!seo) throw new Error(`prerender-seo: no entry for ${route.path} in seoRoutes.json`);
+  if (seo.title.length > MAX_TITLE) throw new Error(`prerender-seo: title for ${route.path} is ${seo.title.length} chars (max ${MAX_TITLE})`);
+  if (seo.description.length > MAX_DESCRIPTION) throw new Error(`prerender-seo: description for ${route.path} is ${seo.description.length} chars (max ${MAX_DESCRIPTION})`);
+  return { ...route, title: seo.title, description: seo.description };
+});
 
 // ---------- FAQ, read from the same source the site uses ----------
 function loadFaq() {

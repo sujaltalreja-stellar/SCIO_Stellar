@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 import SiteLayout, { SITE_SHELL } from "../../components/site/SiteLayout";
 import { Eyebrow, SectionHeading, reveal } from "../../components/site/blocks";
-import { useSeo } from "../../components/site/seo";
+import { pageSeo, useSeo } from "../../components/site/seo";
 import { FORMSPREE_ID } from "../../components/site/ContactForms";
 import { ERP, PLANNING, Tile } from "../../components/landing/ErpTrust";
 
@@ -489,12 +489,7 @@ function RequestForm() {
 }
 
 export function ErpExpertsPage() {
-  useSeo({
-    title: "ERP & Supply Chain Planning Experts for Your Team | Stellar SCIO by Stellarmind.ai",
-    description:
-      "Hire experienced ERP and IT experts from Stellarmind.ai: Blue Yonder planning consultants (10+ years) and developers (5+ years), SAP S/4HANA & SAC data migration (7+ years), SAP Treasury (5+ years) and M365 / Windows infrastructure engineers (6+ years), plus SAP, Oracle, Dynamics 365, Kinaxis and o9 specialists.",
-    path: "/erp-experts",
-  });
+  useSeo(pageSeo("/erp-experts"));
 
   return (
     <SiteLayout>

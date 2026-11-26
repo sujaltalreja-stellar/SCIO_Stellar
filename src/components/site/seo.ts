@@ -1,4 +1,15 @@
 import { useEffect } from "react";
+import SEO_ROUTES from "./seoRoutes.json";
+
+export type SeoPath = keyof typeof SEO_ROUTES;
+
+/**
+ * Title and description for a public route, read from seoRoutes.json. The same file feeds
+ * scripts/prerender-seo.mjs, so the static HTML and the live page can never disagree.
+ */
+export function pageSeo(path: SeoPath) {
+  return { ...SEO_ROUTES[path], path };
+}
 
 export const SITE_URL = "https://www.stellarscio.app";
 const DEFAULT_IMAGE = `${SITE_URL}/thumbnail.png?v=4`;

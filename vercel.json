@@ -10,13 +10,34 @@
       "maxDuration": 60
     }
   },
+  "redirects": [
+    { "source": "/industries", "destination": "/", "permanent": true },
+    { "source": "/industries/:path*", "destination": "/", "permanent": true },
+    { "source": "/customers", "destination": "/", "permanent": true },
+    { "source": "/resources", "destination": "/", "permanent": true },
+    { "source": "/platform/control-tower", "destination": "/platform", "permanent": true },
+    { "source": "/demo", "destination": "/app", "permanent": true },
+    { "source": "/demo/:path*", "destination": "/app/:path*", "permanent": true },
+    { "source": "/energy", "destination": "/?industry=energy&tab=energy-dashboard", "permanent": false },
+    { "source": "/renewable-energy", "destination": "/?industry=energy&tab=energy-dashboard", "permanent": false },
+    { "source": "/dashboard", "destination": "/?industry=energy&tab=energy-dashboard", "permanent": false },
+    { "source": "/maritime", "destination": "/?industry=maritime&tab=dashboard", "permanent": false },
+    { "source": "/maritime-fleet", "destination": "/?industry=maritime&tab=dashboard", "permanent": false },
+    { "source": "/manufacturing", "destination": "/?industry=manufacturing&tab=dashboard", "permanent": false },
+    { "source": "/logistics", "destination": "/?industry=logistics&tab=dashboard", "permanent": false },
+    { "source": "/supply-chain", "destination": "/?industry=logistics&tab=dashboard", "permanent": false }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
       "destination": "/api?__p=:path*"
     },
     {
-      "source": "/((?!api/|assets/).*)",
+      "source": "/app",
+      "destination": "/"
+    },
+    {
+      "source": "/app/:path*",
       "destination": "/"
     }
   ],
@@ -33,8 +54,30 @@
           "value": "SAMEORIGIN"
         },
         {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        }
+      ]
+    },
+    {
+      "source": "/app",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
+      "source": "/app/(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
         }
       ]
     },

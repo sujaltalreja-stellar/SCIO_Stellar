@@ -1,6 +1,7 @@
 # Stellar SCIO: public marketing site. The product app (/app) and API are private.
 User-agent: *
 Allow: /
+Disallow: /app$
 Disallow: /app/
 Disallow: /api/
 
@@ -18,6 +19,7 @@ User-agent: Google-Extended
 User-agent: Applebot-Extended
 User-agent: Bingbot
 Allow: /
+Disallow: /app$
 Disallow: /app/
 Disallow: /api/
 

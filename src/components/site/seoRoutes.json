@@ -1,0 +1,34 @@
+{
+  "/": {
+    "title": "Stellar SCIO | AI Business Operating System for ERP & POS",
+    "description": "SCIO connects your ERP, POS, warehouse, HR and finance systems. Ask questions in plain language, spot problems early and act with approvals."
+  },
+  "/platform": {
+    "title": "Platform | Stellar SCIO AI Business Operating System",
+    "description": "How SCIO works: connect your ERP, POS, WMS and HR systems, ask questions in plain language, and act with approvals and a full audit trail."
+  },
+  "/platform/integrations": {
+    "title": "Integrations: ERP, POS, WMS, HRMS & CRM | Stellar SCIO",
+    "description": "SCIO connects to your ERP (SAP, Oracle and more), POS, warehouse, HR, CRM and accounting systems, plus spreadsheets and documents, without replacing them."
+  },
+  "/use-cases": {
+    "title": "Use Cases: Inventory, Sales, Purchasing & Finance | SCIO",
+    "description": "How businesses use SCIO: inventory and replenishment, store and sales performance, purchasing and suppliers, invoice matching and approval workflows."
+  },
+  "/why-scio": {
+    "title": "Why SCIO | One Operating System Instead of a Dozen Tools",
+    "description": "Your ERP, POS, warehouse and finance tools each hold part of the picture. SCIO connects them, answers in plain words and keeps people in control."
+  },
+  "/erp-experts": {
+    "title": "Hire ERP & Supply Chain Planning Experts | Stellar SCIO",
+    "description": "Hire experienced ERP experts from Stellarmind.ai: Blue Yonder planners (10+ years), SAP S/4HANA migration, SAP Treasury, M365, Oracle, Dynamics 365 and o9."
+  },
+  "/faq": {
+    "title": "FAQ | Stellar SCIO Business Operating System",
+    "description": "Answers to common questions about SCIO: ERP integration, on-premises and private cloud deployment, data ownership, AI governance, security and getting started."
+  },
+  "/contact": {
+    "title": "Contact Sales: Demo, Pilot & Pricing | Stellar SCIO",
+    "description": "Talk to the Stellar SCIO team about a demo, a pilot or pricing for your business. Email sales@stellarmind.ai or send us a message."
+  }
+}

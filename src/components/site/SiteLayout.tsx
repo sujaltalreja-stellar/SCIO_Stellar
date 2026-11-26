@@ -7,13 +7,14 @@ import { ArrowRight, ArrowUpRight, ChevronDown, Menu, X, Mail, Phone, ShieldChec
 import { AnimatePresence, motion } from "framer-motion";
 import { SiteContext, SiteActions, launchHref } from "./SiteContext";
 import { NAV_GROUPS, FOOTER_COLUMNS } from "./nav";
-import { LeadModal } from "./ContactForms";
 import { ThemeToggle, useSiteThemeRoot } from "./theme";
 import { lazyWithReload } from "../../lazyWithReload";
 import { StellarScioLogo } from "./StellarScioLogo";
 
 // The AI assistant is large (~240 KB); load it after the page is visible, not before.
 const ScioSentinelOrb = lazyWithReload(() => import("../ai/ScioSentinelOrb"));
+// The demo/beta forms (and the Formspree client) load the first time someone opens one, not with every page.
+const LeadModal = lazyWithReload(() => import("./ContactForms").then((m) => ({ default: m.LeadModal })));
 
 function useAfterFirstPaint(delayMs = 1200) {
   const [ready, setReady] = useState(false);
@@ -503,6 +504,8 @@ export default function SiteLayout({
   const navigate = useNavigate();
   const [demoOpen, setDemoOpen] = useState(false);
   const [betaOpen, setBetaOpen] = useState(false);
+  // Mounted on first open, then kept mounted so the closing animation can play.
+  const [leadModalMounted, setLeadModalMounted] = useState(false);
   const showOrb = useAfterFirstPaint();
   useSiteThemeRoot();
   const closeDemo = React.useCallback(() => setDemoOpen(false), []);
@@ -514,8 +517,14 @@ export default function SiteLayout({
       else navigate(launchHref(industry, tab));
     };
     return {
-      openDemo: () => setDemoOpen(true),
-      openBeta: () => setBetaOpen(true),
+      openDemo: () => {
+        setLeadModalMounted(true);
+        setDemoOpen(true);
+      },
+      openBeta: () => {
+        setLeadModalMounted(true);
+        setBetaOpen(true);
+      },
       openContact: () => navigate("/contact"),
       openResources: () => navigate("/resources"),
       launchPlatform,
@@ -537,8 +546,12 @@ export default function SiteLayout({
         <SiteFooter onTalk={actions.openDemo} onBeta={actions.openBeta} />
       </div>
 
-      <LeadModal variant="demo" open={demoOpen} onClose={closeDemo} />
-      <LeadModal variant="beta" open={betaOpen} onClose={closeBeta} />
+      {leadModalMounted && (
+        <React.Suspense fallback={null}>
+          <LeadModal variant="demo" open={demoOpen} onClose={closeDemo} />
+          <LeadModal variant="beta" open={betaOpen} onClose={closeBeta} />
+        </React.Suspense>
+      )}
       {showOrb && (
         <React.Suspense fallback={null}>
           <ScioSentinelOrb

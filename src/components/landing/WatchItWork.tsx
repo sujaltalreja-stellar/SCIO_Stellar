@@ -44,6 +44,18 @@ function VideoPlayer({ onReady, ready }: { onReady: () => void; ready: boolean }
     v.currentTime = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * v.duration;
   };
 
+  /** Keyboard seeking for the progress slider: arrows jump 5 s, Home/End go to the start/end. */
+  const seekKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const v = videoRef.current;
+    if (!v || !v.duration) return;
+    const step = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5 }[e.key];
+    if (step !== undefined) v.currentTime = Math.min(v.duration, Math.max(0, v.currentTime + step));
+    else if (e.key === "Home") v.currentTime = 0;
+    else if (e.key === "End") v.currentTime = v.duration;
+    else return;
+    e.preventDefault();
+  };
+
   // Autoplay (muted) while on screen; pause when scrolled away. Respect reduced motion and manual pause.
   useEffect(() => {
     const v = videoRef.current;
@@ -126,10 +138,13 @@ function VideoPlayer({ onReady, ready }: { onReady: () => void; ready: boolean }
           {/* Controls */}
           <div className="absolute inset-x-0 bottom-0 flex flex-col bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-10">
             <div
-              className="flex h-5 w-full cursor-pointer items-center"
+              className="flex h-5 w-full cursor-pointer items-center rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-white/80"
               onClick={seek}
-              role="progressbar"
+              onKeyDown={seekKey}
+              tabIndex={0}
+              role="slider"
               aria-label="Video progress"
+              aria-valuetext={`${Math.round(progress * 100)}% played`}
               aria-valuemin={0}
               aria-valuemax={100}
               aria-valuenow={Math.round(progress * 100)}

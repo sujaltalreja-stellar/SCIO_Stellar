@@ -28,7 +28,7 @@ import { motion, useInView, useReducedMotion } from "framer-motion";
 import { SITE_SHELL } from "../site/SiteLayout";
 import { useSite } from "../site/SiteContext";
 import { ArrowLink, ConnectBand, Eyebrow, PrimaryButton, SectionHeading, reveal } from "../site/blocks";
-import { useSeo } from "../site/seo";
+import { pageSeo, useSeo } from "../site/seo";
 import { ENTERPRISE_QUESTIONS_DATA } from "../site/faqData";
 import HeroCommandCenter from "./HeroCommandCenter";
 import ProductShowcase from "./ProductShowcase";
@@ -159,6 +159,18 @@ function HeroVideoFrame({ reduceMotion }: { reduceMotion: boolean }) {
     v.currentTime = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * v.duration;
   };
 
+  /** Keyboard seeking for the progress slider: arrows jump 5 s, Home/End go to the start/end. */
+  const seekKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const v = videoRef.current;
+    if (!v || !v.duration) return;
+    const step = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5 }[e.key];
+    if (step !== undefined) v.currentTime = Math.min(v.duration, Math.max(0, v.currentTime + step));
+    else if (e.key === "Home") v.currentTime = 0;
+    else if (e.key === "End") v.currentTime = v.duration;
+    else return;
+    e.preventDefault();
+  };
+
   return (
     <div ref={frameRef} className="relative">
       <div className="relative overflow-hidden rounded-[20px] border border-[#E7E5E1] bg-white shadow-[0_30px_90px_-40px_rgba(17,17,19,0.45)]">
@@ -224,10 +236,13 @@ function HeroVideoFrame({ reduceMotion }: { reduceMotion: boolean }) {
               {/* Controls */}
               <div className="absolute inset-x-0 bottom-0 z-20 flex flex-col bg-gradient-to-t from-black/70 to-transparent px-3 pb-2 pt-10 sm:px-4">
                 <div
-                  className="group flex h-5 w-full cursor-pointer items-center"
+                  className="group flex h-5 w-full cursor-pointer items-center rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-white/80"
                   onClick={seek}
-                  role="progressbar"
+                  onKeyDown={seekKey}
+                  tabIndex={0}
+                  role="slider"
                   aria-label="Video progress"
+                  aria-valuetext={`${Math.round(progress * 100)}% played`}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={Math.round(progress * 100)}
@@ -296,13 +311,7 @@ function HeroVideoFrame({ reduceMotion }: { reduceMotion: boolean }) {
 }
 
 export default function HomePage() {
-  useSeo({
-    title: "Stellar SCIO | The AI Business Operating System for ERP, POS & Inventory",
-    description:
-      "SCIO connects your ERP, POS, warehouse, HR and finance systems into one AI business operating system. Ask questions in plain language, spot problems early and act with approvals.",
-    path: "/",
-    image: "/images/business-operations-team-at-work.webp",
-  });
+  useSeo(pageSeo("/"));
 
   const { openDemo } = useSite();
   const reduceMotion = useReducedMotion();
