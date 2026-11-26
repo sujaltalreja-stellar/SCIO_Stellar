@@ -40,6 +40,7 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Company",
     items: [
       { label: "Why SCIO", desc: "The problem we solve, and how we're different", href: "/why-scio" },
+      { label: "ERP experts", desc: "Blue Yonder and ERP talent for your team", href: "/erp-experts" },
       { label: "FAQ", desc: "Deployment, security, AI and pricing questions", href: "/faq" },
       { label: "Contact", desc: "Start a conversation", href: "/contact" },
     ],
@@ -65,6 +66,7 @@ export const FOOTER_COLUMNS: NavGroup[] = [
     label: "Company",
     items: [
       { label: "Why SCIO", href: "/why-scio" },
+      { label: "ERP experts", href: "/erp-experts" },
       { label: "FAQ", href: "/faq" },
       { label: "Contact", href: "/contact" },
     ],

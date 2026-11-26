@@ -82,6 +82,25 @@ const ROUTES = [
       "The answers are in your systems. They're just split across your ERP, POS, warehouse, HR and finance tools, and nobody has time to stitch them together.",
   },
   {
+    path: "/erp-experts",
+    name: "ERP experts",
+    title: "ERP & Supply Chain Planning Experts for Your Team | Stellar SCIO by Stellarmind.ai",
+    description:
+      "Hire experienced ERP and IT experts from Stellarmind.ai: Blue Yonder planning consultants (10+ years) and developers (5+ years), SAP S/4HANA & SAC data migration (7+ years), SAP Treasury (5+ years) and M365 / Windows infrastructure engineers (6+ years), plus SAP, Oracle, Dynamics 365, Kinaxis and o9 specialists.",
+    h1: "ERP and planning experts, ready to join your team.",
+    intro:
+      "Consultants and developers for SAP, Oracle, Microsoft Dynamics 365, Blue Yonder, Kinaxis and o9 Solutions, including Blue Yonder planning leads with 10+ years and developers with 5+. They work inside your team, managed by you, for as long as you need them.",
+    points: [
+      "Blue Yonder Demand Planning Consultant (10+ years): demand planning, forecasting, consensus planning and S&OP; integration with ERP / SAP.",
+      "Blue Yonder Supply Planning / ESP Consultant (10+ years): supply, material, capacity and constraint-based planning; solvers and forecast netting.",
+      "Blue Yonder Developer (5+ years): Blue Yonder / JDA development, SQL and planning data models, batch jobs, data loads and integrations.",
+      "Senior SAP Data Migration Consultant, S/4HANA & SAC (7+ years): full-cycle S/4HANA migrations, Migration Cockpit, LTMC / LTMOM, SAC account-based to measure-based model migration, SAP BPC.",
+      "SAP Treasury Consultant (5+ years): SAP TRM, Cash Management and Liquidity Planning, In-House Cash, Bank Account Management, SAP BCM, SWIFT and EBICS payments.",
+      "Senior M365 / Windows Infrastructure Engineer (6+ years): Microsoft 365, Exchange Online, Entra ID / Active Directory, Teams, SharePoint and Windows Server.",
+      "Also SAP, Oracle, Microsoft Dynamics 365, Kinaxis and o9 Solutions professionals.",
+    ],
+  },
+  {
     path: "/faq",
     name: "FAQ",
     title: "FAQ | Stellar SCIO Business Operating System",
