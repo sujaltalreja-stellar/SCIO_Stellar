@@ -2,9 +2,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Rocket, UserCheck, Users } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowRight, Rocket, UserCheck, Users } from "lucide-react";
 import { SITE_SHELL } from "../site/SiteLayout";
-import { useSite } from "../site/SiteContext";
 import { reveal } from "../site/blocks";
 import { ERP, PLANNING, Tile } from "./ErpTrust";
 
@@ -16,7 +16,6 @@ const STAFFING = [
 ];
 
 export default function StaffAugmentation() {
-  const { openDemo } = useSite();
   return (
     <section id="staff-augmentation" className="bg-white" aria-label="Dedicated ERP experts">
       <div className={`${SITE_SHELL} py-10 sm:py-14`}>
@@ -32,13 +31,13 @@ export default function StaffAugmentation() {
             <p className="mt-4 max-w-[34rem] text-[16px] leading-relaxed text-white/75">
               Skilled professionals with hands-on experience in SAP, Oracle, Microsoft Dynamics 365, Blue Yonder, Kinaxis and o9 Solutions join your team for as long as you need them.
             </p>
-            <button
-              type="button"
-              onClick={openDemo}
-              className="mt-7 inline-flex h-[44px] items-center rounded-full bg-[#F2A93B] px-6 text-[15px] font-semibold text-[#111113] transition hover:bg-[#FFC15E] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111113]"
+            <Link
+              to="/erp-experts"
+              className="group mt-7 inline-flex h-[44px] items-center gap-2 rounded-full bg-[#F2A93B] px-6 text-[15px] font-semibold text-[#111113] transition hover:bg-[#FFC15E] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#111113]"
             >
-              Talk about staffing
-            </button>
+              Meet our ERP experts
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            </Link>
           </div>
           <ul className="grid gap-3">
             {STAFFING.map((x) => (

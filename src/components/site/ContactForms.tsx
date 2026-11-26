@@ -5,7 +5,7 @@ import { useForm, ValidationError } from "@formspree/react";
 import { ArrowRight, CheckCircle2, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
-const FORMSPREE_ID = "mnpdwgvw";
+export const FORMSPREE_ID = "mnpdwgvw";
 
 type Variant = "demo" | "beta" | "contact";
 
@@ -108,6 +108,9 @@ export function LeadForm({ variant }: { variant: Variant }) {
           <option value="" disabled>Select one</option>
           <option>Retail / multi-store</option>
           <option>Distribution / wholesale</option>
+          <option>FMCG / consumer goods</option>
+          <option>Logistics / transport</option>
+          <option>Manufacturing / production</option>
           <option>E-commerce / omnichannel</option>
           <option>Services</option>
           <option>Other</option>

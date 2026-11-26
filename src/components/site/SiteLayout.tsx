@@ -193,9 +193,9 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
   };
 
   const hideBar = hidden && openIdx === null && !mobileOpen;
-  // On the home page the hero photo runs up behind the header: until the bar turns solid,
-  // use light colours so the logo and buttons read on the dark photo.
-  const overHero = pathname === "/" && !scrolled && !mobileOpen;
+  // On the home and ERP experts pages the hero runs up behind the header: until the bar turns solid,
+  // use light colours so the logo and buttons read on the dark hero.
+  const overHero = (pathname === "/" || pathname === "/erp-experts") && !scrolled && !mobileOpen;
 
   return (
     <>

@@ -21,6 +21,7 @@ const UseCasesPage = sitePage("UseCasesPage");
 const WhyScioPage = sitePage("WhyScioPage");
 const FaqPage = sitePage("FaqPage");
 const ContactPage = sitePage("ContactPage");
+const ErpExpertsPage = lazyWithReload(() => import("./app/site/ErpExpertsPage").then((m) => ({ default: m.ErpExpertsPage })));
 
 /** "/" serves the platform dashboards only when the query asks for it (?launch=1 or ?industry=). */
 function isPlatformSearch(search: string) {
@@ -62,6 +63,7 @@ export default function AppRouter() {
           <Route path="/use-cases" element={<UseCasesPage />} />
           <Route path="/why-scio" element={<WhyScioPage />} />
           <Route path="/faq" element={<FaqPage />} />
+          <Route path="/erp-experts" element={<ErpExpertsPage />} />
 
           {/* Contact Page */}
           <Route path="/contact" element={<ContactPage />} />
