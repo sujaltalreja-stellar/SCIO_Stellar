@@ -422,3 +422,13 @@ html.light ::-webkit-scrollbar-thumb:hover {
 :root:not([data-site-theme="dark"]) #main section.bg-\[\#F7F6F4\],
 :root:not([data-site-theme="dark"]) #main section.bg-\[\#FBFAF8\] { background-color: var(--scio-cream-deep); }
 :root:not([data-site-theme="dark"]) #main section.border-\[\#E7E5E1\] { border-color: var(--scio-cream-edge); }
+
+/* Footer "A product of Stellarmind.ai" signature: the bright star in the constellation glints now and then */
+.scio-maker-glint { animation: scio-maker-glint 4.8s ease-in-out infinite; transform-box: view-box; }
+.scio-maker:hover .scio-maker-glint { animation-duration: 1.4s; }
+@keyframes scio-maker-glint {
+  0%, 70%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  80% { transform: scale(1.35) rotate(45deg); opacity: 1; }
+  90% { transform: scale(0.9) rotate(90deg); opacity: 0.85; }
+}
+@media (prefers-reduced-motion: reduce) { .scio-maker-glint { animation: none; } }

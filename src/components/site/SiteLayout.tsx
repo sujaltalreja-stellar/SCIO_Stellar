@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getLenis, scrollToTarget, startSmoothScroll } from "../../lib/smoothScroll";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, ArrowUpRight, ChevronDown, Menu, X, Mail, Phone, ShieldCheck } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SiteContext, SiteActions, launchHref } from "./SiteContext";
 import { NAV_GROUPS, FOOTER_COLUMNS } from "./nav";
 import { LeadModal } from "./ContactForms";
@@ -342,6 +342,59 @@ const TRUSTED_PARTNERS = [
   { name: "Sarvam AI Startup Program", src: "/logos/partners/sarvam-wordmark-white.svg", cls: "h-[18px]" },
 ];
 
+/* The Stellar SCIO mark (a hexagon with an S through it) drawn as a constellation. Lines draw in once in view. */
+const HEX: [number, number][] = [[25, 3], [43, 13.5], [43, 34.5], [25, 45], [7, 34.5], [7, 13.5]];
+const S_PATH: [number, number][] = [[35, 16], [25, 10.5], [15, 16.5], [25, 24], [35, 31.5], [25, 37.5], [15, 32]];
+
+function MakerConstellation() {
+  const still = useReducedMotion();
+  const ease = [0.16, 1, 0.3, 1] as const;
+  const hexLines = HEX.map((p, i) => [p, HEX[(i + 1) % HEX.length]] as const);
+  const sLines = S_PATH.slice(1).map((p, i) => [S_PATH[i], p] as const);
+  const line = (from: readonly [number, number], to: readonly [number, number], i: number, strong: boolean) => (
+    <motion.line
+      key={`${strong ? "s" : "h"}${i}`}
+      x1={from[0]}
+      y1={from[1]}
+      x2={to[0]}
+      y2={to[1]}
+      stroke="white"
+      strokeWidth={strong ? 1.3 : 0.9}
+      strokeLinecap="round"
+      className={`transition-opacity duration-200 ${strong ? "opacity-85 group-hover:opacity-100" : "opacity-30 group-hover:opacity-60"}`}
+      variants={{ hidden: { pathLength: 0 }, show: { pathLength: 1, transition: { duration: 0.45, delay: (strong ? 0.75 : 0.1) + i * 0.08, ease } } }}
+    />
+  );
+  return (
+    <motion.svg
+      viewBox="0 0 50 48"
+      className="h-12 w-[50px] shrink-0 overflow-visible"
+      aria-hidden="true"
+      initial={still ? "show" : "hidden"}
+      whileInView="show"
+      viewport={{ once: true, amount: 0.6 }}
+    >
+      {hexLines.map(([f, t], i) => line(f, t, i, false))}
+      {sLines.map(([f, t], i) => line(f, t, i, true))}
+      {[...HEX.slice(1), ...S_PATH].map(([x, y], i) => (
+        <motion.circle
+          key={`n${i}`}
+          cx={x}
+          cy={y}
+          r={i < HEX.length - 1 ? 1.3 : 1.7}
+          fill="white"
+          variants={{ hidden: { opacity: 0 }, show: { opacity: i < HEX.length - 1 ? 0.6 : 1, transition: { duration: 0.35, delay: 0.1 + i * 0.06 } } }}
+        />
+      ))}
+      {/* The bright star at the top corner glints now and then */}
+      <g className="scio-maker-glint" style={{ transformOrigin: "25px 3px" }}>
+        <circle cx={25} cy={3} r={5} fill="white" opacity={0.12} />
+        <path d="M25-2.5c.4 3 2.1 4.7 5.1 5.5-3 .8-4.7 2.5-5.1 5.5-.4-3-2.1-4.7-5.1-5.5 3-.8 4.7-2.5 5.1-5.5Z" fill="white" />
+      </g>
+    </motion.svg>
+  );
+}
+
 function SiteFooter({ onTalk, onBeta }: { onTalk: () => void; onBeta: () => void }) {
   const link = "inline-flex min-h-[32px] items-center text-left text-[15px] text-[#B9B5AE] hover:text-white transition-colors duration-200 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B]";
   return (
@@ -359,6 +412,26 @@ function SiteFooter({ onTalk, onBeta }: { onTalk: () => void; onBeta: () => void
                 <Logo tone="light" />
               </Link>
             </div>
+            {/* Maker signature: the Stellar SCIO mark as a white constellation that draws itself in */}
+            <a
+              href="https://stellarmind.ai"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="scio-maker group mt-6 inline-flex cursor-pointer items-center gap-4 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2A93B] focus-visible:ring-offset-4 focus-visible:ring-offset-[#0B0B0D]"
+            >
+              <MakerConstellation />
+              <span className="h-10 w-px bg-white/15" aria-hidden="true" />
+              <span className="flex flex-col">
+                <span className="text-[10.5px] font-semibold uppercase tracking-[0.22em] text-white/50">A product of</span>
+                <span className="mt-1 inline-flex items-center gap-1.5">
+                  <span className="relative text-[18px] font-semibold leading-none tracking-tight text-white">
+                    Stellarmind.ai
+                    <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-white/70 transition-transform duration-300 group-hover:scale-x-100" aria-hidden="true" />
+                  </span>
+                  <ArrowUpRight className="h-4 w-4 text-white/40 transition duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white" aria-hidden="true" />
+                </span>
+              </span>
+            </a>
             <p className="mt-5 max-w-sm text-[15px] leading-relaxed">
               The business operating system that connects your ERP, POS, warehouse, HR and finance tools, answers questions in plain language, and turns them into approved actions.
             </p>
