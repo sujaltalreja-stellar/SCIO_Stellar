@@ -239,6 +239,12 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
             >
               Try live demo
             </a>
+            <a
+              href="/app/login"
+              className="inline-flex h-9 lg:h-10 items-center px-4 rounded-full whitespace-nowrap text-[15px] font-semibold bg-[#F2A93B] text-[#111113] hover:bg-[#E8901A] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111113]"
+            >
+              Log in
+            </a>
           </div>
           <div className="md:hidden">
             <ThemeToggle className={`!h-11 !w-11 ${overHero ? "theme-fixed !border-white/35 !text-white hover:!border-white" : ""}`} />
@@ -314,6 +320,14 @@ function SiteHeader({ onTalk }: { onTalk: () => void }) {
                 <a href="/app" className="inline-flex justify-center items-center min-h-[48px] px-5 rounded-full border border-[#E7E5E1] text-[15px] font-medium text-[#111113]">
                   Try live demo
                 </a>
+                <div className="grid grid-cols-2 gap-2">
+                  <a href="/app/login" className="inline-flex justify-center items-center min-h-[48px] px-5 rounded-full bg-[#F2A93B] text-[15px] font-semibold text-[#111113]">
+                    Log in
+                  </a>
+                  <a href="/app/login?mode=signup" className="inline-flex justify-center items-center min-h-[48px] px-5 rounded-full border border-[#E7E5E1] text-[15px] font-medium text-[#111113]">
+                    Sign up
+                  </a>
+                </div>
               </div>
             </div>
           </motion.nav>

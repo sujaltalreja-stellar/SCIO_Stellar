@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useConvex, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import { api } from "../../convex/_generated/api";
 import type { RetailRole } from "./retail/rbac";
 
@@ -63,6 +64,8 @@ interface AuthCtx {
   user: DemoUser | null;
   token: string | null;
   login: (email: string, password: string) => Promise<boolean>;
+  /** Create a read-only account and sign in. Resolves to an error message, or null on success. */
+  signup: (name: string, email: string, password: string) => Promise<string | null>;
   logout: () => void;
 }
 
@@ -84,6 +87,23 @@ export function DemoAuthProvider({ children }: { children: React.ReactNode }) {
     [convex]
   );
 
+  const signup = useCallback(
+    async (name: string, email: string, password: string) => {
+      try {
+        const res = await convex.mutation(api.scioAuth.signup, { name, email, password });
+        const s = { token: res.token, user: toDemoUser(res.user) };
+        setSession(s);
+        writeSession(s);
+        return null;
+      } catch (err) {
+        // Validation messages from the server arrive as ConvexError data; anything else is a connection problem.
+        if (err instanceof ConvexError && typeof err.data === "string") return err.data;
+        throw err;
+      }
+    },
+    [convex]
+  );
+
   const logout = useCallback(() => {
     setSession((s) => {
       if (s) void convex.mutation(api.scioAuth.logout, { token: s.token }).catch(() => {});
@@ -101,7 +121,7 @@ export function DemoAuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [me, session]);
 
-  const value = useMemo(() => ({ user: session?.user ?? null, token: session?.token ?? null, login, logout }), [session, login, logout]);
+  const value = useMemo(() => ({ user: session?.user ?? null, token: session?.token ?? null, login, signup, logout }), [session, login, signup, logout]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

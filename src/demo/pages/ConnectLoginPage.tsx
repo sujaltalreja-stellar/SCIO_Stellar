@@ -19,6 +19,7 @@ import {
   ShoppingCart,
   Sparkles,
   Truck,
+  User,
   Users,
   Zap,
 } from "lucide-react";
@@ -58,10 +59,12 @@ const FEATURES = [
 ];
 
 export default function ConnectLoginPage() {
-  const { user, login } = useDemoAuth();
+  const { user, login, signup } = useDemoAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [mode, setMode] = useState<"signin" | "signup">(() => (new URLSearchParams(location.search).get("mode") === "signup" ? "signup" : "signin"));
   const [step, setStep] = useState<"email" | "password">("email");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -98,9 +101,37 @@ export default function ConnectLoginPage() {
     );
   };
 
+  const switchMode = (m: "signin" | "signup") => {
+    setMode(m);
+    setStep("email");
+    setPassword("");
+    setError("");
+    navigate({ search: m === "signup" ? "?mode=signup" : "" }, { replace: true, state: location.state });
+  };
+
+  const createAccount = () => {
+    setBusy(true);
+    setError("");
+    const timeout = new Promise<never>((_, reject) => setTimeout(() => reject(new Error("timeout")), 20000));
+    Promise.race([signup(name, email, password), timeout]).then(
+      (err) => {
+        if (!err) navigate("/app/retail/ask", { replace: true });
+        else {
+          setError(err);
+          setBusy(false);
+        }
+      },
+      () => {
+        setError("Could not reach the server. Please try again.");
+        setBusy(false);
+      }
+    );
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (step === "email") {
+    if (mode === "signup") createAccount();
+    else if (step === "email") {
       setError("");
       setStep("password");
     } else signIn(email, password);
@@ -184,12 +215,70 @@ export default function ConnectLoginPage() {
           {/* Sign-in card */}
           <section className="scio-rise w-full max-w-[430px] justify-self-center lg:justify-self-end [animation-delay:220ms]">
             <div className="rounded-[28px] border border-[#fff]/15 bg-[#141416]/95 p-7 text-[#fff] shadow-2xl shadow-black/40 backdrop-blur sm:p-9">
-              <div className="text-xs font-bold tracking-[.12em] text-[#d4d4d8]">WELCOME BACK</div>
-              <h2 className="mt-1.5 text-[34px] font-extrabold tracking-tight">Sign in to SCIO</h2>
-              <p className="mt-1 text-[15px] text-[#d4d4d8]">Your business operations, in control.</p>
+              <div role="tablist" aria-label="Account" className="mb-6 grid grid-cols-2 gap-1 rounded-xl border border-[#fff]/15 bg-[#fff]/[0.04] p-1">
+                {(["signin", "signup"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    role="tab"
+                    aria-selected={mode === m}
+                    onClick={() => switchMode(m)}
+                    className={`rounded-lg py-2.5 text-sm font-bold transition ${mode === m ? "bg-[#fff] text-[#141416]" : "text-[#d4d4d8] hover:text-[#fff]"}`}
+                  >
+                    {m === "signin" ? "Sign in" : "Sign up"}
+                  </button>
+                ))}
+              </div>
+              <div className="text-xs font-bold tracking-[.12em] text-[#d4d4d8]">{mode === "signin" ? "WELCOME BACK" : "GET STARTED"}</div>
+              <h2 className="mt-1.5 text-[34px] font-extrabold tracking-tight">{mode === "signin" ? "Sign in to SCIO" : "Create your account"}</h2>
+              <p className="mt-1 text-[15px] text-[#d4d4d8]">{mode === "signin" ? "Your business operations, in control." : "Explore every SCIO workspace with read-only access."}</p>
 
               <form onSubmit={submit} className="mt-7 space-y-4">
-                {step === "email" ? (
+                {mode === "signup" ? (
+                  <>
+                    <CardField label="Full name" icon={User}>
+                      <input
+                        autoFocus
+                        type="text"
+                        autoComplete="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full bg-transparent py-3.5 text-base text-[#fff] outline-none placeholder:text-[#8b8b93]"
+                        placeholder="Jane Doe"
+                        minLength={2}
+                        maxLength={80}
+                        required
+                      />
+                    </CardField>
+                    <CardField label="Work email" icon={Mail}>
+                      <input
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-transparent py-3.5 text-base text-[#fff] outline-none placeholder:text-[#8b8b93]"
+                        placeholder="you@company.com"
+                        required
+                      />
+                    </CardField>
+                    <CardField label="Password" icon={Lock}>
+                      <input
+                        type={show ? "text" : "password"}
+                        autoComplete="new-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-transparent py-3.5 text-base text-[#fff] outline-none placeholder:text-[#8b8b93]"
+                        placeholder="At least 8 characters"
+                        minLength={8}
+                        maxLength={128}
+                        required
+                      />
+                      <button type="button" onClick={() => setShow((s) => !s)} className="text-[#a1a1aa] hover:text-[#f2a93b]" aria-label={show ? "Hide password" : "Show password"}>
+                        {show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </CardField>
+                  </>
+                ) : step === "email" ? (
                   <CardField label="Work email" icon={Mail}>
                     <input
                       autoFocus
@@ -245,7 +334,7 @@ export default function ConnectLoginPage() {
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <>
-                      {step === "email" ? "Continue" : "Sign in"} <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+                      {mode === "signup" ? "Create account" : step === "email" ? "Continue" : "Sign in"} <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
                     </>
                   )}
                 </button>
@@ -293,7 +382,14 @@ export default function ConnectLoginPage() {
                 </div>
               )}
 
-              <div className="mt-6 flex items-center justify-center gap-2 text-sm text-[#d4d4d8]">
+              <p className="mt-5 text-center text-sm text-[#d4d4d8]">
+                {mode === "signin" ? "New to SCIO? " : "Already have an account? "}
+                <button type="button" onClick={() => switchMode(mode === "signin" ? "signup" : "signin")} className="font-bold text-[#f2a93b] hover:underline">
+                  {mode === "signin" ? "Create an account" : "Sign in"}
+                </button>
+              </p>
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-sm text-[#d4d4d8]">
                 <ShieldCheck className="h-4 w-4" /> Secure enterprise access
               </div>
             </div>

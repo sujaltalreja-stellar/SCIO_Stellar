@@ -1,6 +1,7 @@
 // Role-based access for SCIO Retail OS (demo).
 
-export type RetailRole = "HQ" | "Regional Manager" | "Store Manager" | "Procurement" | "Inventory Manager";
+/** "Viewer" is the role given to self sign-ups: it can see everything but take no actions. */
+export type RetailRole = "HQ" | "Regional Manager" | "Store Manager" | "Procurement" | "Inventory Manager" | "Viewer";
 
 export type Permission =
   | "transfer.create"
@@ -43,6 +44,7 @@ export const ROLE_PERMISSIONS: Record<RetailRole, Permission[]> = {
   "Store Manager": ["transfer.create", "transfer.receive", "po.receive", "count.run", "markdown.apply", "ticket.create", "ticket.assign", "ticket.resolve", "alert.manage", "price.fix", "task.update"],
   Procurement: ["po.create", "po.approve", "po.receive", "alert.manage", "transfer.create"],
   "Inventory Manager": ["transfer.create", "transfer.approve", "transfer.receive", "po.create", "po.receive", "count.run", "markdown.apply", "alert.manage", "ticket.create"],
+  Viewer: [],
 };
 
 export const ROLE_DESCRIPTION: Record<RetailRole, string> = {
@@ -51,6 +53,7 @@ export const ROLE_DESCRIPTION: Record<RetailRole, string> = {
   "Store Manager": "Own store only · receives stock, counts, markdowns, tickets",
   Procurement: "All stores · creates and approves purchase orders",
   "Inventory Manager": "All stores · transfers, replenishment, cycle counts",
+  Viewer: "All stores · read-only, no actions",
 };
 
 export function can(role: RetailRole | undefined, perm: Permission) {
