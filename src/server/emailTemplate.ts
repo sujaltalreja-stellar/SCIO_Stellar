@@ -9,6 +9,9 @@ export interface ConfirmationEmailPayload {
   sector?: string;
   businessType?: string;
   locations?: string;
+  country?: string;
+  phone?: string;
+  challenge?: string;
   message?: string;
   meetingType?: string;
   scheduledDate?: string;
@@ -103,7 +106,10 @@ export function renderConfirmationEmailHtml(payload: ConfirmationEmailPayload): 
   if (payload.role?.trim()) detailRows.push(["Role", escapeHtml(payload.role.trim())]);
   if (payload.sector?.trim()) detailRows.push(["Sector", escapeHtml(payload.sector.trim())]);
   if (payload.businessType?.trim()) detailRows.push(["Business Type", escapeHtml(payload.businessType.trim())]);
-  if (payload.locations?.trim()) detailRows.push(["Locations", escapeHtml(payload.locations.trim())]);
+  if (payload.country?.trim()) detailRows.push(["Country", escapeHtml(payload.country.trim())]);
+  if (payload.phone?.trim()) detailRows.push(["Phone", escapeHtml(payload.phone.trim())]);
+  if (payload.locations?.trim()) detailRows.push(["Number of Sites", escapeHtml(payload.locations.trim())]);
+  if (payload.challenge?.trim()) detailRows.push(["Wants to Fix First", escapeHtml(payload.challenge.trim())]);
   if (payload.meetingType?.trim()) detailRows.push(["Session", escapeHtml(payload.meetingType.trim())]);
   if (payload.scheduledDate?.trim()) detailRows.push(["Requested Slot", escapeHtml(payload.scheduledDate.trim())]);
   if (payload.message?.trim()) detailRows.push(["Notes", escapeHtml(payload.message.trim())]);
