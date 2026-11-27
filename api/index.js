@@ -11454,7 +11454,10 @@ function renderConfirmationEmailHtml(payload) {
   if (payload.role?.trim()) detailRows.push(["Role", escapeHtml(payload.role.trim())]);
   if (payload.sector?.trim()) detailRows.push(["Sector", escapeHtml(payload.sector.trim())]);
   if (payload.businessType?.trim()) detailRows.push(["Business Type", escapeHtml(payload.businessType.trim())]);
-  if (payload.locations?.trim()) detailRows.push(["Locations", escapeHtml(payload.locations.trim())]);
+  if (payload.country?.trim()) detailRows.push(["Country", escapeHtml(payload.country.trim())]);
+  if (payload.phone?.trim()) detailRows.push(["Phone", escapeHtml(payload.phone.trim())]);
+  if (payload.locations?.trim()) detailRows.push(["Number of Sites", escapeHtml(payload.locations.trim())]);
+  if (payload.challenge?.trim()) detailRows.push(["Wants to Fix First", escapeHtml(payload.challenge.trim())]);
   if (payload.meetingType?.trim()) detailRows.push(["Session", escapeHtml(payload.meetingType.trim())]);
   if (payload.scheduledDate?.trim()) detailRows.push(["Requested Slot", escapeHtml(payload.scheduledDate.trim())]);
   if (payload.message?.trim()) detailRows.push(["Notes", escapeHtml(payload.message.trim())]);
@@ -11786,6 +11789,9 @@ async function handleApiRequest(req, res) {
         sector: typeof body?.sector === "string" ? body.sector.slice(0, 160) : void 0,
         businessType: typeof body?.businessType === "string" ? body.businessType.slice(0, 160) : void 0,
         locations: typeof body?.locations === "string" ? body.locations.slice(0, 80) : void 0,
+        country: typeof body?.country === "string" ? body.country.slice(0, 80) : void 0,
+        phone: typeof body?.phone === "string" ? body.phone.slice(0, 40) : void 0,
+        challenge: typeof body?.challenge === "string" ? body.challenge.slice(0, 160) : void 0,
         message: typeof body?.message === "string" ? body.message.slice(0, 2e3) : void 0,
         meetingType: typeof body?.meetingType === "string" ? body.meetingType.slice(0, 160) : void 0,
         scheduledDate: typeof body?.scheduledDate === "string" ? body.scheduledDate.slice(0, 160) : void 0

@@ -5,10 +5,12 @@ Disallow: /app/
 Disallow: /api/
 
 # AI search and answer engines are welcome to read and cite the public site.
+# OpenAI: OAI-SearchBot (ChatGPT search), GPTBot (model training), ChatGPT-User (user-requested visits), OAI-AdsBot (ad landing-page checks).
 # A plain-text summary for them lives at /llms.txt (full FAQ at /llms-full.txt).
 User-agent: GPTBot
 User-agent: OAI-SearchBot
 User-agent: ChatGPT-User
+User-agent: OAI-AdsBot
 User-agent: ClaudeBot
 User-agent: Claude-SearchBot
 User-agent: Claude-User
