@@ -35,7 +35,24 @@ const COPY: Record<Variant, { title: string; subtitle: string; submit: string; d
 
 const inputCls =
   "w-full rounded-xl border border-[#D6D3CE] bg-white px-4 py-3 text-[15px] text-[#111113] placeholder:text-[#a19d96] focus:border-[#111113] focus:outline-none focus:ring-2 focus:ring-[#f2a93b]/40";
-const labelCls = "block text-[13px] font-semibold text-[#111113] mb-1.5";
+/** Suggestions for the Country field; visitors can still type any country. */
+const COUNTRIES = [
+  "India",
+  "United States",
+  "United Kingdom",
+  "Canada",
+  "Australia",
+  "United Arab Emirates",
+  "Saudi Arabia",
+  "Qatar",
+  "Singapore",
+  "Germany",
+  "Netherlands",
+  "France",
+  "South Africa",
+];
+
+const labelCls ="block text-[13px] font-semibold text-[#111113] mb-1.5";
 const errCls = "mt-1 block text-[12px] text-red-600";
 
 export function LeadForm({ variant }: { variant: Variant }) {
@@ -63,8 +80,11 @@ export function LeadForm({ variant }: { variant: Variant }) {
       email: String(fd.get("email") || ""),
       company: String(fd.get("company") || ""),
       role: String(fd.get("role") || ""),
+      country: String(fd.get("country") || ""),
+      phone: String(fd.get("phone") || ""),
       businessType: String(fd.get("businessType") || ""),
       locations: String(fd.get("locations") || ""),
+      challenge: String(fd.get("challenge") || ""),
       message: String(fd.get("message") || ""),
     };
     confirmationSentRef.current = false;
@@ -103,6 +123,21 @@ export function LeadForm({ variant }: { variant: Variant }) {
         <input id={id("role")} name="role" autoComplete="organization-title" className={inputCls} placeholder="e.g. Head of Operations" />
       </div>
       <div>
+        <label htmlFor={id("country")} className={labelCls}>Country</label>
+        <input id={id("country")} name="country" list={id("country-list")} autoComplete="country-name" className={inputCls} placeholder="e.g. United States" />
+        <datalist id={id("country-list")}>
+          {COUNTRIES.map((c) => (
+            <option key={c} value={c} />
+          ))}
+        </datalist>
+      </div>
+      <div>
+        <label htmlFor={id("phone")} className={labelCls}>
+          Phone <span className="font-normal text-[#8f8b84]">(optional)</span>
+        </label>
+        <input id={id("phone")} name="phone" type="tel" autoComplete="tel" className={inputCls} placeholder="+1 555 010 2030" />
+      </div>
+      <div>
         <label htmlFor={id("businessType")} className={labelCls}>Business type</label>
         <select id={id("businessType")} name="businessType" className={inputCls} defaultValue="">
           <option value="" disabled>Select one</option>
@@ -117,13 +152,27 @@ export function LeadForm({ variant }: { variant: Variant }) {
         </select>
       </div>
       <div>
-        <label htmlFor={id("locations")} className={labelCls}>Locations</label>
-        <select id={id("locations")} name="locations" className={inputCls} defaultValue="">
+        <label htmlFor={id("locations")} className={labelCls}>Number of sites</label>
+        <select id={id("locations")} name="locations" className={inputCls} defaultValue="" aria-describedby={id("locations-hint")}>
           <option value="" disabled>Select one</option>
-          <option>1</option>
-          <option>2–10</option>
-          <option>11–50</option>
-          <option>50+</option>
+          <option>1 site</option>
+          <option>2–10 sites</option>
+          <option>11–50 sites</option>
+          <option>50+ sites</option>
+        </select>
+        <span id={id("locations-hint")} className="mt-1 block text-[12px] text-[#8f8b84]">Stores, warehouses or plants</span>
+      </div>
+      <div className="sm:col-span-2">
+        <label htmlFor={id("challenge")} className={labelCls}>What do you want to fix first?</label>
+        <select id={id("challenge")} name="challenge" className={inputCls} defaultValue="">
+          <option value="" disabled>Select one</option>
+          <option>Stockouts or overstock</option>
+          <option>Demand forecasting</option>
+          <option>Purchasing and suppliers</option>
+          <option>Visibility across stores or sites</option>
+          <option>Connecting our ERP and other systems</option>
+          <option>Finance and invoice matching</option>
+          <option>Something else</option>
         </select>
       </div>
       <div className="sm:col-span-2">
